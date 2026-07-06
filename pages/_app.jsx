@@ -18,6 +18,7 @@ export default function App({ Component, pageProps }) {
         <title>{`${site.name}`}</title>
         <meta name="description" content={site.tagline} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
       </Head>
       <div className="orb-field" aria-hidden="true">
         <div className="orb orb--blue" />
