@@ -1,9 +1,9 @@
-import Head from "next/head";
 import { site } from "../lib/site.config";
 import { details } from "../lib/details.config";
 import Icon from "../components/Icons";
 import WhatILike from "../components/WhatILike";
 import LiveAge from "../components/LiveAge";
+import Image from "next/image";
 
 export default function About() {
   return (
