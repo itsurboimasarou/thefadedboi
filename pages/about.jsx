@@ -9,7 +9,16 @@ export default function About() {
   return (
     <div className="stack reveal">
       <header className="about-hero">
-        <img src={details.avatar} alt={`Portrait of ${site.name}`} className="avatar" />
+        <Image
+          src={details.avatar}
+          alt={`Portrait of ${site.name}`}
+          className="avatar"
+          width={336}
+          height={336}
+          quality={75}
+          priority
+          sizes="(max-width: 768px) 120px, 168px"
+        />
         <div>
           <p className="eyebrow">Details</p>
           <h1>Much more about me</h1>
