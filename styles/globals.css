@@ -57,7 +57,7 @@ body {
 
 .app-root { font-family: var(--font-body, system-ui, sans-serif); }
 
-/* ── Animated orbs ──────────────────────────────────── */
+/* ── Animated mesh ──────────────────────────────────── */
 .orb-field {
   position: fixed;
   inset: 0;
@@ -66,38 +66,24 @@ body {
   background: var(--bg);
   transition: background 0.35s ease;
 }
-.orb {
+
+.mesh-bg {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  opacity: var(--orb-opacity);
-  mix-blend-mode: var(--orb-blend);
-  will-change: transform;
-  transition: opacity 0.35s ease;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(40px) saturate(1.1);
 }
-.orb--blue {
-  width: 50vw; height: 50vw;
-  background: radial-gradient(circle, var(--accent), transparent 70%);
-  top: -14%; left: -8%;
-  animation: drift-a 26s ease-in-out infinite alternate;
+
+.orb-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
-.orb--ice {
-  width: 44vw; height: 44vw;
-  background: radial-gradient(circle, var(--accent-soft), transparent 70%);
-  bottom: -16%; right: -10%;
-  opacity: calc(var(--orb-opacity) * 0.7);
-  animation: drift-b 32s ease-in-out infinite alternate;
-}
-.orb--mono {
-  width: 34vw; height: 34vw;
-  background: radial-gradient(circle, var(--ink-dim), transparent 70%);
-  top: 42%; left: 55%;
-  opacity: calc(var(--orb-opacity) * 0.45);
-  animation: drift-c 38s ease-in-out infinite alternate;
-}
-@keyframes drift-a { from { transform: translate(0,0) scale(1); } to { transform: translate(10vw,14vh) scale(1.15); } }
-@keyframes drift-b { from { transform: translate(0,0) scale(1.05); } to { transform: translate(-12vw,-10vh) scale(0.9); } }
-@keyframes drift-c { from { transform: translate(0,0); } to { transform: translate(-16vw,10vh); } }
 
 /* ── Wavy background (blurred, faded, seamless loop) ── */
 .waves {

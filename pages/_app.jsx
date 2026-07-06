@@ -4,6 +4,7 @@ import { Work_Sans, IBM_Plex_Sans } from "next/font/google";
 import TopBar from "../components/TopBar";
 import NavRail from "../components/NavRail";
 import { site } from "../lib/site.config";
+import MeshBackground from "../components/MeshBackground";
 
 const display = Work_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
 const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-body" });
@@ -21,9 +22,7 @@ export default function App({ Component, pageProps }) {
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
       </Head>
       <div className="orb-field" aria-hidden="true">
-        <div className="orb orb--blue" />
-        <div className="orb orb--ice" />
-        <div className="orb orb--mono" />
+        <MeshBackground />
         <div className="waves">
           {["wave-1", "wave-2", "wave-3"].map((cls, i) => (
             <svg key={cls} className={cls} viewBox="0 0 2880 320" preserveAspectRatio="none" style={{ bottom: i * 26 }}>
