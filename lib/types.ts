@@ -1,7 +1,7 @@
 export interface Fact { label: string; value: string }
 export interface Status { state: "online" | "offline" | "busy"; label: string }
 export interface LinkItem { label: string; value: string; href: string }
-export interface Project { title: string; description: string; tags: string[]; href: string }
+export interface Project { title: string; description: string; tags: string[]; href?: string; visibility: "public" | "private" }
 export interface JourneyStop { period: string; role: string; org: string; note: string }
 export interface Like { label: string; text: string }
 export interface Album { title: string; googlePhotosUrl: string; folder: string; }

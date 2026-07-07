@@ -411,14 +411,13 @@ a  { color: var(--accent); text-decoration: none; }
 /* ── Status ─────────────────────────────────────────── */
 .status { display: inline-flex; align-items: center; gap: 8px; }
 .status-dot {
+  background: currentColor;
   width: 10px; height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
   animation: status-pulse 2.2s ease-out infinite;
 }
-.status-dot--online  { color: #2ecc71; background: #2ecc71; }
-.status-dot--offline { color: #e74c3c; background: #e74c3c; }
-.status-dot--busy    { color: #f1c40f; background: #f1c40f; }
+
 @keyframes status-pulse {
   0%   { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent); }
   70%  { box-shadow: 0 0 0 8px transparent; }
@@ -434,9 +433,11 @@ a  { color: var(--accent); text-decoration: none; }
   border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
   background: color-mix(in srgb, currentColor 13%, transparent);
 }
-.status-pill--online  { color: #2ecc71; }
-.status-pill--offline { color: #e74c3c; }
-.status-pill--busy    { color: #f1c40f; }
+
+.status-dot--online,  .status-pill--online  { color: #2ecc71; }
+.status-dot--away,    .status-pill--away    { color: #f1c40f; }
+.status-dot--busy,    .status-pill--busy    { color: #e74c3c; }
+.status-dot--offline, .status-pill--offline { color: #8a919c; opacity: 0.75; animation: none; }
 
 /* ── Blog callout ───────────────────────────────────── */
 .blog-card {
@@ -509,6 +510,32 @@ a  { color: var(--accent); text-decoration: none; }
 }
 
 .btn--pill { border-radius: 999px; padding: 12px 26px; }
+
+/* ── Project cards & tags ──────────────────────────── */
+.project-card--private {
+  cursor: default;
+  opacity: 0.85;
+}
+.project-card--private h3 {
+  color: var(--ink-dim);
+}
+
+.vis-tag {
+  display: inline-block;
+  margin: 0 8px 8px 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.vis-tag--public  { color: var(--accent); } 
+.vis-tag--private { color: var(--ink); }
 
 /* ── Portfolio timeline ─────────────────────────────── */
 .timeline { position: relative; padding-left: 28px; list-style: none; }

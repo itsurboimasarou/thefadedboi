@@ -4,9 +4,11 @@ import { home } from "../lib/home.config";
 import BerlinClock from "../components/BerlinClock";
 import Icon from "../components/Icons";
 import LiteModeToggle from "../components/LiteMode";
+import { useLiveStatus, StatusDot, StatusPill } from "../components/LiveStatus";
 import pkg from "../package.json";
 
 export default function Home() {
+  const status = useLiveStatus(home.status);
   return (
     <>
       <div className="stack reveal">
@@ -37,13 +39,11 @@ export default function Home() {
             <dl className="fact-grid glance-grid">
               <div>
                 <dt>
-                  <span className={`status-dot status-dot--${home.status.state}`} aria-hidden="true" />
+                  <StatusDot state={status} />
                   Status
                 </dt>
                 <dd>
-                  <span className={`status-pill status-pill--${home.status.state}`}>
-                    {home.status.label}
-                  </span>
+                  <StatusPill state={status} labels={home.status.labels} />
                 </dd>
               </div>
               <div>
