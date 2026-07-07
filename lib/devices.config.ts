@@ -70,7 +70,7 @@ export const devices: DeviceSection[] = [
       { name: 'Acer Predator XB273U V3', detail: "Primary 2K display for gaming", icon: "display" },
       { name: "Lofree Flow Lite", detail: "Lightweight low-profile keyboard", icon: "keyboard" },
       { name: "ATK Dragonfly A9", detail: "Daily driver mouse", icon: "mouse" },
-      { name: "Sony WH-1000XM5", detail: "Focus headphones", icon: "headphones" },
+      { name: "Tangzu Wan'er SG 2", detail: "Focus IEM", icon: "headphones" },
       { name: "Maono DGM20", detail: "Microphone", icon: "microphone" },
     ],
   },

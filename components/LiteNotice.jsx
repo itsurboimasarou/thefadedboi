@@ -39,7 +39,8 @@ export default function LiteNotice() {
         <p>
           This site uses background animations & blurs. If you&apos;re on an older browser
           or a weak device, you can turn them off — you can change this anytime
-          from the switch on the "At a glance" box at Home page.
+          from the switch on the "At a glance" box at Home page. <br /> 
+          This is a one time message, and you can always change your choice later.
         </p>
         <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
           <button className="btn btn--small" onClick={() => choose(false)}>Keep default</button>

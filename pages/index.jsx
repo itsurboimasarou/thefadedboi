@@ -55,8 +55,19 @@ export default function Home() {
                 <dd>v{pkg.version}</dd>
               </div>
               <div>
-                <dt><Icon name="gear" size={15} />Lite mode</dt>
-                <dd><LiteModeToggle /></dd>
+                <dt>
+                  <Icon name="gear" size={15} />
+                  Lite mode
+                </dt>
+                <dd className="dd-row">
+                  <LiteModeToggle />
+                  <span className="info-tip" tabIndex={0} aria-label="About Lite mode">
+                    <Icon name="info" size={17} />
+                    <span className="info-tip-bubble" role="tooltip">
+                      Turns off animations and transparency effects — recommended for older devices or weak hardware.
+                    </span>
+                  </span>
+                </dd>
               </div>
             </dl>
           </div>
