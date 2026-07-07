@@ -3,15 +3,15 @@ import type { Project, JourneyStop } from "./types";
 export const portfolio = {
   projects: [
     {
-      title: "TBF",
-      description: "TBF",
-      tags: [],
-      href: "/",
+      title: "Seven Star Rising (SSR)",
+      description: "A community of HoYoverse games in Vietnam",
+      tags: ["Community"],
+      href: "https://www.facebook.com/7starsrising",
     },
     {
-      title: "TBF",
-      description: "TBF",
-      tags: [],
+      title: "masarouBlog",
+      description: "A personal blog (on Notion) where I type anything I want to say",
+      tags: ["Blog"],
       href: "/",
     },
     {
@@ -35,10 +35,10 @@ export const portfolio = {
       note: "Writing content scripts for the GEARVN YouTube channel, including product reviews, tutorials, and tech news.",
     },
     {
-      period: "2024 — 2025",
+      period: "2024 — 2025 (and now)",
       role: "Co-founder & Community Administrator",
       org: "Seven Star Rising (SSR)",
-      note: "Build and maintain PixelOS for Redmi K40S (munch).",
+      note: "Co-founded and currently manage the Seven Star Rising (SSR) community, focusing on gaming and technology discussions, events, and collaborations.",
     },
     {
       period: "2022 — 2024",

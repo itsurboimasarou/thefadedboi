@@ -34,7 +34,7 @@ export default function LiteNotice() {
         aria-labelledby="lite-notice-title"
       >
         <h2 id="lite-notice-title" style={{ fontSize: "1.15rem" }}>
-          Notice for low-end device
+          Important Notice
         </h2>
         <p>
           This site uses background animations & blurs. If you&apos;re on an older browser

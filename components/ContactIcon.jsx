@@ -38,6 +38,13 @@ export const contactIcons = {
       <path d="M16.7 3c.35 1.86 1.5 3.13 3.3 3.42v2.9c-1.24.03-2.36-.32-3.53-1.08v5.62c0 4.16-3.05 6.06-5.83 5.9a5.36 5.36 0 0 1-5.14-5.4c.02-3.36 2.87-5.6 5.87-5.28v3.03c-.24-.05-.48-.09-.73-.09a2.42 2.42 0 1 0 2.44 2.5V3Z" />
     </svg>
   ),
+  bilibili: (
+    <svg {...p} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="7" width="18" height="13" rx="3.5" />
+      <path d="m7.5 3 3 3.5M16.5 3l-3 3.5" />
+      <path d="M8.5 12.5v2.5M15.5 12.5v2.5" />
+    </svg>
+  ),
   Email: (
     <svg {...p} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="5" width="18" height="14" rx="3" /><path d="m4 7 8 6 8-6" />
@@ -46,13 +53,14 @@ export const contactIcons = {
 };
 
 const brandColors = {
-  GitHub: "var(--ink)", 
+  GitHub: "var(--ink)",
   LinkedIn: "#0a66c2",
   Facebook: "#1877f2",
   YouTube: "#ff0000",
   Instagram: "#e4405f",
   Telegram: "#26a5e4",
   TikTok: "#fe2c55",
+  bilibili: "#fb7299",
 };
 
 export function ContactIcon({ name }) {
