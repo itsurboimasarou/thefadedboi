@@ -40,6 +40,10 @@
   color-scheme: light;
 }
 
+:root[data-theme="light"] .motion-switch {
+  border-color: rgba(16, 19, 24, 0.32);   /* ~3× the default glass border */
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { color-scheme: dark; scroll-behavior: smooth; }
@@ -61,10 +65,12 @@ body {
 .orb-field {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100lvh;
   z-index: -1;
   overflow: hidden;
   background: var(--bg);
-  transition: background 0.35s ease;
+  transition: background 0.25s ease;
 }
 
 .mesh-bg {
@@ -85,6 +91,7 @@ body {
   position: absolute;
   left: 0; right: 0; bottom: -2px;
   height: 42vh;
+  height: 42lvh;
   min-height: 260px;
   pointer-events: none;
   filter: blur(14px);
@@ -356,6 +363,11 @@ a  { color: var(--accent); text-decoration: none; }
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 14px;
+  --fact-indent: 22px;
+}
+.fact-grid dd {
+  margin-top: 4px;
+  padding-left: var(--fact-indent);
 }
 .fact-grid dt {
   display: flex;
@@ -366,11 +378,19 @@ a  { color: var(--accent); text-decoration: none; }
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
+.fact-grid dt .status-dot {
+  width: 10px;
+  height: 10px;
+  margin: 0 2.5px;
+}
+.fact-grid dd .theme-switch {
+  display: block;          /* obeys the dd's padding-left cleanly */
+  margin-top: 4px;         /* optical nudge so its center matches the text line */
+}
 .fact-grid dt .icn { color: var(--accent); opacity: 0.9; }
 .fact-grid dd { font-family: var(--font-display, system-ui, sans-serif); font-weight: 600; margin-top: 4px; }
 
 .glance-grid { grid-template-columns: 1fr 1fr; }
-.glance-grid > div:last-child { grid-column: 1 / -1; }
 
 /* ── Icons / headings ───────────────────────────────── */
 .icn { display: inline-flex; flex-shrink: 0; }
@@ -404,6 +424,19 @@ a  { color: var(--accent); text-decoration: none; }
   70%  { box-shadow: 0 0 0 8px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  background: color-mix(in srgb, currentColor 13%, transparent);
+}
+.status-pill--online  { color: #2ecc71; }
+.status-pill--offline { color: #e74c3c; }
+.status-pill--busy    { color: #f1c40f; }
 
 /* ── Blog callout ───────────────────────────────────── */
 .blog-card {
@@ -671,14 +704,24 @@ a  { color: var(--accent); text-decoration: none; }
 .gear-card p { font-size: 0.9rem; }
 
 /* ── Footer ─────────────────────────────────────────── */
+.footer-art {
+  display: block;
+  margin: auto;
+  padding: 32px 0;
+  max-width: min(250px, 50%);
+  height: auto;
+}
+
 .footer {
-  margin-top: auto;
-  padding-top: 48px;
+  margin-top: 0;
+  padding-top: 20px;
   border: none;
   font-size: 0.85rem;
   color: var(--ink-dim);
   text-align: center;
 }
+
+.main:not(:has(.footer-art)) .footer { margin-top: auto; }
 
 /* ── Mobile ─────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -711,3 +754,54 @@ a  { color: var(--accent); text-decoration: none; }
   }
 }
 
+/* ── Motion reduction ───────────────────────────────── */
+/* Lite mode: no animation */
+html.lite-mode *, html.lite-mode *::before, html.lite-mode *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Lite mode: no blur, no translucency — solid surfaces */
+html.lite-mode .glass,
+html.lite-mode .nav-rail,
+html.lite-mode .topbar--solid,
+html.lite-mode .theme-switch,
+html.lite-mode .like-bubble,
+html.lite-mode .notice-backdrop,
+html.lite-mode .lightbox {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+html.lite-mode .glass,
+html.lite-mode .gear-card,
+html.lite-mode .spec-item summary,
+html.lite-mode .contact-icon {
+  background: color-mix(in srgb, var(--ink) 6%, var(--bg));  /* opaque stand-in for the tint */
+}
+html.lite-mode .nav-rail,
+html.lite-mode .topbar--solid {
+  background: var(--bg);
+}
+
+.notice-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(5, 7, 12, 0.9);
+  animation: lightbox-in 0.25s ease both;
+}
+
+.lite-notice {
+  max-width: 420px;
+  width: 100%;
+}
+.lite-switch[aria-checked="true"] {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { motionReduced } from "./LiteMode";
 
 const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 const mixColor = (a, b, m) => {
@@ -29,30 +30,42 @@ export default function MeshBackground() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let lastKey = "";
     let w, h, raf;
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-
-    const resize = () => {
-      w = window.innerWidth; h = window.innerHeight;
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
 
     let blend = document.documentElement.dataset.theme === "light" ? 1 : 0;
     let from = blend, to = blend, t0 = 0;
     const DURATION = 150;
     const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 
+    let lastW = 0;
+    const resize = () => {
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
+      w = window.innerWidth;
+      h = Math.max(window.innerHeight, window.screen.height);
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
     const draw = (now) => {
+      const reduced = motionReduced();
       const target = document.documentElement.dataset.theme === "light" ? 1 : 0;
+
       if (target !== to) { from = blend; to = target; t0 = now; }
+
       if (reduced) blend = to;
       else {
         const p = Math.min((now - t0) / DURATION, 1);
         blend = from + (to - from) * easeInOut(p);
       }
 
+      const key = `${target}|${reduced}|${Math.round(w)}x${Math.round(h)}`;
+      if (reduced && key === lastKey) { raf = requestAnimationFrame(draw); return; }
+      lastKey = reduced ? key : "";  
+
+      const time = reduced ? 0 : now;
       ctx.clearRect(0, 0, w, h);
       const R = Math.max(w, h);
 
@@ -63,13 +76,13 @@ export default function MeshBackground() {
 
         let g;
         if (d.vertical) {
-          const reach = (0.45 + Math.sin(now * d.sp + d.ph) * 0.04) * h;
+          const reach = (0.45 + Math.sin(time * d.sp + d.ph) * 0.04) * h;
           g = ctx.createLinearGradient(0, 0, 0, reach);
           g.addColorStop(0, color);
           g.addColorStop(1, "transparent");
         } else {
-          const x = (d.fx + Math.sin(now * d.sp + d.ph) * 0.02) * w;
-          const y = (d.fy + Math.cos(now * d.sp * 1.4 + d.ph) * 0.02) * h;
+          const x = (d.fx + Math.sin(time * d.sp + d.ph) * 0.02) * w;
+          const y = (d.fy + Math.cos(time * d.sp * 1.4 + d.ph) * 0.02) * h;
           g = ctx.createRadialGradient(x, y, 0, x, y, d.r * R);
           g.addColorStop(0, color);
           g.addColorStop(1, "transparent");
@@ -83,13 +96,11 @@ export default function MeshBackground() {
       ctx.globalAlpha = 0.85 * blend;
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, w, h);
-      if (!reduced) raf = requestAnimationFrame(draw);
+      if (!motionReduced()) raf = requestAnimationFrame(draw);
     };
 
     resize();
     window.addEventListener("resize", resize);
-    raf = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
   }, []);
 
   return <canvas ref={canvasRef} className="mesh-bg" aria-hidden="true" />;

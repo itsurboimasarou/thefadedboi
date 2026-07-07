@@ -5,6 +5,7 @@ import TopBar from "../components/TopBar";
 import NavRail from "../components/NavRail";
 import { site } from "../lib/site.config";
 import MeshBackground from "../components/MeshBackground";
+import LiteNotice from "../components/LiteNotice";
 
 const display = Work_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
 const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-body" });
@@ -39,6 +40,7 @@ export default function App({ Component, pageProps }) {
         </main>
       </div>
       <NavRail />
+      <LiteNotice />
     </div>
   );
 }

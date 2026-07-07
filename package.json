@@ -1,6 +1,6 @@
 {
   "name": "masarou-site",
-  "version": "3.0 - a new story of love was written from here",
+  "version": "3.0.0.prv",
   "private": true,
   "scripts": {
     "dev": "next dev",
