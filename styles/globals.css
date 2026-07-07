@@ -1319,6 +1319,8 @@ html.lite-mode .nav-rail,
 html.lite-mode .topbar--solid {
   background: var(--bg);
 }
+html.lite-mode .waves { display: none; }
+html.lite-mode .orb-field::after { display: none; }
 
 /* Lite + light: solid white surfaces */
 html.lite-mode[data-theme="light"] .glass,

@@ -45,7 +45,8 @@ export default function MeshBackground() {
       lastW = window.innerWidth;
       w = window.innerWidth;
       h = Math.max(window.innerHeight, window.screen.height);
-      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
@@ -63,7 +64,7 @@ export default function MeshBackground() {
 
       const key = `${target}|${reduced}|${Math.round(w)}x${Math.round(h)}`;
       if (reduced && key === lastKey) { raf = requestAnimationFrame(draw); return; }
-      lastKey = reduced ? key : "";  
+      lastKey = reduced ? key : "";
 
       const time = reduced ? 0 : now;
       ctx.clearRect(0, 0, w, h);
