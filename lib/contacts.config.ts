@@ -5,7 +5,7 @@ export const contacts = {
   donateUrl: "#",
   direct: [
     { label: "GitHub", value: "@itsurboimasarou", href: "https://github.com/thefadedboi" },
-    { label: "LinkedIn", value: "in/thefadedboi", href: "https://linkedin.com/in/thefadedboi" },
+    { label: "LinkedIn", value: "???", href: "https://linkedin.com/in/#" },
   ] as LinkItem[],
   socials: [
     { label: "Facebook", value: "Lê Nhật Lâm", href: "https://facebook.com/masarou.2004" },
