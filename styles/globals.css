@@ -731,7 +731,7 @@ a  { color: var(--accent); text-decoration: none; }
   display: block;
   margin: auto;
   padding: 32px 0;
-  max-width: min(250px, 50%);
+  max-width: min(230px, 50%);
   transition: opacity 0.2s, transform 0.2s;
 }
 .footer-art img {
@@ -818,6 +818,18 @@ html.lite-mode .contact-icon {
 html.lite-mode .nav-rail,
 html.lite-mode .topbar--solid {
   background: var(--bg);
+}
+
+/* Lite + light: solid white surfaces */
+html.lite-mode[data-theme="light"] .glass,
+html.lite-mode[data-theme="light"] .gear-card,
+html.lite-mode[data-theme="light"] .spec-item summary,
+html.lite-mode[data-theme="light"] .contact-icon {
+  background: #ffffff;
+}
+html.lite-mode[data-theme="light"] .nav-rail,
+html.lite-mode[data-theme="light"] .topbar--solid {
+  background: #ffffff;
 }
 
 .notice-backdrop {
