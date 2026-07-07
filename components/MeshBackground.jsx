@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { motionReduced } from "./LiteMode";
+import { liteMode } from "./LiteMode";
 
 const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 const mixColor = (a, b, m) => {
@@ -50,7 +50,7 @@ export default function MeshBackground() {
     };
 
     const draw = (now) => {
-      const reduced = motionReduced();
+      const reduced = liteMode();
       const target = document.documentElement.dataset.theme === "light" ? 1 : 0;
 
       if (target !== to) { from = blend; to = target; t0 = now; }
@@ -96,7 +96,7 @@ export default function MeshBackground() {
       ctx.globalAlpha = 0.85 * blend;
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, w, h);
-      if (!motionReduced()) raf = requestAnimationFrame(draw);
+      if (!liteMode()) raf = requestAnimationFrame(draw);
     };
 
     resize();

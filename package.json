@@ -1,6 +1,6 @@
 {
   "name": "masarou-site",
-  "version": "3.0.0.prv",
+  "version": "3.0.0.Furina",
   "private": true,
   "scripts": {
     "dev": "next dev",
