@@ -16,7 +16,7 @@ export const details = {
   },
   skills: [
     "React / Next.js", "TypeScript", "Python", "Figma",
-    "/", "Video editing", "Affinity", "Node.js",
+    "Video editing", "Affinity", "Node.js",
   ],
   likes: [
     {
@@ -24,16 +24,16 @@ export const details = {
       text: "Mostly cosplay, or sometimes, street photography — I do love much of the artistry in capturing moments, especially how portraits can tell a story of a cosplay. ",
     },
     {
-      label: "Mechanical keyboards",
-      text: "/",
+      label: "Cosplay",
+      text: "Yes, I especially do cosplay, not too much but I did a few so you could check them out in my photoworks.",
     },
     {
       label: "Play games",
-      text: "/",
+      text: "Not much these days but I'm kinda low-key guy who like gacha games; Genshin, HSR, ZZZ, WuWa.",
     },
     {
       label: "Play the piano",
-      text: "/",
+      text: "I do kinda know how to play the piano, but till now I haven't played much. I do love to play some anime OSTs, or some random songs that I like.",
     },
   ] as Like[],
 };

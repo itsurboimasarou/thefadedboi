@@ -38,6 +38,7 @@ const icons = {
   keyboard: <svg {...p}><rect x="2.5" y="6" width="19" height="12" rx="2" /><path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6 12.5h.01M9.5 12.5h.01M13 12.5h.01M16.5 12.5h.01M7.5 15.5h9" /></svg>,
   mouse: <svg {...p}><rect x="7" y="3" width="10" height="18" rx="5" /><path d="M12 6.5v3.5" /></svg>,
   headphones: <svg {...p}><path d="M4 14v-2a8 8 0 0 1 16 0v2" /><rect x="3" y="14" width="4.5" height="6.5" rx="2" /><rect x="16.5" y="14" width="4.5" height="6.5" rx="2" /></svg>,
+  microphone: <svg {...p}><rect x="9" y="2.5" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0" /><path d="M12 17.5v3M9 20.5h6" /></svg>,
   heart: <svg {...p}><path d="M12 20.5s-7.5-4.7-9.2-9.4C1.6 7.7 4 4.8 7 4.8c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3 0 5.4 2.9 4.2 6.3-1.7 4.7-9.2 9.4-9.2 9.4Z" /></svg>,
   cake: <svg {...p}><path d="M4 13a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7H4v-7Z" /><path d="M4 16c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0" /><path d="M12 11V8.5" /><path d="M12 6.5c-.9 0-1.5-.7-1.5-1.5S12 2.5 12 2.5s1.5 1.7 1.5 2.5-.6 1.5-1.5 1.5Z" /></svg>,
   target: <svg {...p}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5.2" /><circle cx="12" cy="12" r="1.6" /></svg>,

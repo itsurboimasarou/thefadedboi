@@ -67,10 +67,11 @@ export const devices: DeviceSection[] = [
     categoryName: "Gears",
     category: "gear",
     items: [
-      { name: 'LG 27" 4K monitor', detail: "Primary display, calibrated", icon: "display" },
-      { name: "Keychron K8 Pro", detail: "Gateron Brown switches", icon: "keyboard" },
-      { name: "Logitech MX Master 3S", detail: "Daily driver mouse", icon: "mouse" },
+      { name: 'Acer Predator XB273U V3', detail: "Primary 2K display for gaming", icon: "display" },
+      { name: "Lofree Flow Lite", detail: "Lightweight low-profile keyboard", icon: "keyboard" },
+      { name: "ATK Dragonfly A9", detail: "Daily driver mouse", icon: "mouse" },
       { name: "Sony WH-1000XM5", detail: "Focus headphones", icon: "headphones" },
+      { name: "Maono DGM20", detail: "Microphone", icon: "microphone" },
     ],
   },
 ];

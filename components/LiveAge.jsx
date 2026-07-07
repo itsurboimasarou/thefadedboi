@@ -38,7 +38,7 @@ export default function LiveAge({ birthday }) {
 
   return (
     <span suppressHydrationWarning>
-      {date}{age !== null && ` (${age} years old)`}
+      {date}{age !== null && ` (${age})`}
     </span>
   );
 }
