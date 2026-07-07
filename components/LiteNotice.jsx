@@ -44,7 +44,7 @@ export default function LiteNotice() {
         </p>
         <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
           <button className="btn btn--small" onClick={() => choose(false)}>Keep default</button>
-          <button className="btn btn--small btn--ghost" onClick={() => choose(true)}>Switch to lite mode</button>
+          <button className="btn btn--small btn--ghost" onClick={() => choose(true)}>Switch to Lite mode</button>
         </div>
       </div>
     </div>
