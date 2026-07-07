@@ -628,6 +628,29 @@ a  { color: var(--accent); text-decoration: none; }
   color: rgba(255, 255, 255, 0.75);
   font-size: 0.85rem;
 }
+.lightbox-preview {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: blur(24px);
+  transition: opacity 0.25s;
+}
+.lightbox-loader {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.lightbox-loader img {
+  width: 56px;
+  opacity: 0.35;                 /* the "dim" */
+  animation: loader-pulse 1.2s ease-in-out infinite;
+}
+@keyframes loader-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.96); }
+  50%      { opacity: 0.45; transform: scale(1); }
+}
 
 /* ── Devices page ───────────────────────────────────── */
 .spec-item + .spec-item { margin-top: 14px; }
@@ -709,9 +732,22 @@ a  { color: var(--accent); text-decoration: none; }
   margin: auto;
   padding: 32px 0;
   max-width: min(250px, 50%);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.footer-art img {
+  display: block;
+  width: 100%;                  /* fill the link's box; sizing stays controlled by the <a> */
   height: auto;
 }
-
+.footer-art:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);  /* affordance: hints that it's clickable */
+}
+.footer-art:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
 .footer {
   margin-top: 0;
   padding-top: 20px;
@@ -720,7 +756,6 @@ a  { color: var(--accent); text-decoration: none; }
   color: var(--ink-dim);
   text-align: center;
 }
-
 .main:not(:has(.footer-art)) .footer { margin-top: auto; }
 
 /* ── Mobile ─────────────────────────────────────────── */
@@ -773,6 +808,7 @@ html.lite-mode .lightbox {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+html.lite-mode .lightbox-loader img { animation: none; opacity: 0.35; }
 html.lite-mode .glass,
 html.lite-mode .gear-card,
 html.lite-mode .spec-item summary,

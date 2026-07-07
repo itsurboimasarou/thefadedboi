@@ -72,7 +72,15 @@ export default function Home() {
           </a>
         </section>
       </div>
-      <img src="/furina.webp" alt="" className="footer-art" />
+      <a
+        href="https://github.com/itsurboimasarou/thefadedboi"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="footer-art"
+        aria-label="Source code"
+      >
+        <img src="/furina.webp" alt="" />
+      </a>
     </>
   );
 }
