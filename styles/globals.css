@@ -1243,7 +1243,7 @@ a {
     font-size: clamp(1.25rem, 5vw, 1.5rem);
   }
 
-  .hero p {
+  .hero p:not(.eyebrow) {
     font-size: 1.05rem;
   }
 
