@@ -1,6 +1,6 @@
-import { gallery } from "../lib/gallery.config";
-import Icon from "../components/Icons";
-import AlbumGrid from "../components/AlbumGrid";
+import { gallery } from "@/lib/gallery.config";
+import Icon from "@/components/ui/Icons";
+import AlbumGrid from "@/components/gallery/AlbumGrid";
 import fs from "fs";
 import path from "path";
 

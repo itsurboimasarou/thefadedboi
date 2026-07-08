@@ -1,7 +1,7 @@
-import { contacts } from "../lib/contacts.config";
-import CopyEmailButton from "../components/CopyEmailButton";
-import { ContactIcon } from "../components/ContactIcon";
-import Icon from "../components/Icons";
+import { contacts } from "@/lib/contacts.config";
+import CopyEmailButton from "@/components/contact/CopyEmailButton";
+import { ContactIcon } from "@/components/contact/ContactIcon";
+import Icon from "@/components/ui/Icons";
 
 function LinkCard({ item }) {
   return (

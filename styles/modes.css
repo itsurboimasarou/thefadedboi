@@ -1,0 +1,119 @@
+/* ═══ modes.css ═══
+   Mode overrides: mobile, reduced motion, lite mode.
+   Load LAST — these must win the cascade by order. */
+
+/* ── Mobile ─────────────────────────────────────────── */
+@media (max-width: 720px), (max-height: 600px) {
+  html {
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 8vw, 2.6rem);
+  }
+
+  h2 {
+    font-size: clamp(1.25rem, 5vw, 1.5rem);
+  }
+
+  .hero p:not(.eyebrow) {
+    font-size: 1.05rem;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+  }
+
+  .nav-rail {
+    top: auto;
+    bottom: 14px;
+    left: 50%;
+    translate: -50% 0;
+    flex-direction: row;
+    padding: 8px 10px;
+  }
+
+  .nav-item .tip {
+    display: none;
+  }
+
+  .nav-dock-btn, .nav-pin-btn, .nav-divider { display: none; }
+
+  .nav-hotzone { display: none; }
+
+  .main {
+    padding-left: clamp(20px, 5vw, 64px);
+    padding-right: clamp(20px, 5vw, 64px);
+    padding-top: 84px;
+    padding-bottom: 110px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Lite mode: no animation */
+
+html.lite-mode *,
+html.lite-mode *::before,
+html.lite-mode *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Lite mode: no blur, no translucency — solid surfaces */
+html.lite-mode .glass,
+html.lite-mode .nav-rail,
+html.lite-mode .topbar--solid,
+html.lite-mode .theme-switch,
+html.lite-mode .like-bubble,
+html.lite-mode .notice-backdrop,
+html.lite-mode .lightbox {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html.lite-mode .lightbox-loader img {
+  animation: none;
+  opacity: 0.35;
+}
+
+html.lite-mode .glass,
+html.lite-mode .gear-card,
+html.lite-mode .spec-item summary,
+html.lite-mode .contact-icon {
+  background: color-mix(in srgb, var(--ink) 6%, var(--bg));
+}
+
+html.lite-mode .nav-rail,
+html.lite-mode .topbar--solid {
+  background: var(--bg);
+  transition: none;
+}
+html.lite-mode .nav-hotzone { display: none; }
+
+html.lite-mode .version-pill:hover { transform: none; }
+
+html.lite-mode .fluid { display: none; }
+html.lite-mode .orb-field::after { display: none; }
+
+/* Lite + light: solid white surfaces */
+html.lite-mode[data-theme="light"] .glass,
+html.lite-mode[data-theme="light"] .gear-card,
+html.lite-mode[data-theme="light"] .spec-item summary,
+html.lite-mode[data-theme="light"] .contact-icon {
+  background: #ffffff;
+}
+
+html.lite-mode[data-theme="light"] .nav-rail,
+html.lite-mode[data-theme="light"] .topbar--solid {
+  background: #ffffff;
+}

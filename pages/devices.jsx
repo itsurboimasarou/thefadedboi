@@ -1,5 +1,5 @@
-import { devices } from "../lib/devices.config";
-import Icon, { specIconFor } from "../components/Icons";
+import { devices } from "@/lib/devices.config";
+import Icon, { specIconFor } from "@/components/ui/Icons";
 
 const chevron = (
   <svg className="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">

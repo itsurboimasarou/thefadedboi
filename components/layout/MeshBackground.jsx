@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { liteMode } from "./LiteMode";
+import { liteMode } from "../controls/LiteMode";
 
 const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 const mixColor = (a, b, m) => {
@@ -11,16 +11,16 @@ const mix = (a, b, m) => a + (b - a) * m;
 
 const PALETTES = {
   dark: [
-    { fx: -0.1, fy: 1.1, r: 0.9, color: "#7fa8d9", a: 0.30, sp: 0.00005, ph: 0 },
-    { fx: 0.35, fy: 1.15, r: 0.85, color: "#2f6fb3", a: 0.40, sp: 0.00004, ph: 2 },
-    { fx: 1.15, fy: 0.85, r: 1.0, color: "#1c4a80", a: 0.38, sp: 0.00006, ph: 4 },
+    { fx: -0.1, fy: 1.1, r: 0.9, color: "#c9b8f0", a: 0.30, sp: 0.00005, ph: 0 },
+    { fx: 0.35, fy: 1.15, r: 0.85, color: "#6d4fb3", a: 0.40, sp: 0.00004, ph: 2 },
+    { fx: 1.15, fy: 0.85, r: 1.0, color: "#3d2a70", a: 0.38, sp: 0.00006, ph: 4 },
     { fx: 0.7, fy: -0.1, r: 0.8, color: "#0b0f1e", a: 0.92, sp: 0.00003, ph: 1, vertical: true },
   ],
   light: [
     { fx: -0.1, fy: 1.1, r: 0.95, color: "#ffffff", a: 0.85, sp: 0.00005, ph: 0 },
-    { fx: 0.35, fy: 1.15, r: 0.8, color: "#c9e4ff", a: 0.40, sp: 0.00004, ph: 2 },
-    { fx: 1.15, fy: 0.85, r: 0.95, color: "#8cc5f7", a: 0.22, sp: 0.00006, ph: 4 },
-    { fx: 0.7, fy: -0.1, r: 0.75, color: "#eef3fa", a: 0.90, sp: 0.00003, ph: 1 },
+    { fx: 0.35, fy: 1.15, r: 0.8, color: "#e2d6ff", a: 0.40, sp: 0.00004, ph: 2 },
+    { fx: 1.15, fy: 0.85, r: 0.95, color: "#b79df0", a: 0.22, sp: 0.00006, ph: 4 },
+    { fx: 0.7, fy: -0.1, r: 0.75, color: "#f0ecf9", a: 0.90, sp: 0.00003, ph: 1 },
   ],
 };
 

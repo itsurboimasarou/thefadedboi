@@ -1,14 +1,45 @@
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { site } from "../lib/site.config";
-import { home } from "../lib/home.config";
-import BerlinClock from "../components/BerlinClock";
-import Icon from "../components/Icons";
-import LiteModeToggle from "../components/LiteMode";
-import { useLiveStatus, StatusDot, StatusPill } from "../components/LiveStatus";
+import { site } from "@/lib/site.config";
+import { home } from "@/lib/home.config";
+import BerlinClock from "@/components/widgets/BerlinClock";
+import Icon from "@/components/ui/Icons";
+import LiteModeToggle from "@/components/controls/LiteMode";
+import { useLiveStatus, StatusDot, StatusPill } from "@/components/widgets/LiveStatus";
+import ChangelogDialog from "@/components/content/ChangelogDialog";
 import pkg from "../package.json";
 
-export default function Home() {
+import fs from "fs";
+import path from "path";
+
+export async function getStaticProps() {
+  let changelog = "";
+  try {
+    changelog = fs.readFileSync(path.join(process.cwd(), "public", "changelog.md"), "utf8");
+  } catch { }
+  return { props: { changelog } };
+}
+
+export default function Home({ changelog }) {
   const status = useLiveStatus(home.status);
+  const [logOpen, setLogOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("changelog-seen")) return;
+      const openIt = () => {
+        setLogOpen(true);
+        localStorage.setItem("changelog-seen", pkg.version);
+      };
+      if (localStorage.getItem("lite-notice-seen")) {
+        openIt();
+      } else {
+        window.addEventListener("lite-mode-changed", openIt, { once: true });
+        return () => window.removeEventListener("lite-mode-changed", openIt);
+      }
+    } catch { }
+  }, []);
+
   return (
     <>
       <div className="stack reveal">
@@ -47,12 +78,22 @@ export default function Home() {
                 </dd>
               </div>
               <div>
-                <dt><Icon name="clock" size={15} />Time (Berlin, GMT +1:00)</dt>
-                <dd><BerlinClock /></dd>
+                <dt><Icon name="clock" size={15} />Time (Berlin)</dt>
+                <dd>
+                  <span className="status-pill time-pill">
+                    <BerlinClock />
+                  </span>
+                </dd>
               </div>
               <div>
                 <dt><Icon name="tag" size={15} />Site version</dt>
-                <dd>v{pkg.version}</dd>
+                <dd>
+                  <button type="button" className="status-pill version-pill" onClick={() => setLogOpen(true)}>
+                    v{pkg.version}
+                  </button>
+                  <ChangelogDialog open={logOpen} onClose={() => setLogOpen(false)} changelog={changelog} />
+                </dd>
+                <ChangelogDialog open={logOpen} onClose={() => setLogOpen(false)} changelog={changelog} />
               </div>
               <div>
                 <dt>
@@ -90,7 +131,7 @@ export default function Home() {
         className="footer-art"
         aria-label="Source code"
       >
-        <img src="/furina.webp" alt="" />
+        <img src="/sanbina.webp" alt="" />
       </a>
     </>
   );

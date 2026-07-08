@@ -1,8 +1,8 @@
 import { site } from "../lib/site.config";
 import { details } from "../lib/details.config";
-import Icon from "../components/Icons";
-import WhatILike from "../components/WhatILike";
-import LiveAge from "../components/LiveAge";
+import Icon from "@/components/ui/Icons";
+import WhatILike from "@/components/content/WhatILike";
+import LiveAge from "@/components/widgets/LiveAge";
 import Image from "next/image";
 
 export default function About() {

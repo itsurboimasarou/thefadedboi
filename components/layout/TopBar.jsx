@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import ThemeToggle from "./ThemeToggle";
+import ThemeToggle from "../controls/ThemeToggle";
 
 export default function TopBar() {
   const [solid, setSolid] = useState(false);

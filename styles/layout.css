@@ -1,0 +1,295 @@
+/* ═══ layout.css ═══
+   Structural chrome: shell/main, top bar, nav pill, footer. */
+
+/* ── Layout ─────────────────────────────────────────── */
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: clamp(24px, 5vw, 64px);
+  padding-top: calc(64px + clamp(16px, 3vw, 40px));
+  padding-left: clamp(24px, 5vw, 64px);
+  max-width: 1360px;
+  margin: 0 auto;
+  width: 100%;
+  animation: page-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (min-width: 701px) and (min-height: 601px) {
+  .main {
+    padding-left: clamp(24px, 5vw, 64px);
+    padding-right: clamp(24px, 5vw, 64px);
+    transition: padding 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* pinned + docked left: reserve the side gutter (both sides, stays centered) */
+  .app-root:has(.nav-rail--pinned.nav-rail--left) .main {
+    padding-left: calc(var(--nav-w) + clamp(24px, 5vw, 64px));
+    padding-right: calc(var(--nav-w) + clamp(24px, 5vw, 64px));
+  }
+  /* pinned + docked bottom: reserve footer clearance instead */
+  .app-root:has(.nav-rail--pinned.nav-rail--bottom) .main {
+    padding-bottom: 110px;
+  }
+  html.lite-mode .main { transition: none; }
+}
+
+/* ── Top bar ────────────────────────────────────────── */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px clamp(16px, 3vw, 28px);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition: background 0.45s ease, border-color 0.45s ease,
+    backdrop-filter 0.45s ease, -webkit-backdrop-filter 0.45s ease;
+}
+
+.topbar--solid {
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+}
+
+.topbar .logo-corner {
+  display: block;
+  line-height: 0;
+}
+
+.topbar .logo-corner img {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+/* ── Nav pill ───────────────────────────────────────── */
+.nav-rail {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border-radius: 999px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  z-index: 50;
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+
+.nav-item:active,
+.nav-item {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  transition: color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.nav-item:hover {
+  color: var(--ink);
+  background: var(--glass-strong);
+  transform: translateY(-2px);
+}
+
+.nav-item[aria-current="page"] {
+  color: var(--accent);
+  background: var(--glass-strong);
+  box-shadow: inset 0 0 0 1px var(--glass-border);
+}
+
+.nav-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+.nav-item .tip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--glass-border);
+  font-size: 12.5px;
+  color: var(--ink);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s, translate 0.15s;
+  translate: -4px -50%;
+}
+
+.nav-item:hover .tip,
+.nav-item:focus-visible .tip {
+  opacity: 1;
+  translate: 0 -50%;
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.nav-pin-btn--on {
+  color: var(--accent);
+  background: var(--glass-strong);
+}
+.nav-pin-btn--on svg path:first-child { fill: currentColor; }
+
+@media (min-width: 721px) and (min-height: 601px) {
+  .nav-rail--left {
+    left: 16px;
+    top: 50%;
+    translate: 0 -50%;
+    flex-direction: column;
+    transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+  }
+
+  .nav-rail--left.nav-rail--hidden {
+    translate: calc(-100% - 7px) -50%;
+    opacity: 0.6;
+  }
+
+  .nav-divider {
+    width: 26px;
+    height: 1px;
+    background: var(--glass-border);
+    margin: 4px 0;
+  }
+
+  .nav-rail--bottom {
+    left: 50%;
+    top: auto;
+    bottom: 16px;
+    translate: -50% 0;
+    flex-direction: row;
+    transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+  }
+
+  .nav-rail--bottom.nav-rail--hidden {
+    translate: -50% calc(100% + 6px);
+    opacity: 0.6;
+  }
+
+  .nav-rail--bottom .nav-divider {
+    width: 1px;
+    height: 26px;
+    margin: 0 4px;
+  }
+
+  .nav-rail--bottom .nav-item .tip {
+    left: 50%;
+    top: auto;
+    bottom: calc(100% + 12px);
+    translate: -50% 4px;
+  }
+
+  .nav-rail--bottom .nav-item:hover .tip {
+    translate: -50% 0;
+  }
+
+  .app-root:has(.nav-rail--bottom) .main {
+    padding-left: clamp(24px, 5vw, 64px);
+    padding-bottom: 100px;
+  }
+
+  .nav-hotzone {
+    position: fixed;
+    z-index: 49;
+  }
+
+  .nav-hotzone--left {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+  }
+
+  .nav-hotzone--bottom {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 14px;
+  }
+}
+
+/* ── Footer ─────────────────────────────────────────── */
+.footer-art {
+  display: block;
+  margin: auto;
+  padding: 32px 0;
+  max-width: min(230px, 50%);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.footer-art img {
+  display: block;
+  width: 100%;
+  /* fill the link's box; sizing stays controlled by the <a> */
+  height: auto;
+}
+
+.footer-art:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+  /* affordance: hints that it's clickable */
+}
+
+.footer-art:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.footer {
+  margin-top: 0;
+  padding-top: 20px;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+.main:not(:has(.footer-art)) .footer {
+  margin-top: auto;
+}

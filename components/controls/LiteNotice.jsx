@@ -21,6 +21,7 @@ export default function LiteNotice() {
     setLiteMode(reduce);
     try { localStorage.setItem("lite-notice-seen", "1"); } catch {}
     setShow(false);
+    window.dispatchEvent(new Event("lite-mode-changed"));
   };
 
   if (!show) return null;

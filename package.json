@@ -1,6 +1,6 @@
 {
   "name": "masarou-site",
-  "version": "3.1-Furina",
+  "version": "4.0-Columbina",
   "private": true,
   "scripts": {
     "dev": "next dev",

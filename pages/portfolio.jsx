@@ -1,5 +1,5 @@
-import { portfolio } from "../lib/portfolio.config";
-import Icon from "../components/Icons";
+import { portfolio } from "@/lib/portfolio.config";
+import Icon from "@/components/ui/Icons";
 
 export default function Portfolio() {
   return (
