@@ -45,6 +45,7 @@ export const devices: DeviceSection[] = [
           { label: "Model", value: "21U40001CD" },
           { label: "Display", value: "14.5-inch 2K+ (2560x1600) IPS 90Hz 100% sRGB 400nits" },
           { label: "CPU", value: "AMD Ryzen 7 H 255" },
+          { label: "Graphics", value: "AMD Radeon 780M (integrated)" },
           { label: "RAM", value: "24GB LPDDR5X 7500MHz" },
           { label: "Storage-1", value: "512GB YMTC YMSS2ED06D25MC NVMe PCIe 4.0" },
           { label: "Storage-2", value: "1TB Samsung SSD 980 NVMe PCIe 3.0" },
