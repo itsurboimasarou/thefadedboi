@@ -1,9 +1,29 @@
+
+
 # thefadedboi
 
-This wasn't just a new alias to me, but also a brand new identity. And this site is my new web space corner where you could find everything around me; all my hobbies, my photographs, my own stuffs, etc.
+![Vercel](https://img.shields.io/github/deployments/itsurboimasarou/thefadedboi/production?label=deploy&logo=vercel)
 
-This site is a non-profitable project, use for educational purpose only
+This wasn't just a new alias to me, but also a brand new identity — and this site is
+my web space corner where you can find everything around me: my hobbies, my
+photographs, my cosplays, my own stuff, etc.
 
-Have fun surfing, looking around or forking to your own custom!
+<img width="1300" alt="thefadedboi — masarou's sandbox" src="https://raw.githubusercontent.com/itsurboimasarou/itsurboimasarou/refs/heads/main/banner/banner-soap.png" />
 
-<img width="1300" alt="thefadedboi - masarou's sandbox" src="https://raw.githubusercontent.com/itsurboimasarou/thefadedboi/refs/heads/soap/public/banner.png" />
+## How to run it
+
+```bash
+npm install
+npm run dev        # → http://localhost:3000
+```
+
+## Tech notes
+
+- Deployed on **Vercel**, domain via **Cloudflare DNS**
+- <a href="https://github.com/itsurboimasarou/thefadedboi/blob/soap/public/changelog.md">Changelog can be read from here</a>, it will soon available on-page render starting from next version
+
+## License & purpose
+
+This is a non-profit, educational-purpose personal project — have fun surfing, look around or fork to your own custom!
+
+All the images from the title *Genshin Impact* belongs to COGNOSPHERE PTE. LTD. All rights reserved.
