@@ -8,7 +8,8 @@ import "@/styles/pages.css";
 import "@/styles/modes.css";
 
 // Layout Components
-import Head from "next/head"
+import Head from "next/head";
+import type { AppProps } from "next/app";
 import { useEffect } from "react";
 import { Work_Sans, IBM_Plex_Sans } from "next/font/google";
 import TopBar from "@/components/layout/TopBar";
@@ -23,7 +24,7 @@ const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], 
 const WAVE_PATH =
   "M0,192 C240,120 480,120 720,192 C960,264 1200,264 1440,192 C1680,120 1920,120 2160,192 C2400,264 2640,264 2880,192 L2880,320 L0,320 Z";
 
-export default function App({ Component, pageProps }) {
+export default function App({ Component, pageProps }: AppProps) {
   
   useEffect(() => {
     document.body.classList.add(display.variable, body.variable);

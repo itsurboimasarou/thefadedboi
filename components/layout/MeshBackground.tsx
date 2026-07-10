@@ -1,15 +1,19 @@
 import { useEffect, useRef } from "react";
 import { liteMode } from "../controls/LiteMode";
 
-const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-const mixColor = (a, b, m) => {
+const rgb = (hex: string): number[] => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const mixColor = (a: string, b: string, m: number): string => {
   const [r1, g1, b1] = rgb(a), [r2, g2, b2] = rgb(b);
-  const ch = (x, y) => Math.round(Math.sqrt(x * x + (y * y - x * x) * m));
+  const ch = (x: number, y: number) => Math.round(Math.sqrt(x * x + (y * y - x * x) * m));
   return `rgb(${ch(r1, r2)}, ${ch(g1, g2)}, ${ch(b1, b2)})`;
 };
-const mix = (a, b, m) => a + (b - a) * m;
+const mix = (a: number, b: number, m: number): number => a + (b - a) * m;
 
-const PALETTES = {
+interface MeshField {
+  fx: number; fy: number; r: number; color: string;
+  a: number; sp: number; ph: number; vertical?: boolean;
+}
+const PALETTES: { dark: MeshField[]; light: MeshField[] } = {
   dark: [
     { fx: -0.1, fy: 1.1, r: 0.9, color: "#c9b8f0", a: 0.30, sp: 0.00005, ph: 0 },
     { fx: 0.35, fy: 1.15, r: 0.85, color: "#6d4fb3", a: 0.40, sp: 0.00004, ph: 2 },
@@ -25,19 +29,21 @@ const PALETTES = {
 };
 
 export default function MeshBackground() {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     let lastKey = "";
-    let w, h, raf;
+    let w = 0, h = 0, raf = 0;
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
     let blend = document.documentElement.dataset.theme === "light" ? 1 : 0;
     let from = blend, to = blend, t0 = 0;
     const DURATION = 150;
-    const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const easeInOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 
     let lastW = 0;
     const resize = () => {
@@ -50,7 +56,7 @@ export default function MeshBackground() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
-    const draw = (now) => {
+    const draw = (now: number) => {
       const reduced = liteMode();
       const target = document.documentElement.dataset.theme === "light" ? 1 : 0;
 
@@ -75,7 +81,7 @@ export default function MeshBackground() {
         const color = mixColor(d.color, l.color, blend);
         const alpha = mix(d.a, l.a, blend);
 
-        let g;
+        let g: CanvasGradient;
         if (d.vertical) {
           const reach = (0.45 + Math.sin(time * d.sp + d.ph) * 0.04) * h;
           g = ctx.createLinearGradient(0, 0, 0, reach);
@@ -97,11 +103,16 @@ export default function MeshBackground() {
       ctx.globalAlpha = 0.85 * blend;
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, w, h);
-      if (!liteMode()) raf = requestAnimationFrame(draw);
+      raf = requestAnimationFrame(draw);
     };
 
     resize();
     window.addEventListener("resize", resize);
+    raf = requestAnimationFrame(draw);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
 
   return <canvas ref={canvasRef} className="mesh-bg" aria-hidden="true" />;

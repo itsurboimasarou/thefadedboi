@@ -17,7 +17,7 @@ export default function LiteNotice() {
     return () => { document.body.style.overflow = ""; };
   }, [show]);
 
-  const choose = (reduce) => {
+  const choose = (reduce: boolean) => {
     setLiteMode(reduce);
     try { localStorage.setItem("lite-notice-seen", "1"); } catch {}
     setShow(false);

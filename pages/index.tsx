@@ -9,6 +9,7 @@ import { useLiveStatus, StatusDot, StatusPill } from "@/components/widgets/LiveS
 import ChangelogDialog from "@/components/content/ChangelogDialog";
 import pkg from "../package.json";
 
+import type { InferGetStaticPropsType } from "next";
 import fs from "fs";
 import path from "path";
 
@@ -20,7 +21,7 @@ export async function getStaticProps() {
   return { props: { changelog } };
 }
 
-export default function Home({ changelog }) {
+export default function Home({ changelog }: InferGetStaticPropsType<typeof getStaticProps>) {
   const status = useLiveStatus(home.status);
   const [logOpen, setLogOpen] = useState(false);
 

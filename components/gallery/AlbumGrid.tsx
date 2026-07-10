@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import type { GalleryImage } from "@/lib/types";
 
-export default function AlbumGrid({ images, title }) {
-  const [index, setIndex] = useState(null);
+interface AlbumGridProps { images: GalleryImage[]; title: string }
+export default function AlbumGrid({ images, title }: AlbumGridProps) {
+  const [index, setIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
-  const items = images.map((it) =>
-    typeof it === "string" ? { full: it, thumb: it } : { thumb: it.full, ...it }
+  const items: { full: string; thumb: string }[] = images.map((it) =>
+    typeof it === "string" ? { full: it, thumb: it } : { thumb: it.thumb ?? it.full, full: it.full }
   );
 
   useEffect(() => setMounted(true), []);
@@ -16,18 +18,18 @@ export default function AlbumGrid({ images, title }) {
 
   const close = useCallback(() => setIndex(null), []);
   const step = useCallback(
-    (dir) => setIndex((i) => (i === null ? i : (i + dir + items.length) % items.length)),
+    (dir: number) => setIndex((i) => (i === null ? i : (i + dir + items.length) % items.length)),
     [items.length]
   );
 
-  const warm = (src) => {
+  const warm = (src: string) => {
     const i = new window.Image();
     i.src = src;
   };
 
   useEffect(() => {
     if (index === null) return;
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
       if (e.key === "ArrowRight") step(1);
       if (e.key === "ArrowLeft") step(-1);

@@ -1,7 +1,8 @@
 import { useState } from "react";
+import type { Like } from "@/lib/types";
 
-export default function WhatILike({ likes }) {
-  const [active, setActive] = useState(null);
+export default function WhatILike({ likes }: { likes: Like[] }) {
+  const [active, setActive] = useState<number | null>(null);
 
   return (
     <div>

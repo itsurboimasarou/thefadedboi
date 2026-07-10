@@ -14,10 +14,11 @@ const moon = (
 );
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState(null);
+  const [theme, setTheme] = useState<"dark" | "light" | null>(null);
 
   useEffect(() => {
-    setTheme(document.documentElement.dataset.theme || "dark");
+    const t = document.documentElement.dataset.theme;
+    setTheme(t === "light" ? "light" : "dark");
   }, []);
 
   function toggle() {
@@ -26,7 +27,7 @@ export default function ThemeToggle() {
     setTheme(next);
     try {
       localStorage.setItem("theme", next);
-    } catch {}
+    } catch { }
   }
 
   return (

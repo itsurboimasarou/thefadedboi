@@ -3,7 +3,9 @@ import CopyEmailButton from "@/components/contact/CopyEmailButton";
 import { ContactIcon } from "@/components/contact/ContactIcon";
 import Icon from "@/components/ui/Icons";
 
-function LinkCard({ item }) {
+import type { LinkItem } from "@/lib/types";
+
+function LinkCard({ item }: { item: LinkItem }) {
   return (
     <a href={item.href} className="glass glass--hover contact-card" target="_blank" rel="noopener noreferrer">
       <ContactIcon name={item.label} />

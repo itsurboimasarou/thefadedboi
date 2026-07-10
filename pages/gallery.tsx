@@ -1,6 +1,7 @@
 import { gallery } from "@/lib/gallery.config";
 import Icon from "@/components/ui/Icons";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
+import type { InferGetStaticPropsType } from "next";
 import fs from "fs";
 import path from "path";
 
@@ -21,7 +22,7 @@ export async function getStaticProps() {
   return { props: { albums } };
 }
 
-export default function Gallery({ albums }) {
+export default function Gallery({ albums }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <div className="stack reveal">
 

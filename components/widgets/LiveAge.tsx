@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function wholeYears(birthday) {
+function wholeYears(birthday: string): number {
   const b = new Date(birthday);
   const now = new Date();
   let age = now.getFullYear() - b.getFullYear();
@@ -11,7 +11,7 @@ function wholeYears(birthday) {
   return age;
 }
 
-function ordinal(day) {
+function ordinal(day: number): string {
   if (day % 100 >= 11 && day % 100 <= 13) return `${day}th`;
   switch (day % 10) {
     case 1: return `${day}st`;
@@ -21,8 +21,8 @@ function ordinal(day) {
   }
 }
 
-export default function LiveAge({ birthday }) {
-  const [age, setAge] = useState(null);
+export default function LiveAge({ birthday }: { birthday: string }) {
+  const [age, setAge] = useState<number | null>(null);
 
   useEffect(() => {
     if (!birthday || Number.isNaN(new Date(birthday).getTime())) return;

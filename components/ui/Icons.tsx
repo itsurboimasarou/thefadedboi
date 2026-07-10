@@ -7,9 +7,9 @@ const p = {
   strokeLinecap: "round",
   strokeLinejoin: "round",
   "aria-hidden": true,
-};
+} as const;
 
-const icons = {
+const icons: Record<string, JSX.Element> = {
   // frickin sections
   phone: <svg {...p}><rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M10.5 18.5h3" /></svg>,
   laptop: <svg {...p}><rect x="4" y="4.5" width="16" height="11" rx="2" /><path d="M2.5 19.5h19" /></svg>,
@@ -47,7 +47,7 @@ const icons = {
   dot: <svg {...p}><circle cx="12" cy="12" r="3.5" /></svg>,
 };
 
-const specMap = [
+const specMap: ReadonlyArray<readonly [string, string]> = [
   ["display", "display"], ["screen", "display"],
   ["chip", "chip"], ["cpu", "chip"], ["processor", "chip"],
   ["memory", "memory"], ["ram", "memory"],
@@ -60,13 +60,14 @@ const specMap = [
   ["model", "tag"],
 ];
 
-export function specIconFor(label) {
+export function specIconFor(label: string): string {
   const l = label.toLowerCase();
   const hit = specMap.find(([k]) => l.includes(k));
   return hit ? hit[1] : "dot";
 }
 
-export default function Icon({ name, size = 20, className = "" }) {
+interface IconProps { name: string; size?: number; className?: string }
+export default function Icon({ name, size = 20, className = "" }: IconProps) {
   const svg = icons[name] ?? icons.dot;
   return (
     <span className={`icn ${className}`} style={{ width: size, height: size }}>

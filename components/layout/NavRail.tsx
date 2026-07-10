@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-const icons = {
+const icons: Record<string, JSX.Element> = {
   home: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /><path d="M9.5 21v-6h5v6" />
@@ -50,7 +50,8 @@ const icons = {
   ),
 };
 
-const items = [
+interface NavItem { href: string; label: string; icon: string }
+const items: NavItem[] = [
   { href: "/", label: "Home", icon: "home" },
   { href: "/about", label: "Details", icon: "person" },
   { href: "/contacts", label: "Contacts", icon: "contacts" },
@@ -59,87 +60,115 @@ const items = [
   { href: "/devices", label: "Devices & Equipment", icon: "devices" },
 ];
 
+type Dock = "left" | "bottom";
+
+const HIDE_DELAY = 600;
+const FIRST_HIDE_DELAY = 3000;
+const COMPACT_MQ = "(max-width: 720px), (max-height: 600px)";
+const TOUCH_MQ = "(pointer: coarse)";
+
 export default function NavRail() {
   const { pathname } = useRouter();
-  const [dock, setDock] = useState("left");
+  const [dock, setDock] = useState<Dock>("left");
   const [hidden, setHidden] = useState(false);
   const [pinned, setPinned] = useState(true);
   const [touchMode, setTouchMode] = useState(false);
-  const timer = useRef(null);
-  const hiddenRef = useRef(hidden);
-  const pinnedRef = useRef(false);
 
-  const isCompact = () => window.matchMedia("(max-width: 720px), (max-height: 600px)").matches;
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pinnedRef = useRef(true);
+  const hiddenRef = useRef(false);
+  const compactRef = useRef(false);
+  const suppressDismiss = useRef(false);
+
+  useEffect(() => { pinnedRef.current = pinned; }, [pinned]);
+  useEffect(() => { hiddenRef.current = hidden; }, [hidden]);
+
+  const cancel = useCallback(() => {
+    if (timer.current !== null) { clearTimeout(timer.current); timer.current = null; }
+  }, []);
+
+  const schedule = useCallback((delay: number = HIDE_DELAY) => {
+    cancel();
+    if (pinnedRef.current || compactRef.current) return;
+    timer.current = setTimeout(() => setHidden(true), delay);
+  }, [cancel]);
+
+  const summon = useCallback((suppressMs = 0) => {
+    cancel();
+    setHidden(false);
+    if (suppressMs > 0) {
+      suppressDismiss.current = true;
+      setTimeout(() => { suppressDismiss.current = false; }, suppressMs);
+    }
+  }, [cancel]);
+
+  const reveal = useCallback(() => {
+    setHidden(false);
+    schedule();
+  }, [schedule]);
 
   const togglePin = () => {
     const next = !pinned;
     setPinned(next);
-    try { localStorage.setItem("nav-pinned", next ? "1" : "0"); } catch { }
-    if (next) { clearTimeout(timer.current); setHidden(false); }
-    else arm();
+    pinnedRef.current = next;
+    try { localStorage.setItem("nav-pinned", next ? "1" : "0"); } catch {}
+    if (next) summon();
+    else schedule();
   };
 
-  const arm = (delay = 600) => {
-    clearTimeout(timer.current);
-    if (pinnedRef.current || isCompact()) return;
-    timer.current = setTimeout(() => setHidden(true), delay);
-  };
-
-  const summon = () => {
-    clearTimeout(timer.current);
-    setHidden(false);
-  };
-
-  const pin = () => {
-    summon();
-  };
-
-  const reveal = () => {
-    setHidden(false);
-    arm();
-  };
-
-  const setDockAndSave = (d) => {
+  const setDockAndSave = (d: Dock) => {
     setDock(d);
-    try { localStorage.setItem("nav-dock", d); } catch { }
+    try { localStorage.setItem("nav-dock", d); } catch {}
   };
-
-  useEffect(() => { pinnedRef.current = pinned; }, [pinned]);
-
-  useEffect(() => { hiddenRef.current = hidden; }, [hidden]);
-
-  useEffect(() => {
-    try { setDock(localStorage.getItem("nav-dock") || "left"); } catch { }
-  }, []);
 
   useEffect(() => {
     try {
-      setDock(localStorage.getItem("nav-dock") || "left");
-      setPinned(localStorage.getItem("nav-pinned") === "0");
-    } catch { }
+      const savedDock = localStorage.getItem("nav-dock");
+      if (savedDock === "left" || savedDock === "bottom") setDock(savedDock);
+      const savedPin = localStorage.getItem("nav-pinned") !== "0";
+      setPinned(savedPin);
+      pinnedRef.current = savedPin;
+    } catch {}
   }, []);
 
   useEffect(() => {
-    setTouchMode(window.matchMedia("(pointer: coarse)").matches);
-  }, []);
+    const touch = window.matchMedia(TOUCH_MQ);
+    const compact = window.matchMedia(COMPACT_MQ);
+    const syncTouch = () => setTouchMode(touch.matches);
+    const syncCompact = () => {
+      compactRef.current = compact.matches;
+      if (compact.matches) summon();
+    };
+    syncTouch();
+    syncCompact();
+    touch.addEventListener("change", syncTouch);
+    compact.addEventListener("change", syncCompact);
+    return () => {
+      touch.removeEventListener("change", syncTouch);
+      compact.removeEventListener("change", syncCompact);
+    };
+  }, [summon]);
 
+  useEffect(() => {
+    if (!touchMode) schedule(FIRST_HIDE_DELAY);
+    return cancel;
+  }, [touchMode, schedule, cancel]);
 
   useEffect(() => {
     if (!touchMode) return;
-    let start = null;
+    let start: { x: number; y: number } | null = null;
 
-    const onStart = (e) => {
+    const onStart = (e: TouchEvent) => {
       const t = e.touches[0];
-      const nearEdge = dock === "left" ? t.clientX < 24
-        : t.clientY > window.innerHeight - 24;
+      const nearEdge = dock === "left" ? t.clientX < 24 : t.clientY > window.innerHeight - 24;
       start = nearEdge ? { x: t.clientX, y: t.clientY } : null;
     };
-    const onMove = (e) => {
+    const onMove = (e: TouchEvent) => {
       if (!start) return;
       const t = e.touches[0];
       const inward = dock === "left" ? t.clientX - start.x : start.y - t.clientY;
       if (inward > 30) {
-        summon();
+        summon(350);
         start = null;
       }
     };
@@ -150,39 +179,40 @@ export default function NavRail() {
       window.removeEventListener("touchstart", onStart);
       window.removeEventListener("touchmove", onMove);
     };
-  }, [touchMode, dock]);
+  }, [touchMode, dock, summon]);
 
   useEffect(() => {
     if (!touchMode) return;
-    const onTap = (e) => {
-      if (e.target.closest(".nav-rail")) return;
+    const onTap = (e: TouchEvent) => {
+      if (suppressDismiss.current) return;
+      if ((e.target as HTMLElement).closest(".nav-rail")) return;
       if (hiddenRef.current) return;
-      arm(600);
+      schedule(HIDE_DELAY);
     };
     document.addEventListener("touchstart", onTap, { passive: true });
     return () => document.removeEventListener("touchstart", onTap);
-  }, [touchMode]);
-
-  useEffect(() => { if (!touchMode) arm(3000); }, [touchMode]);
+  }, [touchMode, schedule]);
 
   return (
     <>
-      {!touchMode && <div
-        className={`nav-hotzone nav-hotzone--${dock}`}
-        onMouseEnter={reveal}
-        aria-hidden="true"
-      />}
+      {!touchMode && (
+        <div
+          className={`nav-hotzone nav-hotzone--${dock}`}
+          onMouseEnter={reveal}
+          aria-hidden="true"
+        />
+      )}
       <nav
         className={`nav-rail nav-rail--${dock}${hidden ? " nav-rail--hidden" : ""}${pinned ? " nav-rail--pinned" : ""}`}
         aria-label="Primary"
-        onMouseEnter={pin}
-        onMouseLeave={() => arm()}
-        onFocus={pin}
-        onBlur={() => arm()}
+        onMouseEnter={() => summon()}
+        onMouseLeave={() => schedule()}
+        onFocus={() => summon()}
+        onBlur={() => schedule()}
         onTouchStart={(e) => {
-          if (hidden) {
+          if (hiddenRef.current) {
             e.preventDefault();
-            summon();
+            summon(350);
           }
         }}
       >

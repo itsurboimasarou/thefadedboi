@@ -1,4 +1,4 @@
-import type { Status } from "./types";
+import type { StatusConfig } from "./types";
 
 export const home = {
   eyebrow: "Greetings! How was the moon today?",
@@ -14,7 +14,7 @@ export const home = {
       { state: "offline", from: 23, to: 9 },
     ],
     labels: { online: "Online", away: "Away", busy: "Busy", offline: "Offline" },
-  },
+  } satisfies StatusConfig as StatusConfig,
   blog: {
     title: "I also write",
     description: "Longer thoughts on life — over on my blog (coming soon).",

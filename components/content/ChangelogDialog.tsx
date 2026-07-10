@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
-function renderMd(md) {
+function renderMd(md: string) {
   return md.replace(/\r/g, "").split("\n").map((line, i) => {
     if (line.startsWith("### ")) {
       const m = line.match(/\[([^\]]+)\]/);
@@ -16,10 +16,11 @@ function renderMd(md) {
   });
 }
 
-export default function ChangelogDialog({ open, onClose, changelog }) {
+interface ChangelogDialogProps { open: boolean; onClose: () => void; changelog: string }
+export default function ChangelogDialog({ open, onClose, changelog }: ChangelogDialogProps) {
   useEffect(() => {
     if (!open) return;
-    const onKey = (e) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
