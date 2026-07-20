@@ -30,7 +30,7 @@ export default function Gallery({ albums }: InferGetStaticPropsType<typeof getSt
         <p className="eyebrow">Gallery</p>
         <h1>Photos</h1>
         <p style={{ marginTop: 12, maxWidth: "100ch" }}>
-          Selected shots from each album — the full sets live on Google Photos.
+          Selected shots from each album — the full sets live on Google Photos. For cosplay, click "See more" to get the full list of albums from selected events/festivals.
         </p>
       </header>
 

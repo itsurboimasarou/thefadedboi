@@ -4,6 +4,13 @@ All notable changes to this site are documented here.
 
 ## Columbina (codename: moon)
 
+### [4.1]
+- Switch completely to TypeScript
+- The end of glassy boxes, reduced up to 30% GPU usage
+- Fluid animation reoptimized
+- Introduced Google Photos link in albums (finally!)
+- I'm no longer a cosplayer...
+
 ### [4.0]
 - Friendship ended with Furina, now Columbina Hyposelenia is my friend!
 - Navigation pill now can be interchangable between left and bottom auto-hide (and disabled when Lite mode activated, available for desktop scale only)

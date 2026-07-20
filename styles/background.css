@@ -33,35 +33,19 @@
   pointer-events: none;
 }
 .fluid-blob {
-  filter: blur(60px);
+  filter: blur(32px);
   position: absolute;
   width: 70vw;
   height: 70vh;
   background: linear-gradient(120deg, var(--accent), #aa4d76, transparent 70%);
   opacity: 0.1;
-  animation: fluid-morph 17s ease-in-out infinite alternate;
-  will-change: border-radius, transform;
+  animation: none;
+  will-change: auto;
   transform: translateZ(0);
 }
-.fluid-blob--a { top: -15vh; left: -15vw; }
-.fluid-blob--b {
-  bottom: -15vh; right: -15vw;
-  background: linear-gradient(240deg, #aa4d76, var(--accent), transparent 80%);
-  animation-duration: 20s;
-  animation-direction: alternate-reverse;
-}
-.fluid-blob--c {
-  top: 30%; left: 25%;
-  width: 50vw; height: 50vh;
-  background: radial-gradient(closest-side, #c6d1e2, transparent);
-  opacity: 0.07;
-  animation-duration: 24s;
-}
-@keyframes fluid-morph {
-  0%   { border-radius: 58% 42% 63% 37% / 45% 55% 45% 55%; }
-  50%  { border-radius: 40% 60% 45% 55% / 60% 38% 62% 40%; }
-  100% { border-radius: 55% 45% 38% 62% / 42% 60% 40% 58%; }
-}
+.fluid-blob--a { transform: rotate(-4deg); border-radius: 58% 42% 63% 37% / 45% 55% 45% 55%; }
+.fluid-blob--b { transform: rotate(3deg) translate(-8vw, -6vh); border-radius: 40% 60% 45% 55% / 60% 38% 62% 40%; }
+.fluid-blob--c { transform: scale(1.1); border-radius: 55% 45% 38% 62% / 42% 60% 40% 58%; }
 
 /* three distinct roaming paths — corner to corner through the middle */
 @keyframes roam-a {

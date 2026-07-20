@@ -39,6 +39,17 @@
   color-scheme: light;
 }
 
+:root[data-theme="light"] .glass,
+:root[data-theme="light"] .gear-card,
+:root[data-theme="light"] .spec-item summary,
+:root[data-theme="light"] .contact-icon {
+  background: #ffffff;
+}
+:root[data-theme="light"] .glass--hover:hover,
+:root[data-theme="light"] .gear-card:hover {
+  background: #f4f7fb; 
+}
+
 :root[data-theme="light"] .motion-switch {
   border-color: rgba(16, 19, 24, 0.32);
   /* ~3× the default glass border */
