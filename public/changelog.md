@@ -7,8 +7,8 @@ All notable changes to this site are documented here.
 ### [4.1]
 - Switch completely to TypeScript
 - The end of glassy boxes, reduced up to 30% GPU usage
-- Fluid animation reoptimized
-- Introduced Google Photos link in albums (finally!)
+- Removed fluid animation & replaced with shooting stars (and moon, with massive GPU usage reduction) 
+- Massive Gallery update & introducing Google Photos link in albums (finally! but only 2 albums for now...)
 - I'm no longer a cosplayer...
 
 ### [4.0]
