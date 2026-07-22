@@ -132,7 +132,7 @@ export default function Home({ changelog }: InferGetStaticPropsType<typeof getSt
         className="footer-art"
         aria-label="Source code"
       >
-        <img src="/sanbina.webp" alt="" />
+        <img src="/Sanbina.webp" alt="" />
       </a>
     </>
   );
