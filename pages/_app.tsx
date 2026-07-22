@@ -41,10 +41,11 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <div className="orb-field" aria-hidden="true">
         <MeshBackground />
-        <div className="fluid" aria-hidden="true">
-          <span className="fluid-blob fluid-blob--a" />
-          <span className="fluid-blob fluid-blob--b" />
-          <span className="fluid-blob fluid-blob--c" />
+        <div className="sky" aria-hidden="true">
+          <span className="moon" />
+          {Array.from({ length: 7 }, (_, i) => (
+            <span key={i} className={`star star--${i + 1}`} />
+          ))}
         </div>
       </div>
       <TopBar />

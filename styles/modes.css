@@ -102,8 +102,7 @@ html.lite-mode .nav-hotzone { display: none; }
 
 html.lite-mode .version-pill:hover { transform: none; }
 
-html.lite-mode .fluid { display: none; }
-html.lite-mode .orb-field::after { display: none; }
+html.lite-mode .sky .star { display: none; }  
 
 html.lite-mode .year-menu { animation: none; }
 
