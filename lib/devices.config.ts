@@ -28,7 +28,7 @@ export const devices: DeviceSection[] = [
           { label: "Memory", value: "12GB LPDDR4X / 256GB UFS 2.1" },
           { label: "Camera", value: "48MP IMX586 + 8MP (ultrawide) + 2MP (macro)" },
           { label: "Battery", value: "4000mAh, 18W wired" },
-          { label: "OS", value: "Android 12 - ColorOS 12.1" },
+          { label: "OS", value: "ColorOS 12.1 (Android 12L)" },
         ],
       },
     ],

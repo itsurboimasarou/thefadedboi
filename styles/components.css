@@ -96,7 +96,6 @@
 }
 
 .glass--hover:hover {
-  transform: translateY(-4px);
   background: color-mix(in srgb, var(--ink) 9%, var(--bg));
   border-color: var(--accent);
 }
@@ -131,7 +130,6 @@
 
 .btn:active,
 .btn:hover {
-  transform: translateY(-2px);
   box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
@@ -370,7 +368,6 @@
 }
 .version-pill:hover{
   background: color-mix(in srgb, currentColor 22%, transparent);
-  transform: translateY(-1px);
 }
 
 .dd-row {
@@ -442,3 +439,26 @@
 .glance-grid .info-tip:focus-visible .info-tip-bubble {
   translate: 0 0;
 }
+
+.event-chips {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 50%, transparent) transparent;
+  mask-image: linear-gradient(to right, black calc(100% - 24px), transparent);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent);
+}
+.event-chips .like-bubble {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+.event-chips::-webkit-scrollbar { height: 6px; }
+.event-chips::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 999px;
+}
+.event-chips::-webkit-scrollbar-track { background: transparent; }

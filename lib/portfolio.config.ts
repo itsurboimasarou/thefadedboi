@@ -1,6 +1,13 @@
 import type { Project, JourneyStop } from "./types";
 
 export const portfolio = {
+  banner: {
+    text: "The certificates behind these projects are in my gallery.",
+    ctaLabel: "View achievements →",
+    ctaHref: "/gallery#achievements",
+    variant: "solid" as const,
+    icon: "trophy",
+  },
   projects: [
     {
       title: "Seven Star Rising (SSR)",

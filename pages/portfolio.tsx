@@ -1,4 +1,5 @@
 import { portfolio } from "@/lib/portfolio.config";
+import LinkBanner from "@/components/content/LinkBanner";
 import Icon from "@/components/ui/Icons";
 
 export default function Portfolio() {
@@ -8,6 +9,8 @@ export default function Portfolio() {
         <p className="eyebrow">Portfolio</p>
         <h1>Highlights</h1>
       </header>
+
+      <LinkBanner {...portfolio.banner} />
 
       <section className="grid grid--2">
         {portfolio.projects.map((p) => {

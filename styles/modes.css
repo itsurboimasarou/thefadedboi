@@ -105,6 +105,8 @@ html.lite-mode .version-pill:hover { transform: none; }
 html.lite-mode .fluid { display: none; }
 html.lite-mode .orb-field::after { display: none; }
 
+html.lite-mode .year-menu { animation: none; }
+
 /* Lite + light: solid white surfaces */
 html.lite-mode[data-theme="light"] .glass,
 html.lite-mode[data-theme="light"] .gear-card,
