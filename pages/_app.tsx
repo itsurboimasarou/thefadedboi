@@ -21,8 +21,15 @@ import LiteNotice from "@/components/controls/LiteNotice";
 const display = Work_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
 const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-body" });
 
-const WAVE_PATH =
-  "M0,192 C240,120 480,120 720,192 C960,264 1200,264 1440,192 C1680,120 1920,120 2160,192 C2400,264 2640,264 2880,192 L2880,320 L0,320 Z";
+/* Star lanes are computed ONCE at module scope, not on every render.
+   Deterministic (prime-stepped, not Math.random) so SSR and the client
+   produce identical markup — no hydration mismatch. */
+const STARS = Array.from({ length: 24 }, (_, i) => ({
+  top: `${Math.round((i * 37) % 60)}%`,
+  left: `${Math.round(30 + ((i * 53) % 70))}%`,
+  animationDuration: `${5 + (i % 5) * 0.7}s`,
+  animationDelay: `${(i * 1.7) % 20}s`,
+}));
 
 export default function App({ Component, pageProps }: AppProps) {
   
@@ -43,8 +50,8 @@ export default function App({ Component, pageProps }: AppProps) {
         <MeshBackground />
         <div className="sky" aria-hidden="true">
           <span className="moon" />
-          {Array.from({ length: 7 }, (_, i) => (
-            <span key={i} className={`star star--${i + 1}`} />
+          {STARS.map((s, i) => (
+            <span key={i} className="star" style={s} />
           ))}
         </div>
       </div>

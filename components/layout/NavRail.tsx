@@ -184,6 +184,7 @@ export default function NavRail() {
   useEffect(() => {
     if (!touchMode) return;
     const onTap = (e: TouchEvent) => {
+      if (pinnedRef.current || compactRef.current) return;
       if (suppressDismiss.current) return;
       if ((e.target as HTMLElement).closest(".nav-rail")) return;
       if (hiddenRef.current) return;

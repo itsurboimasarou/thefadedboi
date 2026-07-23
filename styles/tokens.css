@@ -50,18 +50,18 @@
   background: #f4f7fb; 
 }
 
-:root[data-theme="light"] .motion-switch {
+:root[data-theme="light"] .lite-switch {
   border-color: rgba(16, 19, 24, 0.32);
   /* ~3× the default glass border */
 }
 
 :root[data-theme="light"] .motion-notice,
 :root[data-theme="light"] .changelog-dialog {
-  background: rgba(255, 255, 255, 0.88);
+  background: #ffffff;
 }
 
 :root[data-theme="light"] .notice-backdrop {
-  background: rgba(235, 239, 245, 0.705);
+  background: #ffffff;
 }
 
 :root[data-theme="light"] .link-banner--solid {

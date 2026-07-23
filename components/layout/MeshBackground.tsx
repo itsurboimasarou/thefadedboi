@@ -28,51 +28,43 @@ const PALETTES: { dark: MeshField[]; light: MeshField[] } = {
   ],
 };
 
+const CROSSFADE = 100;
+
 export default function MeshBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
-    let lastKey = "";
-    let w = 0, h = 0, raf = 0;
+
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    let w = 0, h = 0;
+    let lastW = -1;
 
     let blend = document.documentElement.dataset.theme === "light" ? 1 : 0;
-    let from = blend, to = blend, t0 = 0;
-    const DURATION = 150;
-    const easeInOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    let fadeFrom = blend;
+    let fadeTo = blend;
+    let fadeStart = 0;
+    let raf = 0;
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
 
-    let lastW = 0;
-    const resize = () => {
-      if (window.innerWidth === lastW) return;
+    const easeInOut = (x: number) =>
+      x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+
+    const resize = (): boolean => {
+      if (window.innerWidth === lastW) return false;
       lastW = window.innerWidth;
       w = window.innerWidth;
       h = Math.max(window.innerHeight, window.screen.height);
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return true;
     };
 
-    const draw = (now: number) => {
-      const reduced = liteMode();
-      const target = document.documentElement.dataset.theme === "light" ? 1 : 0;
-
-      if (target !== to) { from = blend; to = target; t0 = now; }
-
-      if (reduced) blend = to;
-      else {
-        const p = Math.min((now - t0) / DURATION, 1);
-        blend = from + (to - from) * easeInOut(p);
-      }
-
-      const key = `${target}|${reduced}|${Math.round(w)}x${Math.round(h)}`;
-      if (reduced && key === lastKey) { raf = requestAnimationFrame(draw); return; }
-      lastKey = reduced ? key : "";
-
-      const time = reduced ? 0 : now;
+    const paint = () => {
       ctx.clearRect(0, 0, w, h);
       const R = Math.max(w, h);
 
@@ -83,13 +75,13 @@ export default function MeshBackground() {
 
         let g: CanvasGradient;
         if (d.vertical) {
-          const reach = (0.45 + Math.sin(time * d.sp + d.ph) * 0.04) * h;
+          const reach = (0.45 + Math.sin(d.ph) * 0.04) * h;
           g = ctx.createLinearGradient(0, 0, 0, reach);
           g.addColorStop(0, color);
           g.addColorStop(1, "transparent");
         } else {
-          const x = (d.fx + Math.sin(time * d.sp + d.ph) * 0.02) * w;
-          const y = (d.fy + Math.cos(time * d.sp * 1.4 + d.ph) * 0.02) * h;
+          const x = (d.fx + Math.sin(d.ph) * 0.02) * w;
+          const y = (d.fy + Math.cos(d.ph) * 0.02) * h;
           g = ctx.createRadialGradient(x, y, 0, x, y, d.r * R);
           g.addColorStop(0, color);
           g.addColorStop(1, "transparent");
@@ -103,15 +95,56 @@ export default function MeshBackground() {
       ctx.globalAlpha = 0.85 * blend;
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, w, h);
-      raf = requestAnimationFrame(draw);
+      ctx.globalAlpha = 1;
+    };
+
+    const step = (now: number) => {
+      const p = Math.min((now - fadeStart) / CROSSFADE, 1);
+      blend = fadeFrom + (fadeTo - fadeFrom) * easeInOut(p);
+      paint();
+      if (p < 1) {
+        raf = requestAnimationFrame(step);
+      } else {
+        raf = 0;
+      }
+    };
+
+    const startFade = (target: number) => {
+      if (target === fadeTo && raf !== 0) return;
+      fadeFrom = blend;
+      fadeTo = target;
+      if (liteMode()) {
+        blend = target;
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        paint();
+        return;
+      }
+      fadeStart = performance.now();
+      if (raf === 0) raf = requestAnimationFrame(step);
     };
 
     resize();
-    window.addEventListener("resize", resize);
-    raf = requestAnimationFrame(draw);
+    paint();
+
+    const onResize = () => {
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        resizeTimer = null;
+        if (resize()) paint();
+      }, 150);
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+
+    const obs = new MutationObserver(() => {
+      startFade(document.documentElement.dataset.theme === "light" ? 1 : 0);
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      obs.disconnect();
+      window.removeEventListener("resize", onResize);
+      if (resizeTimer) clearTimeout(resizeTimer);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, []);
 

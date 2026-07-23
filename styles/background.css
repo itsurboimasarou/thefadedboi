@@ -10,7 +10,7 @@
   z-index: -1;
   overflow: hidden;
   background: var(--bg);
-  transition: background 0.25s ease;
+  transition: background 0.2s ease;
 }
 
 .mesh-bg {
@@ -18,7 +18,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  filter: blur(40px) saturate(1.1);
+  filter: blur(0px) saturate(1);
 }
 
 :root[data-theme="light"] .orb-field::after {
@@ -32,6 +32,9 @@
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  isolation: isolate;
+  contain: layout paint style;
+  transform: translateZ(0);
 }
 
 /* moon: large circle peeking from the bottom-left corner */
@@ -39,18 +42,22 @@
   position: absolute;
   left: -14vw;
   bottom: -32vh;
-  width: 52vw;
-  height: 52vw;
-  max-width: 620px;
-  max-height: 620px;
+  width: 60vw;
+  height: 60vw;
+  max-width: 740px;
+  max-height: 740px;
   border-radius: 50%;
-  background: rgba(190, 194, 205, 0.16);          /* dark mode: light gray */
-  box-shadow: 0 0 90px rgba(190, 194, 205, 0.10);
+  background: radial-gradient(closest-side,
+    rgba(190, 194, 205, 0.16) 78%,
+    rgba(190, 194, 205, 0.06) 92%,
+    transparent);
   transition: background 0.35s ease;
 }
 :root[data-theme="light"] .moon {
-  background: rgba(96, 102, 118, 0.22);            /* light mode: bolder gray */
-  box-shadow: 0 0 90px rgba(96, 102, 118, 0.10);
+  background: radial-gradient(closest-side,
+    rgba(96, 102, 118, 0.22) 78%,
+    rgba(96, 102, 118, 0.08) 92%,
+    transparent);
 }
 
 /* shooting stars: a 2px head with a fading tail, travelling diagonally */
@@ -60,10 +67,10 @@
   height: 2px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6);
   opacity: 0;
   animation: shoot 6s linear infinite;
   will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .star::before {                                    /* the tail */
@@ -79,21 +86,11 @@
 }
 
 :root[data-theme="light"] .star {
-  background: var(--accent);                       /* pink in light mode */
-  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--accent) 55%, transparent);
+  background: var(--accent);
 }
 :root[data-theme="light"] .star::before {
   color: color-mix(in srgb, var(--accent) 70%, transparent);
 }
-
-/* each star gets its own lane, timing, and delay */
-.star--1 { top: 8%;  left: 78%; animation-duration: 5.5s; animation-delay: 0s;   }
-.star--2 { top: 22%; left: 92%; animation-duration: 7s;   animation-delay: 1.8s; }
-.star--3 { top: 4%;  left: 55%; animation-duration: 6.2s; animation-delay: 3.4s; }
-.star--4 { top: 35%; left: 85%; animation-duration: 8s;   animation-delay: 5.1s; }
-.star--5 { top: 15%; left: 40%; animation-duration: 6.8s; animation-delay: 7.3s; }
-.star--6 { top: 48%; left: 96%; animation-duration: 7.5s; animation-delay: 9.6s; }
-.star--7 { top: 28%; left: 68%; animation-duration: 5.8s; animation-delay: 12s;  }
 
 @keyframes shoot {
   0%        { transform: rotate(135deg) translateX(0);      opacity: 0; }

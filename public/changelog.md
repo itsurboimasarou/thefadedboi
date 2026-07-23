@@ -10,6 +10,7 @@ All notable changes to this site are documented here.
 - Removed fluid animation & replaced with shooting stars (and moon, with massive GPU usage reduction) 
 - Massive Gallery update & introducing Google Photos link in albums (finally! but only 2 albums for now...)
 - I'm no longer a cosplayer...
+- [update-1] Re-optimized mesh background
 
 ### [4.0]
 - Friendship ended with Furina, now Columbina Hyposelenia is my friend!

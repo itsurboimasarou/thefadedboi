@@ -118,3 +118,12 @@ html.lite-mode[data-theme="light"] .nav-rail,
 html.lite-mode[data-theme="light"] .topbar--solid {
   background: #ffffff;
 }
+
+/* Lite mode: release GPU layers too. Hidden stars still hold compositor
+   memory if `will-change` stays live, so drop the hint alongside them. */
+html.lite-mode .star,
+html.lite-mode .sky {
+  will-change: auto;
+  contain: none;
+  transform: none;
+}
