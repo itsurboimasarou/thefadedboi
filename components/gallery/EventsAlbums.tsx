@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef,  useState } from "react";
 import AlbumGrid from "./AlbumGrid";
 import type { EventAlbum, ScannedSection } from "@/lib/types";
 import Icon from "../ui/Icons";
@@ -19,6 +19,8 @@ export default function EventAlbums({ events, eventImages, title, description }:
   const [year, setYear] = useState<number | undefined>(years[0]);
   const shown = useMemo(() => events.filter((e) => e.year === year), [events, year]);
   const [active, setActive] = useState<EventAlbum | null>(shown[0] ?? null);
+
+  const rowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setActive(shown[0] ?? null); }, [year]);
 
@@ -49,6 +51,7 @@ export default function EventAlbums({ events, eventImages, title, description }:
             </button>
           ))}
         </div>
+
         <a
           href={active.googlePhotosUrl}
           target="_blank"

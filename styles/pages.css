@@ -304,13 +304,25 @@
 .selector-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   flex-wrap: nowrap;
   margin-bottom: 6px;
   padding-bottom: 6px;
 }
-.selector-row .btn { flex-shrink: 0; }
+.selector-row .btn { flex-shrink: 0; margin-bottom: 12px; }
+
+.event-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.event-chips .like-bubble {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 
 .lightbox {
   position: fixed;
