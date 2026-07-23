@@ -80,6 +80,7 @@ html.lite-mode .lightbox {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+html.lite-mode .theme-switch .knob { transition: none; }
 
 html.lite-mode .lightbox-loader img {
   animation: none;
@@ -127,3 +128,29 @@ html.lite-mode .sky {
   contain: none;
   transform: none;
 }
+
+/* ── OLED mode: pitch-black surfaces ───────────────── */
+html.oled[data-theme="dark"] .glass,
+html.oled[data-theme="dark"] .glass--hover,
+html.oled[data-theme="dark"] .gear-card,
+html.oled[data-theme="dark"] .spec-item summary,
+html.oled[data-theme="dark"] .contact-icon,
+html.oled[data-theme="dark"] .changelog-dialog,
+html.oled[data-theme="dark"] .lite-notice,
+html.oled[data-theme="dark"] .info-tip-bubble {
+  background: #000000;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+html.oled[data-theme="dark"] .glass--hover:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent);
+}
+
+html.oled[data-theme="dark"] .topbar--solid {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+/* the backdrop is the whole point of OLED — let true black dominate */
+html.oled[data-theme="dark"] .mesh-bg { opacity: 0.3; }
+html.oled[data-theme="dark"] .moon { opacity: 0.55; }

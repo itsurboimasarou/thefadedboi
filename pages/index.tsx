@@ -5,6 +5,7 @@ import { home } from "@/lib/home.config";
 import BerlinClock from "@/components/widgets/BerlinClock";
 import Icon from "@/components/ui/Icons";
 import LiteModeToggle from "@/components/controls/LiteMode";
+import OledModeToggle from "@/components/controls/OledMode";
 import { useLiveStatus, StatusDot, StatusPill } from "@/components/widgets/LiveStatus";
 import ChangelogDialog from "@/components/content/ChangelogDialog";
 import pkg from "../package.json";
@@ -92,7 +93,6 @@ export default function Home({ changelog }: InferGetStaticPropsType<typeof getSt
                   <button type="button" className="status-pill version-pill" onClick={() => setLogOpen(true)}>
                     v{pkg.version}
                   </button>
-                  <ChangelogDialog open={logOpen} onClose={() => setLogOpen(false)} changelog={changelog} />
                 </dd>
                 <ChangelogDialog open={logOpen} onClose={() => setLogOpen(false)} changelog={changelog} />
               </div>
@@ -107,6 +107,21 @@ export default function Home({ changelog }: InferGetStaticPropsType<typeof getSt
                     <Icon name="info" size={17} />
                     <span className="info-tip-bubble" role="tooltip">
                       Turns off animations and transparency effects — recommended for older devices or weak hardware.
+                    </span>
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <Icon name="moon" size={15} />
+                  OLED mode
+                </dt>
+                <dd className="dd-row">
+                  <OledModeToggle />
+                  <span className="info-tip" tabIndex={0} aria-label="About OLED mode">
+                    <Icon name="info" size={17} />
+                    <span className="info-tip-bubble" role="tooltip">
+                      Turns every surface pitch black in dark mode — saves power on OLED screens.
                     </span>
                   </span>
                 </dd>

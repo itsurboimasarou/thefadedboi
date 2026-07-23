@@ -45,6 +45,7 @@ const icons: Record<string, JSX.Element> = {
   cake: <svg {...p}><path d="M4 13a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7H4v-7Z" /><path d="M4 16c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0" /><path d="M12 11V8.5" /><path d="M12 6.5c-.9 0-1.5-.7-1.5-1.5S12 2.5 12 2.5s1.5 1.7 1.5 2.5-.6 1.5-1.5 1.5Z" /></svg>,
   target: <svg {...p}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5.2" /><circle cx="12" cy="12" r="1.6" /></svg>,
   pin: <svg {...p}><path d="M12 21.5s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z" /><circle cx="12" cy="10.5" r="2.6" /></svg>,
+  moon: <svg {...p}><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" /></svg>,
   dot: <svg {...p}><circle cx="12" cy="12" r="3.5" /></svg>,
 };
 

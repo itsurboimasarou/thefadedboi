@@ -4,6 +4,11 @@ All notable changes to this site are documented here.
 
 ## Columbina (codename: moon)
 
+### [4.2]
+- Thêm Tiếng Việt
+- Added OLED mode for dark theme
+- Bring back topbar blur (removed in testing animation previously)
+
 ### [4.1]
 - Switch completely to TypeScript
 - The end of glassy boxes, reduced up to 30% GPU usage

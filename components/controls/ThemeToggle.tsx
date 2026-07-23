@@ -35,13 +35,13 @@ export default function ThemeToggle() {
       type="button"
       role="switch"
       aria-checked={theme === "light"}
-      aria-label="Toggle light mode"
       className="theme-switch"
       onClick={toggle}
+      aria-label="Toggle theme"
     >
+      <span className="knob" aria-hidden="true" />
       <span className="track-icon track-icon--moon">{moon}</span>
       <span className="track-icon track-icon--sun">{sun}</span>
-      <span className="knob">{theme === "light" ? sun : moon}</span>
     </button>
   );
 }

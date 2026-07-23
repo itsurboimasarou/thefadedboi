@@ -98,3 +98,18 @@ body {
 .app-root {
   font-family: var(--font-body, system-ui, sans-serif);
 }
+
+/* ── OLED mode ───────────────────────────────────────
+   A modifier on dark mode, not a third theme: qualified with
+   [data-theme="dark"] so leaving it on and switching to light
+   still gives normal light mode. */
+html.oled[data-theme="dark"] {
+  --bg: #000000;
+  --ink: #ffffff;
+  --ink-dim: #8b8b93;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-strong: rgba(255, 255, 255, 0.09);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --shadow: none;
+  --nav-bg: rgba(0, 0, 0, 0.72);
+}
