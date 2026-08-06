@@ -21,41 +21,51 @@ export interface Project {
 }
 export interface JourneyStop { period: string; role: string; org: string; note: string }
 export interface Like { label: string; text: string }
-export interface EventAlbum {
-  name: string;
-  year: number;
+
+export interface SubAlbum {
+  slug: string;
+  title: string;
+  year?: number
   folder: string;
-  googlePhotosUrl: string;
+  cover?: string;
+  driveUrl?: string;
 }
 
-interface SectionBase { title: string; description?: string }
+export interface Album {
+  slug: string;
+  title: string;
+  year?: number;
+  folder: string;
+  cover?: string;
+  driveUrl?: string;
+  subAlbums?: SubAlbum[];
+}
 
-export interface SimpleSection extends SectionBase {
-  kind: "simple";
-  folder: string;
-  googlePhotosUrl: string;
-}
-export interface EventsSection extends SectionBase {
-  kind: "events";
-  googlePhotosUrl?: string;
-  events: EventAlbum[];
-}
-export interface BannerSection extends SectionBase {
-  kind: "banner";
-  folder: string;
-  bannerText: string;
+export interface SubjectBanner {
+  text: string;
   ctaLabel: string;
   ctaHref: string;
 }
-export type GallerySection = SimpleSection | EventsSection | BannerSection;
 
-export type ScannedSimple = SimpleSection & { images: string[] };
-export type ScannedBanner = BannerSection & { images: string[] };
-export type ScannedEvents = EventsSection & {
-  images: string[];
-  eventImages: Record<string, string[]>;
-};
-export type ScannedSection = ScannedSimple | ScannedBanner | ScannedEvents;
+export interface Subject {
+  slug: string;
+  title: string;
+  description?: string;
+  icon?: string;
+  folder?: string;
+  banner?: SubjectBanner;
+  albums: Album[];
+}
+
+export type ScannedSubject = Subject & { images?: string[] };
+
+export interface Manifest {
+  version: number;
+  subjects: Subject[];
+}
+
+export type ScannedSubAlbum = SubAlbum & { images: string[] };
+
 export type GalleryImage = string | { full: string; thumb?: string };
 
 export interface Spec { label: string; value: string }

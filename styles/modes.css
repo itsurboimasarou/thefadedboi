@@ -154,3 +154,10 @@ html.oled[data-theme="dark"] .topbar--solid {
 /* the backdrop is the whole point of OLED — let true black dominate */
 html.oled[data-theme="dark"] .mesh-bg { opacity: 0.3; }
 html.oled[data-theme="dark"] .moon { opacity: 0.55; }
+
+/* Lite mode: a static ring still communicates "working" without animating. */
+html.lite-mode .page-loader-ring {
+  animation: none;
+  border-top-color: var(--accent);
+}
+

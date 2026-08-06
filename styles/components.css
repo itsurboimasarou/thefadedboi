@@ -222,6 +222,8 @@
   white-space: nowrap;
 }
 
+.head-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
 /* ── Status ─────────────────────────────────────────── */
 .status {
   display: inline-flex;
@@ -441,8 +443,6 @@
   padding-bottom: 0;
   scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--accent) 50%, transparent) transparent;
-  mask-image: linear-gradient(to right, black calc(100% - 24px), transparent);
-  -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent);
 }
 .event-chips .like-bubble {
   flex-shrink: 0;

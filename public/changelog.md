@@ -5,7 +5,7 @@ All notable changes to this site are documented here.
 ## Columbina (codename: moon)
 
 ### [4.2]
-- Thêm Tiếng Việt
+- Gallery rebuild & refreshed UI
 - Added OLED mode for dark theme
 - Bring back topbar blur (removed in testing animation previously)
 

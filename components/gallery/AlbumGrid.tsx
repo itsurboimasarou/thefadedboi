@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/router";
 import Image from "next/image";
 import type { GalleryImage } from "@/lib/types";
 
 interface AlbumGridProps { images: GalleryImage[]; title: string }
 export default function AlbumGrid({ images, title }: AlbumGridProps) {
+  const router = useRouter();
   const [index, setIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const warmed = useRef<HTMLImageElement[]>([]);
 
   const items: { full: string; thumb: string }[] = images.map((it) =>
     typeof it === "string" ? { full: it, thumb: it } : { thumb: it.thumb ?? it.full, full: it.full }
@@ -16,6 +20,25 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
   useEffect(() => setMounted(true), []);
   useEffect(() => setLoaded(false), [index]);
 
+  useEffect(() => {
+    const onStart = () => {
+      setLeaving(true);
+      setIndex(null);
+      warmed.current.forEach((img) => { img.src = ""; });
+      warmed.current = [];
+    };
+    const onDone = () => setLeaving(false);
+
+    router.events.on("routeChangeStart", onStart);
+    router.events.on("routeChangeComplete", onDone);
+    router.events.on("routeChangeError", onDone);
+    return () => {
+      router.events.off("routeChangeStart", onStart);
+      router.events.off("routeChangeComplete", onDone);
+      router.events.off("routeChangeError", onDone);
+    };
+  }, [router.events]);
+
   const close = useCallback(() => setIndex(null), []);
   const step = useCallback(
     (dir: number) => setIndex((i) => (i === null ? i : (i + dir + items.length) % items.length)),
@@ -23,8 +46,10 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
   );
 
   const warm = (src: string) => {
+    if (leaving) return;
     const i = new window.Image();
     i.src = src;
+    warmed.current.push(i);
   };
 
   useEffect(() => {
@@ -117,27 +142,32 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
   return (
     <>
       <div className="album-grid">
-        {items.map((img, i) => (
-          <button
-            key={img.full}
-            type="button"
-            className="album-thumb"
-            onMouseEnter={() => warm(img.full)}
-            onTouchStart={() => warm(img.full)}
-            onClick={() => setIndex(i)}
-            aria-label={`View photo ${i + 1} of ${title} full size`}
-          >
-            <Image
-              src={img.thumb}
-              alt={`${title} — photo ${i + 1}`}
-              width={400}
-              height={400}
-              sizes="(max-width: 600px) 50vw, (max-width: 900px) 33vw, 300px"
-              quality={65}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          </button>
-        ))}
+        {items.map((img, i) =>
+          leaving ? (
+            <span key={img.full} className="album-thumb album-thumb--idle" aria-hidden="true" />
+          ) : (
+            <button
+              key={img.full}
+              type="button"
+              className="album-thumb"
+              onMouseEnter={() => warm(img.full)}
+              onTouchStart={() => warm(img.full)}
+              onClick={() => setIndex(i)}
+              aria-label={`View photo ${i + 1} of ${title} full size`}
+            >
+              <Image
+                src={img.thumb}
+                alt={`${title} — photo ${i + 1}`}
+                width={400}
+                height={400}
+                sizes="(max-width: 600px) 50vw, (max-width: 900px) 33vw, 300px"
+                quality={65}
+                fetchPriority="low"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </button>
+          )
+        )}
       </div>
       {mounted && lightbox && createPortal(lightbox, document.body)}
     </>

@@ -17,6 +17,7 @@ import NavRail from "@/components/layout/NavRail";
 import { site } from "@/lib/site.config";
 import MeshBackground from "@/components/layout/MeshBackground";
 import LiteNotice from "@/components/controls/LiteNotice";
+import PageLoader from "@/components/layout/PageLoader";
 
 const display = Work_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
 const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-body" });
@@ -64,6 +65,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </div>
       <NavRail />
       <LiteNotice />
+      <PageLoader />
     </div>
   );
 }

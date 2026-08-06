@@ -3,3 +3,7 @@ node_modules
 next-env.d.ts
 .vercel
 .env*
+
+# photos synced at build time from the private photo repo
+public/albums/
+.photo-cache.json
