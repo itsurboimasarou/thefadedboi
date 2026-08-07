@@ -5,25 +5,13 @@ export const BRANCH = "main";
 export const CDN = `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}`;
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
+const IGNORE_PREFIX = /^_/;
 
-/** Encode each path segment separately: encodeURI leaves "#", "?" and "+"
- *  intact, which silently breaks CDN URLs for files with those characters —
- *  the usual cause of a handful of photos failing while the rest load. */
 const encPath = (p: string) => p.split("/").map(encodeURIComponent).join("/");
 
 export const cdnUrl = (folder: string, file: string) =>
   `${CDN}/albums/${encPath(folder)}/${encodeURIComponent(file)}`;
 
-/**
- * Optional pre-shrunk thumbnail. If the photos repo has a mirrored
- * `thumbs/<folder>/<file>` tree (800px longest edge is plenty), grid tiles
- * pull from it instead of the full-resolution original — by far the largest
- * available speedup, since the optimizer no longer fetches multi-MB files
- * just to emit a 300px tile.
- *
- * Set USE_THUMBS once the thumbs/ tree exists; until then grids fall back to
- * originals and nothing breaks.
- */
 export const USE_THUMBS = process.env.PHOTOS_THUMBS === "1";
 
 export const thumbUrl = (folder: string, file: string) =>
@@ -52,7 +40,7 @@ export async function listImages(
     }
     const files: { name: string; type: string }[] = await res.json();
     return files
-      .filter((f) => f.type === "file" && IMAGE_EXT.test(f.name))
+      .filter((f) => f.type === "file" && IMAGE_EXT.test(f.name) && !IGNORE_PREFIX.test(f.name) )
       .map((f) => f.name)
       .sort()
       .map((name) => ({
