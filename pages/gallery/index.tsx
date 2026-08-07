@@ -54,7 +54,7 @@ function SubjectSection({ subject }: { subject: ScannedSubject }) {
           text={subject.banner.text}
           ctaLabel={subject.banner.ctaLabel}
           ctaHref={subject.banner.ctaHref}
-          icon="trophy"
+          icon="briefcase"
         />
       )}
 
