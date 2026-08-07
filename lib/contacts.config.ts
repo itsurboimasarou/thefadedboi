@@ -13,7 +13,7 @@ export const contacts = {
     { label: "Instagram", value: "@itsurboimasarou", href: "https://instagram.com/itsurboimasarou" },
     { label: "Telegram", value: "@itsurboimasarou", href: "https://t.me/itsurboimasarou" },
     { label: "TikTok", value: "@itsurboimasarou", href: "https://tiktok.com/@itsurboimasarou" },
-    { label: "TikTok (2nd account)", value: "@masarou.photophone", href: "https://tiktok.com/@masarou.photophone" },
+    { label: "TikTok", value: "@masarou.photophone", href: "https://tiktok.com/@masarou.photophone" },
     { label: "bilibili", value: "masarou", href: "https://space.bilibili.com/3493093460413289" },
   ] as LinkItem[],
 };
