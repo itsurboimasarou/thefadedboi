@@ -161,3 +161,5 @@ html.lite-mode .page-loader-ring {
   border-top-color: var(--accent);
 }
 
+html.lite-mode .thumb-loader::after { animation: none; }
+

@@ -6,8 +6,30 @@ export const CDN = `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}`;
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
 
+/** Encode each path segment separately: encodeURI leaves "#", "?" and "+"
+ *  intact, which silently breaks CDN URLs for files with those characters —
+ *  the usual cause of a handful of photos failing while the rest load. */
+const encPath = (p: string) => p.split("/").map(encodeURIComponent).join("/");
+
 export const cdnUrl = (folder: string, file: string) =>
-  `${CDN}/albums/${folder}/${file}`;
+  `${CDN}/albums/${encPath(folder)}/${encodeURIComponent(file)}`;
+
+/**
+ * Optional pre-shrunk thumbnail. If the photos repo has a mirrored
+ * `thumbs/<folder>/<file>` tree (800px longest edge is plenty), grid tiles
+ * pull from it instead of the full-resolution original — by far the largest
+ * available speedup, since the optimizer no longer fetches multi-MB files
+ * just to emit a 300px tile.
+ *
+ * Set USE_THUMBS once the thumbs/ tree exists; until then grids fall back to
+ * originals and nothing breaks.
+ */
+export const USE_THUMBS = process.env.PHOTOS_THUMBS === "1";
+
+export const thumbUrl = (folder: string, file: string) =>
+  USE_THUMBS
+    ? `${CDN}/thumbs/${encPath(folder)}/${encodeURIComponent(file)}`
+    : cdnUrl(folder, file);
 
 const ghHeaders: HeadersInit = {
   Accept: "application/vnd.github+json",
@@ -16,10 +38,12 @@ const ghHeaders: HeadersInit = {
   }),
 };
 
-export async function listImages(folder: string): Promise<string[]> {
+export async function listImages(
+  folder: string
+): Promise<{ full: string; thumb: string }[]> {
   try {
     const res = await fetch(
-      `https://api.github.com/repos/${REPO}/contents/albums/${encodeURI(folder)}?ref=${BRANCH}`,
+      `https://api.github.com/repos/${REPO}/contents/albums/${encPath(folder)}?ref=${BRANCH}`,
       { headers: ghHeaders }
     );
     if (!res.ok) {
@@ -31,7 +55,10 @@ export async function listImages(folder: string): Promise<string[]> {
       .filter((f) => f.type === "file" && IMAGE_EXT.test(f.name))
       .map((f) => f.name)
       .sort()
-      .map((name) => cdnUrl(folder, name));
+      .map((name) => ({
+        full: cdnUrl(folder, name),
+        thumb: thumbUrl(folder, name),
+      }));
   } catch (err) {
     // console.warn(`[gallery] failed listing albums/${folder}:`, err);
     return [];

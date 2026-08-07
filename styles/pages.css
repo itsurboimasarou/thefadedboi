@@ -685,7 +685,8 @@
 .page-loader {
   position: fixed;
   top: 76px;
-  right: 20px;
+  left: 50%;
+  translate: -50% 0;
   z-index: 150;
   display: grid;
   place-items: center;
@@ -724,7 +725,36 @@
 }
 
 @media (max-width: 720px) {
-  .page-loader { top: auto; bottom: 96px; right: 16px; }
+  .page-loader { top: auto; bottom: 96px; left: 50%; right: auto; }
   .album-cards { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}
+
+/* ── Per-thumbnail loading / failure states ─────────── */
+.album-thumb { position: relative; }
+
+.thumb-loader,
+.thumb-failed {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--ink) 8%, var(--bg));
+  border-radius: inherit;
+}
+
+.thumb-loader::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-top-color: var(--accent);
+  animation: loader-spin 0.7s linear infinite;
+}
+
+.thumb-failed {
+  color: var(--ink-dim);
+  opacity: 0.55;
 }
 

@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import type { GalleryImage } from "@/lib/types";
+import Icon from "../ui/Icons";
 
 interface AlbumGridProps { images: GalleryImage[]; title: string }
 export default function AlbumGrid({ images, title }: AlbumGridProps) {
@@ -12,6 +13,10 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
   const [loaded, setLoaded] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const warmed = useRef<HTMLImageElement[]>([]);
+  const [ready, setReady] = useState<Record<string, boolean>>({});
+  const [attempt, setAttempt] = useState<Record<string, number>>({});
+  const [dead, setDead] = useState<Record<string, boolean>>({});
+  const retryTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const items: { full: string; thumb: string }[] = images.map((it) =>
     typeof it === "string" ? { full: it, thumb: it } : { thumb: it.thumb ?? it.full, full: it.full }
@@ -44,6 +49,25 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
     (dir: number) => setIndex((i) => (i === null ? i : (i + dir + items.length) % items.length)),
     [items.length]
   );
+
+  const MAX_RETRIES = 2;
+
+  const onThumbError = (src: string) => {
+    const tries = attempt[src] ?? 0;
+    if (tries >= MAX_RETRIES) {
+      setDead((d) => ({ ...d, [src]: true }));
+      return;
+    }
+    const t = setTimeout(() => {
+      setAttempt((a) => ({ ...a, [src]: (a[src] ?? 0) + 1 }));
+    }, 600 * (tries + 1));
+    retryTimers.current.push(t);
+  };
+
+  useEffect(() => () => {
+    retryTimers.current.forEach(clearTimeout);
+    retryTimers.current = [];
+  }, []);
 
   const warm = (src: string) => {
     if (leaving) return;
@@ -85,7 +109,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
             style={{ opacity: loaded ? 0 : 1 }}
           />
           <Image
-            key={items[index].full}
+            key={`${items[index].full}#${attempt[items[index].full] ?? 0}`}
             src={items[index].full}
             alt={`${title} — photo ${index + 1} full size`}
             fill
@@ -93,6 +117,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
             quality={80}
             priority
             onLoad={() => setLoaded(true)}
+            onError={() => onThumbError(items[index].full)}
             style={{ objectFit: "contain", opacity: loaded ? 1 : 0, transition: "opacity 0.25s" }}
           />
           {items.length > 1 &&
@@ -152,18 +177,35 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               className="album-thumb"
               onMouseEnter={() => warm(img.full)}
               onTouchStart={() => warm(img.full)}
-              onClick={() => setIndex(i)}
+              onClick={() => !dead[img.thumb] && setIndex(i)}
               aria-label={`View photo ${i + 1} of ${title} full size`}
             >
+              {!ready[img.thumb] && !dead[img.thumb] && (
+                <span className="thumb-loader" aria-hidden="true" />
+              )}
+              {dead[img.thumb] && (
+                <span className="thumb-failed" aria-hidden="true">
+                  <Icon name="image" size={20} />
+                </span>
+              )}
               <Image
+                key={`${img.thumb}#${attempt[img.thumb] ?? 0}`}
                 src={img.thumb}
                 alt={`${title} — photo ${i + 1}`}
                 width={400}
                 height={400}
                 sizes="(max-width: 600px) 50vw, (max-width: 900px) 33vw, 300px"
-                quality={65}
+                quality={60}
                 fetchPriority="low"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onLoad={() => setReady((r) => ({ ...r, [img.thumb]: true }))}
+                onError={() => onThumbError(img.thumb)}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  opacity: ready[img.thumb] ? 1 : 0,
+                  transition: "opacity 0.25s",
+                }}
               />
             </button>
           )

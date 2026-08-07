@@ -57,14 +57,14 @@ export interface Subject {
   albums: Album[];
 }
 
-export type ScannedSubject = Subject & { images?: string[] };
+export type ScannedSubject = Subject & { images?: GalleryImage[] };
 
 export interface Manifest {
   version: number;
   subjects: Subject[];
 }
 
-export type ScannedSubAlbum = SubAlbum & { images: string[] };
+export type ScannedSubAlbum = SubAlbum & { images: GalleryImage[] };
 
 export type GalleryImage = string | { full: string; thumb?: string };
 
