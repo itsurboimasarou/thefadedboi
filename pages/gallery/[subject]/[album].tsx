@@ -95,7 +95,13 @@ export default function AlbumPage({
           </h2>
           <div className="head-actions">
             {years.length > 0 && <YearSelect years={years} value={year} onChange={setYear} />}
-            {driveUrl && <a href={driveUrl} target="_blank" rel="noopener noreferrer" className="btn btn--small"><Icon name="download" size={15} />Download</a>}
+            {driveUrl && 
+              <a href={driveUrl} target="_blank" rel="noopener noreferrer"
+                className="btn btn--small btn--download" aria-label="Download album">
+                <Icon name="download" size={15} />
+                <span className="btn-label">Download</span>
+              </a>
+            }
           </div>
         </div>
 

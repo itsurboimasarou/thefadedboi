@@ -59,6 +59,15 @@
   }
 }
 
+@media (max-width: 720px) {
+  .btn--download .btn-label { display: none; }
+  .btn--download {
+    padding: 8px;
+    aspect-ratio: 1;
+    justify-content: center;
+  }
+}
+
 /* Lite mode: no animation */
 
 html.lite-mode *,

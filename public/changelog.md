@@ -8,6 +8,7 @@ All notable changes to this site are documented here.
 - Gallery rebuild & refreshed UI
 - Added OLED mode for dark theme
 - Bring back topbar blur (removed in testing animation previously)
+- [update-1] Packing sub-albums onto a scrollbar
 
 ### [4.1]
 - Switch completely to TypeScript
