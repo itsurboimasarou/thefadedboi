@@ -27,7 +27,6 @@ export interface SubAlbum {
   title: string;
   year?: number
   folder: string;
-  cover?: string;
   driveUrl?: string;
 }
 
