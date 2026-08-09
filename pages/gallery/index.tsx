@@ -100,7 +100,6 @@ function AlbumCard({ subject, album }: { subject: ScannedSubject; album: Album }
       <span className="album-card-body">
         <span className="album-card-title">{album.title}</span>
         <span className="album-card-meta">
-          {album.year}
           {count > 0 && ` · ${count} set${count > 1 ? "s" : ""}`}
         </span>
       </span>
