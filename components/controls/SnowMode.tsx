@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { liteMode } from "./LiteMode";
 
 const EVT = "snow-mode-change";
 
@@ -14,15 +15,34 @@ export function setSnow(on: boolean) {
 
 export default function SnowToggle() {
   const [on, setOn] = useState(true);
+  const [locked, setLocked] = useState(false);
+
   useEffect(() => {
     setOn(!document.documentElement.classList.contains("no-snow"));
-    const h = (e: Event) => setOn((e as CustomEvent<boolean>).detail);
-    window.addEventListener(EVT, h);
-    return () => window.removeEventListener(EVT, h);
+    setLocked(liteMode());
+
+    const onSnow = (e: Event) => setOn((e as CustomEvent<boolean>).detail);
+    const onLite = (e: Event) => setLocked((e as CustomEvent<boolean>).detail);
+
+    window.addEventListener(EVT, onSnow);
+    window.addEventListener("lite-mode-change", onLite);
+    return () => {
+      window.removeEventListener(EVT, onSnow);
+      window.removeEventListener("lite-mode-change", onLite);
+    };
   }, []);
+
   return (
-    <button type="button" role="switch" aria-checked={on} aria-label="Snowfall"
-      className="theme-switch lite-switch" onClick={() => setSnow(!on)}>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={locked ? false : on}
+      aria-label="Snowfall"
+      className="theme-switch lite-switch"
+      disabled={locked}
+      title={locked ? "Disabled by Lite mode" : undefined}
+      onClick={() => setSnow(!on)}
+    >
       <span className="knob" aria-hidden="true" />
     </button>
   );

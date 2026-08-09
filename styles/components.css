@@ -67,6 +67,14 @@
   outline-offset: 2px;
 }
 
+.theme-switch:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.row--disabled dt { opacity: 0.6; }
+
 /* ── Snowflake shape setting ────────────────────────── */
 .shape-toggle {
   display: grid;

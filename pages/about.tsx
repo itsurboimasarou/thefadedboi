@@ -1,7 +1,7 @@
 import { site } from "../lib/site.config";
 import { details } from "../lib/details.config";
 import Icon from "@/components/ui/Icons";
-import WhatILike from "@/components/content/WhatILike";
+import Favourites from "@/components/content/Favourites";
 import LiveAge from "@/components/widgets/LiveAge";
 import Image from "next/image";
 
@@ -34,8 +34,8 @@ export default function About() {
       </section>
 
       <section className="glass">
-        <h2 className="h-with-icon"><Icon name="heart" />What I like</h2>
-        <WhatILike likes={details.likes} />
+        <h2 className="h-with-icon"><Icon name="heart" />Favourites</h2>
+        <Favourites likes={details.likes} />
       </section>
 
       <section className="grid grid--2">

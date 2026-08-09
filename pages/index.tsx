@@ -25,6 +25,7 @@ export async function getStaticProps() {
 
 export default function Home({ changelog }: InferGetStaticPropsType<typeof getStaticProps>) {
   const status = useLiveStatus(home.status);
+  const liteOn = LiteModeToggle();
   const [logOpen, setLogOpen] = useState(false);
 
   useEffect(() => {
@@ -127,7 +128,7 @@ export default function Home({ changelog }: InferGetStaticPropsType<typeof getSt
                   </span>
                 </dd>
               </div>
-              <div>
+              <div className={liteOn ? "row--disabled" : undefined}>
                 <dt>
                   <Icon name="snow" size={15} />
                   Snow mode
