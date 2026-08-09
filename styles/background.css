@@ -26,7 +26,7 @@
   mix-blend-mode: soft-light;
 }
 
-/* ── Night sky: moon + shooting stars ───────────────── */
+/* ── Night sky: snowflakes! ───────────────── */
 .sky {
   position: absolute;
   inset: 0;
@@ -37,65 +37,112 @@
   transform: translateZ(0);
 }
 
-/* moon: large circle peeking from the bottom-left corner */
-.moon {
+.flake {
   position: absolute;
-  left: -14vw;
-  bottom: -32vh;
-  width: 60vw;
-  height: 60vw;
-  max-width: 740px;
-  max-height: 740px;
-  border-radius: 50%;
-  background: radial-gradient(closest-side,
-    rgba(190, 194, 205, 0.16) 78%,
-    rgba(190, 194, 205, 0.06) 92%,
-    transparent);
-  transition: background 0.35s ease;
-}
-:root[data-theme="light"] .moon {
-  background: radial-gradient(closest-side,
-    rgba(96, 102, 118, 0.22) 78%,
-    rgba(96, 102, 118, 0.08) 92%,
-    transparent);
-}
-
-/* shooting stars: a 2px head with a fading tail, travelling diagonally */
-.star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  border-radius: 50%;
-  background: #ffffff;
-  opacity: 0;
-  animation: shoot 6s linear infinite;
-  will-change: transform, opacity;
+  top: -8vh;
+  width: var(--flake-size);
+  height: var(--flake-size);
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
   backface-visibility: hidden;
 }
 
-.star::before {                                    /* the tail */
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: 0;
-  width: 120px;
-  height: 1px;
-  translate: 0 -70%;
-  background: linear-gradient(to left, currentColor, transparent);
-  color: rgba(255, 255, 255, 0.75);
+/* ── Dot mode ────────────────────────────────────────
+   Only the DOT variant gets a background + border-radius. Scoping these to
+   :not(.snow-fancy) is what stops the crystal from being drawn inside a
+   coloured circle — the previous light-mode rule out-specified the fancy
+   override and painted a disc behind every flake. */
+html:not(.snow-fancy) .flake {
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  scale: 0.4;
 }
 
-:root[data-theme="light"] .star {
-  background: var(--accent);
+html:not(.snow-fancy)[data-theme="light"] .flake {
+  background: color-mix(in srgb, var(--accent) 80%, transparent);
 }
-:root[data-theme="light"] .star::before {
+
+html:not(.snow-fancy) .flake svg { display: none; }
+
+/* ── Crystal mode ────────────────────────────────────
+   No background at all: the SVG stroke IS the flake, coloured via
+   currentColor so it re-tints with the theme. */
+html.snow-fancy .flake {
+  background: none;
+  border-radius: 0;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+html.snow-fancy[data-theme="light"] .flake {
   color: color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
-@keyframes shoot {
-  0%        { transform: rotate(135deg) translateX(0);      opacity: 0; }
-  4%        { opacity: 1; }
-  22%       { opacity: 1; }
-  30%, 100% { transform: rotate(135deg) translateX(130vmax); opacity: 0; }
+html.snow-fancy .flake svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
+@keyframes fall {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25%  { transform: translate3d(1.5vw, 30vh, 0) rotate(35deg); }
+  50%  { transform: translate3d(-1vw, 60vh, 0) rotate(-25deg); }
+  75%  { transform: translate3d(1vw, 85vh, 0) rotate(50deg); }
+  100% { transform: translate3d(0, 120vh, 0) rotate(90deg); }
+}
+
+/* ── Settled snow ────────────────────────────────────
+   Layered drifts: two soft mounds plus a crisper top edge, so the horizon
+   reads as uneven snow rather than a flat band. Entirely static — no cost. */
+.snow-ground {
+  position: absolute;
+  left: -2vw;
+  right: -2vw;
+  bottom: 0;
+  height: 90px;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    /* crisp foreground drift */
+    radial-gradient(60% 120% at 12% 118%, var(--ink) 0 99%, transparent 100%),
+    radial-gradient(48% 105% at 38% 122%, var(--ink) 0 99%, transparent 100%),
+    radial-gradient(70% 130% at 68% 120%, var(--ink) 0 99%, transparent 100%),
+    radial-gradient(52% 110% at 93% 124%, var(--ink) 0 99%, transparent 100%);
+  opacity: 0.14;
+}
+
+/* softer, taller haze behind the drift for depth */
+.snow-ground::before {
+  content: "";
+  position: absolute;
+  left: -4vw;
+  right: -4vw;
+  bottom: 0;
+  height: 130px;
+  background:
+    radial-gradient(70% 120% at 25% 125%, var(--ink) 0 99%, transparent 100%),
+    radial-gradient(80% 130% at 80% 128%, var(--ink) 0 99%, transparent 100%);
+  opacity: 0.5;
+  filter: blur(6px);
+}
+
+/* faint bright lip where the drift catches light */
+.snow-ground::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  background:
+    radial-gradient(60% 120% at 12% 118%, var(--ink) 0 99%, transparent 100%),
+    radial-gradient(70% 130% at 68% 120%, var(--ink) 0 99%, transparent 100%);
+  opacity: 0.35;
+  translate: 0 -3px;
+  filter: blur(1px);
+}
+
+html.lite-mode .snow-ground { opacity: 0.1; }

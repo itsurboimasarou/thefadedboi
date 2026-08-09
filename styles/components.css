@@ -67,6 +67,34 @@
   outline-offset: 2px;
 }
 
+/* ── Snowflake shape setting ────────────────────────── */
+.shape-toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.shape-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.shape-toggle--on {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 /* ── Glass panels ───────────────────────────────────── */
 .glass {
   background: color-mix(in srgb, var(--ink) 6%, var(--bg));

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ThemeToggle from "../controls/ThemeToggle";
+import SnowShapeToggle from "../controls/SnowShapeToggle";
 
 export default function TopBar() {
   const [solid, setSolid] = useState(false);
@@ -25,7 +26,10 @@ export default function TopBar() {
       <Link href="/" className="logo-corner" aria-label="Home">
         <img src="/logo.png" alt="Logo" />
       </Link>
-      <ThemeToggle />
+      <div className="topbar-actions">
+        <SnowShapeToggle />
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

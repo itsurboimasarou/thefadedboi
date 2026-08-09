@@ -5,15 +5,15 @@
 /* ── Overall theming ────────────────── */
 :root,
 :root[data-theme="dark"] {
-  --bg: #14151f;
-  --ink: #ebeff5;
-  --ink-dim: #9aa5b8;
-  --accent: #dc2f7e;
-  --accent-soft: #e87aa8;
-  --accent-contrast: #24060f;
+  --bg: #0a1424;
+  --ink: #eaf4fb;
+  --ink-dim: #8fa6bf;
+  --accent: #6fc9e8;
+  --accent-soft: #b9e6f5;
+  --accent-contrast: #06192b;
   --glass: rgba(255, 255, 255, 0.055);
   --glass-strong: rgba(255, 255, 255, 0.10);
-  --glass-border: rgba(255, 255, 255, 0.13);
+  --glass-border: rgba(180, 220, 240, 0.16);
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
   --orb-blend: screen;
   --orb-opacity: 0.4;
@@ -23,11 +23,11 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #ebeff5;
-  --ink: #1f2132;
-  --ink-dim: #5a6377;
-  --accent: #b3195f;
-  --accent-soft: #dc2f7e;
+  --bg: #eef5fa;
+  --ink: #0d2137;
+  --ink-dim: #4f6883;
+  --accent: #1c74a3;
+  --accent-soft: #6fc9e8;
   --accent-contrast: #ffffff;
   --glass: rgba(255, 255, 255, 0.6);
   --glass-strong: rgba(255, 255, 255, 0.82);

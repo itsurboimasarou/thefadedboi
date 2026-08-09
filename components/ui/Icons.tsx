@@ -47,6 +47,7 @@ const icons: Record<string, JSX.Element> = {
   target: <svg {...p}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5.2" /><circle cx="12" cy="12" r="1.6" /></svg>,
   pin: <svg {...p}><path d="M12 21.5s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z" /><circle cx="12" cy="10.5" r="2.6" /></svg>,
   moon: <svg {...p}><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" /></svg>,
+  snow: <svg {...p}><path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7" /><path d="M12 5.6 9.9 7.6M12 5.6l2.1 2M12 18.4l-2.1-2M12 18.4l2.1-2" /><path d="m6.8 9.1.2 2.8M6.8 9.1l-2.7.7M17.2 14.9l-.2-2.8M17.2 14.9l2.7-.7" /><path d="m6.8 14.9-.2-2.8M6.8 14.9l-2.7-.7M17.2 9.1l.2 2.8M17.2 9.1l2.7.7" /></svg>,
   dot: <svg {...p}><circle cx="12" cy="12" r="3.5" /></svg>,
 };
 

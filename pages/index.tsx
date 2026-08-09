@@ -13,6 +13,7 @@ import pkg from "../package.json";
 import type { InferGetStaticPropsType } from "next";
 import fs from "fs";
 import path from "path";
+import SnowToggle from "@/components/controls/SnowMode";
 
 export async function getStaticProps() {
   let changelog = "";
@@ -118,6 +119,21 @@ export default function Home({ changelog }: InferGetStaticPropsType<typeof getSt
                 </dt>
                 <dd className="dd-row">
                   <OledModeToggle />
+                  <span className="info-tip" tabIndex={0} aria-label="About OLED mode">
+                    <Icon name="info" size={17} />
+                    <span className="info-tip-bubble" role="tooltip">
+                      Turns every surface pitch black in dark mode — saves power on OLED screens.
+                    </span>
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  <Icon name="snow" size={15} />
+                  Snow mode
+                </dt>
+                <dd className="dd-row">
+                  <SnowToggle />
                   <span className="info-tip" tabIndex={0} aria-label="About OLED mode">
                     <Icon name="info" size={17} />
                     <span className="info-tip-bubble" role="tooltip">

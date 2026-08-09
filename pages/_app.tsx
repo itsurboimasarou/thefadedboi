@@ -18,19 +18,10 @@ import { site } from "@/lib/site.config";
 import MeshBackground from "@/components/layout/MeshBackground";
 import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
+import Snowfall from "@/components/layout/Snowfall";
 
 const display = Work_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
 const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-body" });
-
-/* Star lanes are computed ONCE at module scope, not on every render.
-   Deterministic (prime-stepped, not Math.random) so SSR and the client
-   produce identical markup — no hydration mismatch. */
-const STARS = Array.from({ length: 24 }, (_, i) => ({
-  top: `${Math.round((i * 37) % 60)}%`,
-  left: `${Math.round(30 + ((i * 53) % 70))}%`,
-  animationDuration: `${5 + (i % 5) * 0.7}s`,
-  animationDelay: `${(i * 1.7) % 20}s`,
-}));
 
 export default function App({ Component, pageProps }: AppProps) {
   
@@ -49,12 +40,18 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <div className="orb-field" aria-hidden="true">
         <MeshBackground />
-        <div className="sky" aria-hidden="true">
-          <span className="moon" />
-          {STARS.map((s, i) => (
-            <span key={i} className="star" style={s} />
-          ))}
-        </div>
+        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+          <symbol id="flake-glyph" viewBox="0 0 24 24">
+            <g stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" fill="none">
+              <path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7" />
+              <path d="M12 5.5 9.6 7.8M12 5.5l2.4 2.3M12 18.5l-2.4-2.3M12 18.5l2.4-2.3" />
+              <path d="m6.6 9 .3 3.2M6.6 9 3.6 9.9M17.4 15l-.3-3.2M17.4 15l3-.9" />
+              <path d="m6.6 15-.3-3.2M6.6 15l-3-.9M17.4 9l.3 3.2M17.4 9l3 .9" />
+            </g>
+          </symbol>
+        </svg>
+        <Snowfall />
+        <div className="snow-ground" aria-hidden="true" />
       </div>
       <TopBar />
       <div className="shell">

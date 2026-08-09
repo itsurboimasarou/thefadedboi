@@ -112,7 +112,7 @@ html.lite-mode .nav-hotzone { display: none; }
 
 html.lite-mode .version-pill:hover { transform: none; }
 
-html.lite-mode .sky .star { display: none; }  
+html.lite-mode .sky .flake { display: none; }  
 
 html.lite-mode .year-menu { animation: none; }
 
@@ -131,7 +131,6 @@ html.lite-mode[data-theme="light"] .topbar--solid {
 
 /* Lite mode: release GPU layers too. Hidden stars still hold compositor
    memory if `will-change` stays live, so drop the hint alongside them. */
-html.lite-mode .star,
 html.lite-mode .sky {
   will-change: auto;
   contain: none;
@@ -162,7 +161,6 @@ html.oled[data-theme="dark"] .topbar--solid {
 
 /* the backdrop is the whole point of OLED — let true black dominate */
 html.oled[data-theme="dark"] .mesh-bg { opacity: 0.3; }
-html.oled[data-theme="dark"] .moon { opacity: 0.55; }
 
 /* Lite mode: a static ring still communicates "working" without animating. */
 html.lite-mode .page-loader-ring {
@@ -171,4 +169,9 @@ html.lite-mode .page-loader-ring {
 }
 
 html.lite-mode .thumb-loader::after { animation: none; }
+
+/* Snow off is handled in JS (Snowfall.tsx): each flake finishes its descent
+   and is then removed, so the field empties naturally instead of freezing
+   mid-air. Nothing to do here — but the ground stays, since settled snow
+   should not vanish when it stops falling. */
 
