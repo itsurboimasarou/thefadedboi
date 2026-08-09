@@ -92,6 +92,11 @@ export default function AlbumPage({
           <h2 className="h-with-icon">
             <Icon name="image" />
             {active ? active.title : album.title}
+            <p className="album-count">
+              {subAlbums
+                ? `${subAlbums.reduce((n, s) => n + s.images.length, 0)} photos`
+                : `${images.length} photos`}
+            </p>
           </h2>
           <div className="head-actions">
             {years.length > 0 && <YearSelect years={years} value={year} onChange={setYear} />}

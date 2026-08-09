@@ -7,19 +7,32 @@ import LinkBanner from "@/components/content/LinkBanner";
 import YearSelect from "@/components/gallery/YearSelect";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
 import { getManifest, cdnUrl, listImages } from "@/lib/photos";
-import type { Album, ScannedSubject } from "@/lib/types";
+import type { ScannedAlbum, ScannedIndexSubject } from "@/lib/types";
 
 export async function getStaticProps() {
   const { subjects } = await getManifest();
-  const withImages: ScannedSubject[] = await Promise.all(
-    subjects.map(async (s) =>
-      s.folder ? { ...s, images: await listImages(s.folder) } : s
-    )
+
+  const withData: ScannedIndexSubject[] = await Promise.all(
+    subjects.map(async (s) => ({
+      ...s,
+      ...(s.folder ? { images: await listImages(s.folder) } : {}),
+      albums: await Promise.all(
+        s.albums.map(async (a): Promise<ScannedAlbum> => ({
+          ...a,
+          count: a.subAlbums?.length
+            ? (
+                await Promise.all(a.subAlbums.map((sa) => listImages(sa.folder)))
+              ).reduce((n, imgs) => n + imgs.length, 0)
+            : (await listImages(a.folder)).length,
+        }))
+      ),
+    }))
   );
-  return { props: { subjects: withImages }, revalidate: 300 };
+
+  return { props: { subjects: withData }, revalidate: 300 };
 }
 
-function SubjectSection({ subject }: { subject: ScannedSubject }) {
+function SubjectSection({ subject }: { subject: ScannedIndexSubject }) {
   const years = useMemo(
     () =>
       [...new Set(subject.albums.map((a) => a.year).filter(Boolean))].sort(
@@ -75,9 +88,9 @@ function SubjectSection({ subject }: { subject: ScannedSubject }) {
   );
 }
 
-function AlbumCard({ subject, album }: { subject: ScannedSubject; album: Album }) {
+function AlbumCard({ subject, album }: { subject: ScannedIndexSubject; album: ScannedAlbum }) {
   const cover = album.cover ? cdnUrl(album.folder, album.cover) : null;
-  const count = album.subAlbums?.length ?? 0;
+  const subCount = album.subAlbums?.length ?? 0;
 
   return (
     <Link href={`/gallery/${subject.slug}/${album.slug}`} className="album-card">
@@ -100,7 +113,7 @@ function AlbumCard({ subject, album }: { subject: ScannedSubject; album: Album }
       <span className="album-card-body">
         <span className="album-card-title">{album.title}</span>
         <span className="album-card-meta">
-          {count > 0 && ` · ${count} set${count > 1 ? "s" : ""}`}
+          {subCount > 0 ? `${subCount} set${subCount > 1 ? "s" : ""}` : `${album.count} photos`}
         </span>
       </span>
     </Link>

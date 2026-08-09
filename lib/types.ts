@@ -64,6 +64,11 @@ export interface Manifest {
 }
 
 export type ScannedSubAlbum = SubAlbum & { images: GalleryImage[] };
+export type ScannedAlbum = Album & { count: number };
+export type ScannedIndexSubject = Omit<Subject, "albums"> & {
+  images?: GalleryImage[];
+  albums: ScannedAlbum[];
+};
 
 export type GalleryImage = string | { full: string; thumb?: string };
 

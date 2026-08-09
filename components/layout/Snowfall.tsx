@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
-const COUNT = 40;
+const COUNT = 24;
 
 const FLAKES = Array.from({ length: COUNT }, (_, i) => ({
   left: `${Math.round((i * 53) % 100)}%`,
-  ["--flake-size" as string]: `${6 + (i % 5) * 3}px`,
+  ["--flake-size" as string]: `${6 + (i % 4) * 3}px`,
   opacity: 0.25 + ((i * 7) % 50) / 100,
-  animationDuration: `${9 + ((i * 3) % 11)}s`,
-  animationDelay: `${(i * 1.3) % 14}s`,
+  animationDuration: `${11 + ((i * 3) % 10)}s`,
+  animationDelay: `${(i * 1.9) % 21}s`,
 }));
 
 export default function Snowfall() {

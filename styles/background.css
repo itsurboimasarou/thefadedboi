@@ -75,6 +75,13 @@ html.snow-fancy .flake {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* Crystals cost roughly an order of magnitude more to rasterize than dots
+   (12 stroked paths vs one filled circle), so fancy mode shows every other
+   flake: same visual density class, same GPU budget as dot mode. */
+html.snow-fancy .flake:nth-child(odd) {
+  display: none;
+}
+
 html.snow-fancy[data-theme="light"] .flake {
   color: color-mix(in srgb, var(--accent) 70%, transparent);
 }
@@ -87,11 +94,23 @@ html.snow-fancy .flake svg {
 }
 
 @keyframes fall {
-  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-  25%  { transform: translate3d(1.5vw, 30vh, 0) rotate(35deg); }
-  50%  { transform: translate3d(-1vw, 60vh, 0) rotate(-25deg); }
-  75%  { transform: translate3d(1vw, 85vh, 0) rotate(50deg); }
-  100% { transform: translate3d(0, 120vh, 0) rotate(90deg); }
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(1.5vw, 30vh, 0); }
+  50%  { transform: translate3d(-1vw, 60vh, 0); }
+  75%  { transform: translate3d(1vw, 85vh, 0); }
+  100% { transform: translate3d(0, 120vh, 0); }
+}
+
+/* Spin lives on the SVG child, fancy mode only: dots are rotation-invariant,
+   so spinning them would burn GPU resampling for zero visual change. One slow
+   linear spin also lets the compositor reuse the rasterized crystal texture
+   instead of re-rasterizing — rotation of a cached layer is cheap; it is
+   rotation combined with per-frame repaint that is not. */
+html.snow-fancy .flake svg {
+  animation: flake-spin 14s linear infinite;
+}
+@keyframes flake-spin {
+  to { rotate: 360deg; }
 }
 
 /* ── Settled snow ────────────────────────────────────
@@ -111,7 +130,7 @@ html.snow-fancy .flake svg {
     radial-gradient(48% 105% at 38% 122%, var(--ink) 0 99%, transparent 100%),
     radial-gradient(70% 130% at 68% 120%, var(--ink) 0 99%, transparent 100%),
     radial-gradient(52% 110% at 93% 124%, var(--ink) 0 99%, transparent 100%);
-  opacity: 0.14;
+  opacity: 0.16;
 }
 
 /* softer, taller haze behind the drift for depth */
@@ -127,22 +146,6 @@ html.snow-fancy .flake svg {
     radial-gradient(80% 130% at 80% 128%, var(--ink) 0 99%, transparent 100%);
   opacity: 0.5;
   filter: blur(6px);
-}
-
-/* faint bright lip where the drift catches light */
-.snow-ground::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  background:
-    radial-gradient(60% 120% at 12% 118%, var(--ink) 0 99%, transparent 100%),
-    radial-gradient(70% 130% at 68% 120%, var(--ink) 0 99%, transparent 100%);
-  opacity: 0.35;
-  translate: 0 -3px;
-  filter: blur(1px);
 }
 
 html.lite-mode .snow-ground { opacity: 0.1; }

@@ -137,7 +137,7 @@ export default function Home({ changelog }: InferGetStaticPropsType<typeof getSt
                   <span className="info-tip" tabIndex={0} aria-label="About OLED mode">
                     <Icon name="info" size={17} />
                     <span className="info-tip-bubble" role="tooltip">
-                      Turns every surface pitch black in dark mode — saves power on OLED screens.
+                      Falling snows at the background, increase GPU usage. Turn this off will end the snowflake generation (may take a bit time to stop).
                     </span>
                   </span>
                 </dd>
