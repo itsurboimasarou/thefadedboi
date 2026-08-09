@@ -150,6 +150,11 @@ html.oled[data-theme="dark"] .info-tip-bubble {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
+html.oled[data-theme="dark"] .gear-card:hover,
+html.oled[data-theme="dark"] .spec-item summary:hover {
+  border-color: var(--accent);
+}
+
 html.oled[data-theme="dark"] .glass--hover:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: var(--accent);
@@ -174,4 +179,7 @@ html.lite-mode .thumb-loader::after { animation: none; }
    and is then removed, so the field empties naturally instead of freezing
    mid-air. Nothing to do here — but the ground stays, since settled snow
    should not vanish when it stops falling. */
+
+/* Lite mode: stop the only permanently-running animation on the page. */
+html.lite-mode .status-dot::after { animation: none; opacity: 0; }
 
