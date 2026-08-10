@@ -175,7 +175,6 @@ html.oled[data-theme="dark"] .spec-item summary:hover {
 }
 
 html.oled[data-theme="dark"] .glass--hover:hover {
-  background: rgba(255, 255, 255, 0.05);
   border-color: var(--accent);
 }
 

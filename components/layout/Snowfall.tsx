@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const COUNT = 24;
+const COUNT = 30;
 
 const FLAKES = Array.from({ length: COUNT }, (_, i) => ({
   left: `${Math.round((i * 53) % 100)}%`,

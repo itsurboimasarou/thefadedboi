@@ -49,7 +49,7 @@
 }
 :root[data-theme="light"] .glass--hover:hover,
 :root[data-theme="light"] .gear-card:hover {
-  background: #f4f7fb; 
+  border-color: var(--accent);
 }
 
 :root[data-theme="light"] .lite-switch {

@@ -57,7 +57,7 @@
 html:not(.snow-fancy) .flake {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
-  scale: 0.4;
+  --flake-size: 5px;
 }
 
 html:not(.snow-fancy)[data-theme="light"] .flake {

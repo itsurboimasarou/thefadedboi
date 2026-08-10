@@ -114,11 +114,10 @@
 }
 
 .glass--hover {
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background 0.25s, border-color 0.25s;
+  transition: transform 0.25s linear, background 0.25s, border-color 0.25s;
 }
 
 .glass--hover:hover {
-  background: color-mix(in srgb, var(--ink) 9%, var(--bg));
   border-color: var(--accent);
 }
 
