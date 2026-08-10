@@ -9,6 +9,14 @@ const p = {
   "aria-hidden": true,
 } as const;
 
+export const snowPaths = (
+  <>
+    <path d="M12 2.5v19M3.8 7.3l16.4 9.5M3.8 16.8 20.2 7.3" />
+    <path d="M10 4.5 12 2.5l2 2M10 19.5l2 2 2-2M6.5 6.5 3.8 7.3l.7 2.7M17.5 6.5l2.7.8-.7 2.7M4.5 14l-.7 2.7 2.7.8M19.5 14l.7 2.8-2.7.7" />
+    <path d="M10.5 5.9 12 7.4l1.5-1.5M10.5 18.1 12 16.6l1.5 1.5M7.5 7.6 8 9.7l-2.1.6M16.5 7.6 16 9.7l2.1.6M7.5 16.4 8 14.3l-2.1-.6M16.5 16.4 16 14.3l2.1-.6" />
+  </>
+);
+
 const icons: Record<string, JSX.Element> = {
   // frickin sections
   phone: <svg {...p}><rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M10.5 18.5h3" /></svg>,
@@ -47,7 +55,7 @@ const icons: Record<string, JSX.Element> = {
   target: <svg {...p}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5.2" /><circle cx="12" cy="12" r="1.6" /></svg>,
   pin: <svg {...p}><path d="M12 21.5s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z" /><circle cx="12" cy="10.5" r="2.6" /></svg>,
   moon: <svg {...p}><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" /></svg>,
-  snow: <svg {...p}><path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7" /><path d="M12 5.6 9.9 7.6M12 5.6l2.1 2M12 18.4l-2.1-2M12 18.4l2.1-2" /><path d="m6.8 9.1.2 2.8M6.8 9.1l-2.7.7M17.2 14.9l-.2-2.8M17.2 14.9l2.7-.7" /><path d="m6.8 14.9-.2-2.8M6.8 14.9l-2.7-.7M17.2 9.1l.2 2.8M17.2 9.1l2.7.7" /></svg>,
+  snow: <svg {...p}>{snowPaths}</svg>,
   dot: <svg {...p}><circle cx="12" cy="12" r="3.5" /></svg>,
 };
 
