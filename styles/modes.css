@@ -68,6 +68,25 @@
   }
 }
 
+@media (max-width: 600px) {
+  .link-banner {
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;   /* not center — the text is left-aligned */
+    gap: 12px;
+  }
+  .link-banner p { flex: none; }
+  .link-banner .btn {
+    margin-left: 0;            /* kill any row-layout indent */
+    align-self: stretch;       /* full-width button reads better when stacked */
+    justify-content: center;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .nav-item .tip { display: none !important; }
+}
+
 /* Lite mode: no animation */
 
 html.lite-mode *,
