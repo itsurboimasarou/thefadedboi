@@ -5,7 +5,7 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 365,
 
     remotePatterns: [
-      { protocol: "https", hostname: "cdn.jsdelivr.net", pathname: "/gh/itsurboimasarou/**" },
+      { protocol: "https", hostname: "cdn.thefadedboi.me", pathname: "/**" },
     ],  
   },
 };

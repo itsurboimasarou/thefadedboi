@@ -25,6 +25,8 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
   useEffect(() => setMounted(true), []);
   useEffect(() => setLoaded(false), [index]);
 
+  useEffect(() => setIndex(null), [images]);
+
   useEffect(() => {
     const onStart = () => {
       setLeaving(true);

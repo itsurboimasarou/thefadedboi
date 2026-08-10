@@ -102,3 +102,5 @@ a {
 .reveal>*:nth-child(6) {
   animation-delay: 0.35s;
 }
+
+[hidden] { display: none !important; }

@@ -6,7 +6,7 @@ import Icon from "@/components/ui/Icons";
 import LinkBanner from "@/components/content/LinkBanner";
 import YearSelect from "@/components/gallery/YearSelect";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
-import { getManifest, cdnUrl, listImages } from "@/lib/photos";
+import { getManifest, cdnUrl, listImages } from "@/lib/assets";
 import type { ScannedAlbum, ScannedIndexSubject } from "@/lib/types";
 
 export async function getStaticProps() {
@@ -113,7 +113,7 @@ function AlbumCard({ subject, album }: { subject: ScannedIndexSubject; album: Sc
       <span className="album-card-body">
         <span className="album-card-title">{album.title}</span>
         <span className="album-card-meta">
-          {subCount > 0 ? `${subCount} set${subCount > 1 ? "s" : ""}` : `${album.count} photos`}
+          {subCount > 0 ? `${subCount} set${subCount > 1 ? "s" : ""} · ${album.count} photos` : `${album.count} photos`}
         </span>
       </span>
     </Link>

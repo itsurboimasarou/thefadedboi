@@ -73,8 +73,6 @@
   filter: grayscale(1);
 }
 
-.row--disabled dt { opacity: 0.6; }
-
 /* ── Snowflake shape setting ────────────────────────── */
 .shape-toggle {
   display: grid;

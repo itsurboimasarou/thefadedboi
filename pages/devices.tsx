@@ -1,4 +1,5 @@
-import { devices } from "@/lib/devices.config";
+import type { InferGetStaticPropsType } from "next";
+import { getDevices, deviceImage } from "@/lib/assets";
 import Icon, { specIconFor } from "@/components/ui/Icons";
 import type { DeviceItem } from "@/lib/types";
 
@@ -20,7 +21,7 @@ function SpecDropdown({ item }: { item: DeviceItem }) {
       </summary>
       <div className="spec-body">
         {item.image && (
-          <img src={item.image} alt={item.name} className="spec-photo" />
+          <img src={deviceImage(item.image)} alt={item.name} className="spec-photo" loading="lazy" />
         )}
         <dl className="spec-list">
           {(item.specs ?? []).map((s) => (
@@ -35,7 +36,13 @@ function SpecDropdown({ item }: { item: DeviceItem }) {
   );
 }
 
-export default function Devices() {
+export async function getStaticProps() {
+  return { props: { devices: await getDevices() }, revalidate: 300 };
+}
+
+export default function Devices({
+  devices,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <div className="stack reveal">
       <header>

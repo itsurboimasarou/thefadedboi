@@ -7,3 +7,6 @@ next-env.d.ts
 # photos synced at build time from the private photo repo
 public/albums/
 .photo-cache.json
+
+# local photo staging — uploaded to R2, never committed
+photos-src/

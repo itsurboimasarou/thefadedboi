@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import type { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Icon from "@/components/ui/Icons";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
-import { getManifest, listImages, findAlbum } from "@/lib/photos";
+import { getManifest, listImages, findAlbum } from "@/lib/assets";
 import YearSelect from "@/components/gallery/YearSelect";
 import type { ScannedSubAlbum } from "@/lib/types";
 
@@ -89,15 +89,13 @@ export default function AlbumPage({
 
       <section className="glass">
         <div className="section-head">
-          <h2 className="h-with-icon">
-            <Icon name="image" />
-            {active ? active.title : album.title}
-            <p className="album-count">
-              {subAlbums
-                ? `${subAlbums.reduce((n, s) => n + s.images.length, 0)} photos`
-                : `${images.length} photos`}
-            </p>
-          </h2>
+          <div className="section-title">
+            <h2 className="h-with-icon">
+              <Icon name="image" />
+              {active ? active.title : album.title}
+            </h2>
+            <p className="album-count">{(active?.images ?? images).length} photos</p>
+          </div>
           <div className="head-actions">
             {years.length > 0 && <YearSelect years={years} value={year} onChange={setYear} />}
             {driveUrl && 
@@ -130,18 +128,24 @@ export default function AlbumPage({
           </div>
         )}
 
-        {shown.length === 0 ? (
+        {subAlbums ? (
+          subAlbums.map((sa) => (
+            <div key={sa.slug} hidden={active?.slug !== sa.slug}>
+              {sa.images.length === 0 ? (
+                <p className="album-empty">Photos to be added.</p>
+              ) : (
+                <AlbumGrid images={sa.images} title={`${album.title} — ${sa.title}`} />
+              )}
+            </div>
+          ))
+        ) : shown.length === 0 ? (
           <p className="album-empty">
             {driveUrl
               ? "Photos to be added — the full set is on the Download link above."
               : "Photos to be added."}
           </p>
         ) : (
-          <AlbumGrid
-            key={active?.slug ?? album.slug}
-            images={shown}
-            title={gridTitle}
-          />
+          <AlbumGrid images={shown} title={gridTitle} />
         )}
       </section>
     </div>

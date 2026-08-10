@@ -11,16 +11,11 @@ import ChangelogDialog from "@/components/content/ChangelogDialog";
 import pkg from "../package.json";
 
 import type { InferGetStaticPropsType } from "next";
-import fs from "fs";
-import path from "path";
 import SnowToggle from "@/components/controls/SnowMode";
+import { getChangelog } from "@/lib/assets";
 
 export async function getStaticProps() {
-  let changelog = "";
-  try {
-    changelog = fs.readFileSync(path.join(process.cwd(), "public", "changelog.md"), "utf8");
-  } catch { }
-  return { props: { changelog } };
+  return { props: { changelog: await getChangelog() }, revalidate: 300 };
 }
 
 export default function Home({ changelog }: InferGetStaticPropsType<typeof getStaticProps>) {
