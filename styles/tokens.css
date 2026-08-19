@@ -5,7 +5,8 @@
 /* ── Overall theming ────────────────── */
 :root,
 :root[data-theme="dark"] {
-  --bg: #0a1424;
+  /* Dark is pitch black by default — what OLED mode used to opt into. */
+  --bg: #000000;
   --ink: #eaf4fb;
   --ink-dim: #8fa6bf;
   --accent: #6fc9e8;
@@ -13,18 +14,19 @@
   --accent-contrast: #06192b;
   --glass: color-mix(in srgb, var(--ink) 6%, var(--bg));
   --glass-strong: color-mix(in srgb, var(--ink) 9%, var(--bg));
-  --glass-border: rgba(180, 220, 240, 0.16);
+  /* borders carry the separation that background contrast used to */
+  --glass-border: rgba(180, 220, 240, 0.18);
   --shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
-  --nav-solid: #10203a;
-  --orb-blend: screen;
-  --orb-opacity: 0.4;
+  --nav-solid: #0a0a0a;
+  /* bottom-docked pill height — the control panel stacks above it */
+  --nav-h: 68px;
   --radius: 20px;
   --nav-w: 84px;
-  --nav-bg: #10203a;
+  --nav-bg: #0a0a0a;
 }
 
 :root[data-theme="light"] {
-  --bg: #eef5fa;
+  --bg: #ffffff;
   --ink: #0d2137;
   --ink-dim: #4f6883;
   --accent: #1c74a3;
@@ -35,8 +37,6 @@
   --glass-border: rgba(16, 19, 24, 0.1);
   --shadow: 0 4px 14px rgba(30, 60, 100, 0.10);
   --nav-solid: #ffffff;
-  --orb-blend: normal;
-  --orb-opacity: 0.3;
   --nav-bg: #ffffff;
   color-scheme: light;
 }
@@ -101,18 +101,3 @@ body {
   font-family: var(--font-body, system-ui, sans-serif);
 }
 
-/* ── OLED mode ───────────────────────────────────────
-   A modifier on dark mode, not a third theme: qualified with
-   [data-theme="dark"] so leaving it on and switching to light
-   still gives normal light mode. */
-html.oled[data-theme="dark"] {
-  --bg: #000000;
-  --ink: #ffffff;
-  --ink-dim: #8b8b93;
-  --glass: color-mix(in srgb, var(--ink) 5%, var(--bg));
-  --glass-strong: color-mix(in srgb, var(--ink) 8%, var(--bg));
-  --glass-border: rgba(255, 255, 255, 0.16);
-  --shadow: none;
-  --nav-solid: #000000;
-  --nav-bg: #000000;
-}

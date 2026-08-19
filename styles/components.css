@@ -422,7 +422,8 @@
   bottom: calc(100% + 8px);
   left: 50%;
   translate: -50% 0;
-  width: 220px;
+  width: max-content;
+  max-width: 220px;
   padding: 8px 12px;
   border-radius: 10px;
   background: var(--bg);
@@ -433,6 +434,8 @@
   color: var(--ink);
   text-transform: none;
   letter-spacing: normal;
+  /* never wider than the viewport allows, whatever the anchor's position */
+  max-width: calc(100vw - 32px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s, translate 0.15s;
@@ -463,6 +466,19 @@
   translate: 0 4px;
 }
 
+/* Narrow screens: pin every bubble to the panel's own box rather than to the
+   tip, so neither column can push it past an edge. */
+@media (max-width: 720px) {
+  .glance-grid .info-tip { position: static; }
+  .glance-grid .info-tip-bubble {
+    right: 0;
+    left: 0;
+    width: auto;
+    max-width: none;
+  }
+  .glance-grid > div { position: relative; }
+}
+
 .glance-grid .info-tip:hover .info-tip-bubble,
 .glance-grid .info-tip:focus-visible .info-tip-bubble {
   translate: 0 0;
@@ -488,3 +504,28 @@
   border-radius: 999px;
 }
 .event-chips::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Top-bar pills ───────────────────────────────────
+   Both carry a leading glyph, so they need to be flex rows. */
+.status-pill,
+.time-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The status pill opens the changelog: it is a real button, so strip the UA
+   chrome and keep the pill's own look. */
+.status-pill--action {
+  border: 1px solid currentColor;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.status-pill--action:hover {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.time-pill .icn { opacity: 0.65; }
+

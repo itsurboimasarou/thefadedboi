@@ -15,6 +15,7 @@
   padding: clamp(24px, 5vw, 64px);
   padding-top: calc(64px + clamp(16px, 3vw, 40px));
   padding-left: clamp(24px, 5vw, 64px);
+  /* padding-bottom: clamp(24px, 5vw, 64px); */
   max-width: 1360px;
   margin: 0 auto;
   width: 100%;
@@ -69,10 +70,8 @@
 }
 
 .topbar--solid {
-  background: color-mix(in srgb, var(--bg) 62%, transparent);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
   border-bottom: 1px solid var(--glass-border);
-  backdrop-filter: blur(14px) saturate(1.25);
-  -webkit-backdrop-filter: blur(14px) saturate(1.25);
 }
 
 .topbar .logo-corner {
@@ -98,12 +97,15 @@
   gap: 6px;
   padding: 10px 8px;
   border-radius: 999px;
-  /* Solid, not glass: a backdrop-filter here re-rasterizes every frame that
-     anything moves behind it — with snow falling, that is permanently. */
+  /* Solid by default; the glass-fx class opts into the blur. A
+     backdrop-filter re-rasterizes every frame anything moves behind it, so
+     it is a choice the visitor makes, not one imposed on them. */
   background: var(--nav-solid);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
-  z-index: 50;
+  /* above .control-panel (55): the rail's tooltips are children, so the whole
+     rail has to win the stacking contest or they render behind the panel */
+  z-index: 58;
   transition: background 0.35s ease, border-color 0.35s ease;
 }
 
@@ -252,33 +254,6 @@
 }
 
 /* ── Footer ─────────────────────────────────────────── */
-.footer-art {
-  display: block;
-  margin: auto;
-  padding: 32px 0;
-  max-width: min(230px, 50%);
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.footer-art img {
-  display: block;
-  width: 100%;
-  /* fill the link's box; sizing stays controlled by the <a> */
-  height: auto;
-}
-
-.footer-art:hover {
-  opacity: 0.85;
-  transform: translateY(-2px);
-  /* affordance: hints that it's clickable */
-}
-
-.footer-art:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-  border-radius: 8px;
-}
-
 .footer {
   margin-top: 0;
   padding-top: 20px;
@@ -288,6 +263,25 @@
   text-align: center;
 }
 
-.main:not(:has(.footer-art)) .footer {
-  margin-top: auto;
+/* ── Control-panel button in the nav pill ─────────────
+   Same 44px cell as the other items; only the glyph rotates. */
+.nav-panel-btn svg {
+  transition: rotate 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-panel-btn--open svg { rotate: 180deg; }
+.nav-panel-btn--open { color: var(--accent); }
+
+/* ── Home: single-screen layout ──────────────────────
+   .main normally stretches to 100vh and lets content push past it. On home
+   the page IS the viewport, so it clips instead and the footer is hidden —
+   there is nowhere to scroll to reach it. */
+html.no-scroll .shell,
+html.no-scroll .main {
+  min-height: 100svh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+html.no-scroll .hero--bottom {
+  padding-bottom: clamp(40px, 6vh, 70px);
 }

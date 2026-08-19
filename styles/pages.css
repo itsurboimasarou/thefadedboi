@@ -785,4 +785,93 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Home hero: anchored bottom-centre over the video ── */
+.hero--bottom {
+  /* fills whatever height .main gives it rather than adding its own 100vh,
+     which would overflow the now-clipped container */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+  padding-bottom: clamp(90px, 14vh, 160px);
+}
+
+/* The one place the script face goes big. The h1 itself is inline-sized
+   (width: fit-content) so the JS measurement reads the text, not the column. */
+.hero-title {
+  font-size: clamp(3.2rem, 9vw, 6rem);
+  line-height: 1.1;
+  margin-bottom: 10px;
+  width: fit-content;
+  margin-inline: auto;
+}
+
+/* Body face, not the script. Width is set inline from the measured h1; the
+   ch value is only the pre-measurement fallback for the first paint. */
+.hero-copy {
+  font-size: 1.12rem;
+  max-width: 48ch;
+  margin: 0 auto;
+  color: var(--ink-dim);
+  line-height: 1.55;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+@media (max-width: 720px) {
+  .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
+}
+
+/* ── Control panel ───────────────────────────────────
+   Flies up from behind the nav pill. Transform + opacity only, so the whole
+   transition is compositor work — no layout, no repaint. */
+.control-panel {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h, 68px) + 26px);
+  z-index: 55;
+  width: min(560px, calc(100vw - 32px));
+  padding: 20px 22px;
+  border-radius: 20px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+
+  translate: -50% 0;
+  transform: translateY(24px) scale(0.98);
+  transform-origin: bottom center;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.22s ease,
+    visibility 0s linear 0.34s;
+}
+
+.control-panel--open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease,
+    visibility 0s;
+}
+
+.panel-title {
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+/* Nav docked left: nothing occupies the bottom centre, so drop the panel. */
+.app-root:has(.nav-rail--left) .control-panel { bottom: 40px; }
 

@@ -1,7 +1,6 @@
 /* ═══ background.css ═══
-   Background layers: mesh canvas, fluid blobs, grain. */
+   Background layers: video backdrop, snowfall, settled snow. */
 
-/* ── Animated mesh ──────────────────────────────────── */
 .orb-field {
   position: fixed;
   inset: 0;
@@ -11,19 +10,6 @@
   overflow: hidden;
   background: var(--bg);
   transition: background 0.2s ease;
-}
-
-.mesh-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  /* no filter: a 0px blur still forces a full-canvas filter pass */
-}
-
-:root[data-theme="light"] .orb-field::after {
-  opacity: 0.2;
-  mix-blend-mode: soft-light;
 }
 
 /* ── Night sky: snowflakes! ───────────────── */
@@ -42,6 +28,7 @@
   top: -8vh;
   width: var(--flake-size);
   height: var(--flake-size);
+  color: rgba(255, 255, 255, 0.85);
   animation-name: fall;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -49,50 +36,26 @@
   backface-visibility: hidden;
 }
 
-/* ── Dot mode ────────────────────────────────────────
-   Only the DOT variant gets a background + border-radius. Scoping these to
-   :not(.snow-fancy) is what stops the crystal from being drawn inside a
-   coloured circle — the previous light-mode rule out-specified the fancy
-   override and painted a disc behind every flake. */
-html:not(.snow-fancy) .flake {
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  --flake-size: 5px;
-}
-
-html:not(.snow-fancy)[data-theme="light"] .flake {
-  background: color-mix(in srgb, var(--accent) 80%, transparent);
-}
-
-html:not(.snow-fancy) .flake svg { display: none; }
-
-/* ── Crystal mode ────────────────────────────────────
-   No background at all: the SVG stroke IS the flake, coloured via
-   currentColor so it re-tints with the theme. */
-html.snow-fancy .flake {
-  background: none;
-  border-radius: 0;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-/* Crystals cost roughly an order of magnitude more to rasterize than dots
-   (12 stroked paths vs one filled circle), so fancy mode shows every other
-   flake: same visual density class, same GPU budget as dot mode. */
-html.snow-fancy .flake:nth-child(odd) {
-  display: none;
-}
-
-html.snow-fancy[data-theme="light"] .flake {
+/* One snow style, always crystals. The SVG stroke IS the flake — no
+   background, so nothing can draw a disc behind it. */
+html[data-theme="light"] .flake {
   color: color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
-html.snow-fancy .flake svg {
+.flake svg {
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
+  animation: flake-spin 14s linear infinite;
 }
 
+@keyframes flake-spin {
+  to { rotate: 360deg; }
+}
+
+/* Fall is translate-only: rotation lives on the child above, so the
+   compositor can reuse the rasterized crystal instead of resampling it. */
 @keyframes fall {
   0%   { transform: translate3d(0, 0, 0); }
   25%  { transform: translate3d(1.5vw, 30vh, 0); }
@@ -100,55 +63,6 @@ html.snow-fancy .flake svg {
   75%  { transform: translate3d(1vw, 85vh, 0); }
   100% { transform: translate3d(0, 120vh, 0); }
 }
-
-/* Spin lives on the SVG child, fancy mode only: dots are rotation-invariant,
-   so spinning them would burn GPU resampling for zero visual change. One slow
-   linear spin also lets the compositor reuse the rasterized crystal texture
-   instead of re-rasterizing — rotation of a cached layer is cheap; it is
-   rotation combined with per-frame repaint that is not. */
-html.snow-fancy .flake svg {
-  animation: flake-spin 14s linear infinite;
-}
-@keyframes flake-spin {
-  to { rotate: 360deg; }
-}
-
-/* ── Settled snow ────────────────────────────────────
-   Layered drifts: two soft mounds plus a crisper top edge, so the horizon
-   reads as uneven snow rather than a flat band. Entirely static — no cost. */
-.snow-ground {
-  position: absolute;
-  left: -2vw;
-  right: -2vw;
-  bottom: 0;
-  height: 90px;
-  pointer-events: none;
-  z-index: 1;
-  background:
-    /* crisp foreground drift */
-    radial-gradient(60% 120% at 12% 118%, var(--ink) 0 99%, transparent 100%),
-    radial-gradient(48% 105% at 38% 122%, var(--ink) 0 99%, transparent 100%),
-    radial-gradient(70% 130% at 68% 120%, var(--ink) 0 99%, transparent 100%),
-    radial-gradient(52% 110% at 93% 124%, var(--ink) 0 99%, transparent 100%);
-  opacity: 0.16;
-}
-
-/* softer, taller haze behind the drift for depth */
-.snow-ground::before {
-  content: "";
-  position: absolute;
-  left: -4vw;
-  right: -4vw;
-  bottom: 0;
-  height: 130px;
-  background:
-    radial-gradient(70% 120% at 25% 125%, var(--ink) 0 99%, transparent 100%),
-    radial-gradient(80% 130% at 80% 128%, var(--ink) 0 99%, transparent 100%);
-  opacity: 0.5;
-  filter: blur(6px);
-}
-
-html.lite-mode .snow-ground { opacity: 0.1; }
 
 /* ── Snow off ────────────────────────────────────────
    Flakes are removed from the DOM by Snowfall.tsx, but belt-and-braces: kill
@@ -160,3 +74,29 @@ html.no-snow .flake svg {
   will-change: auto;
 }
 
+/* ── Video backdrop ──────────────────────────────────
+   Sits under the snow. When no file exists the element removes itself
+   and the theme's flat --bg shows through, which is the intended fallback. */
+/* Only the home route mounts the video; this class is what tells the snow
+   to stand down (see below). */
+.bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* the page reads over it, so knock it back rather than showing it raw */
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+html[data-theme="light"] .bg-video { opacity: 0.35; }
+
+/* ── Snow vs video ───────────────────────────────────
+   When a video backdrop is playing, snow on top of it reads as noise — and
+   doubles the compositor work over the busiest part of the page. The video
+   wins; snow resumes on every other route automatically because the class
+   only exists while the home page is mounted. */
+html.has-bg-video .sky {
+  display: none;
+}

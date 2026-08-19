@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import ThemeToggle from "../controls/ThemeToggle";
-import SnowShapeToggle from "../controls/SnowShapeToggle";
+import BerlinClock from "../widgets/BerlinClock";
+import { useLiveStatus, StatusPill } from "../widgets/LiveStatus";
+import Icon from "../ui/Icons";
+import { openChangelog } from "./ControlPanel";
+import { home } from "@/lib/home.config";
 
 export default function TopBar() {
   const [solid, setSolid] = useState(false);
+  const status = useLiveStatus(home.status);
 
   useEffect(() => {
     let ticking = false;
@@ -27,8 +31,15 @@ export default function TopBar() {
         <img src="/logo.png" alt="Logo" />
       </Link>
       <div className="topbar-actions">
-        <SnowShapeToggle />
-        <ThemeToggle />
+        <StatusPill
+          state={status}
+          labels={home.status.labels}
+          onClick={openChangelog}
+        />
+        <span className="status-pill time-pill">
+          <Icon name="clock" size={14} />
+          <BerlinClock />
+        </span>
       </div>
     </header>
   );

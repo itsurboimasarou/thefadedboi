@@ -17,9 +17,16 @@ h3 {
   line-height: 1.15;
 }
 
+/* Page-name headers: script face, but sized so descenders clear the line
+   below — the first cut was so large that "Say hello" and "Highlights" ran
+   into their subtitles. Home's hero overrides this to go big. */
 h1 {
-  font-size: clamp(2.3rem, 5.5vw, 3.8rem);
-  font-weight: 700;
+  font-family: var(--font-script), var(--font-display, system-ui, sans-serif);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.25;
+  padding-bottom: 0.12em;
 }
 
 h2 {
@@ -104,3 +111,13 @@ a {
 }
 
 [hidden] { display: none !important; }
+
+/* Home page: exactly one viewport, no scroll. Set on <html> AND body so iOS
+   cannot rubber-band the document behind a merely-clipped child. */
+html.no-scroll,
+html.no-scroll body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+

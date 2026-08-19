@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { toggleControlPanel } from "./ControlPanel";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -72,6 +73,12 @@ export default function NavRail() {
   const [dock, setDock] = useState<Dock>("left");
   const [hidden, setHidden] = useState(false);
   const [pinned, setPinned] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(false);
+  useEffect(() => {
+    const h = (e: Event) => setPanelOpen((e as CustomEvent<boolean>).detail);
+    window.addEventListener("control-panel-state", h);
+    return () => window.removeEventListener("control-panel-state", h);
+  }, []);
   const [touchMode, setTouchMode] = useState(false);
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -230,6 +237,19 @@ export default function NavRail() {
           </Link>
         ))}
         <span className="nav-divider" aria-hidden="true" />
+        <button
+          type="button"
+          className={`nav-item nav-panel-btn${panelOpen ? " nav-panel-btn--open" : ""}`}
+          onClick={toggleControlPanel}
+          aria-expanded={panelOpen}
+          aria-controls="control-panel"
+          aria-label={panelOpen ? "Close controls" : "Open controls"}
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m6 15 6-6 6 6" />
+          </svg>
+          <span className="tip">{panelOpen ? "Close controls" : "At a glance"}</span>
+        </button>
         <button
           type="button"
           className="nav-item nav-dock-btn"

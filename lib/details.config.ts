@@ -1,7 +1,7 @@
 import type { Like } from "./types";
 
 export const details = {
-  avatar: "/profile.jpg",
+  avatar: "/profile.png",
   aboutMe: [
     "I'm Lê Nhật Lâm a.k.a thefadedboi (or masarou for mostly in gaming). I'm currently a freestyle photophoner, and a part-time designer-developer hybrid. Living in Vietnam & on the road to study abroad.",
     "Not a kind of extrovert person, as my nicknamed already shows, I tend to be a bit faded in the crowd. But what I do love is to share my thoughts and ideas with the world, especially through my photoworks and cosplays. My journey started as the all-time love with artistic expression, yes, is photophone, which has been a passion of mine for years and leads to design and web development.",

@@ -13,6 +13,17 @@ export function setLiteMode(on: boolean) {
   window.dispatchEvent(new CustomEvent(EVT, { detail: on }));
 }
 
+export function useLiteMode() {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    setOn(liteMode());
+    const h = (e: Event) => setOn((e as CustomEvent<boolean>).detail);
+    window.addEventListener(EVT, h);
+    return () => window.removeEventListener(EVT, h);
+  }, []);
+  return on;
+}
+
 export default function LiteModeToggle() {
   const [on, setOn] = useState(false);
 

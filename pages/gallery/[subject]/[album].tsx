@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import type { GetStaticPropsContext, InferGetStaticPropsType } from "next";
 import Icon from "@/components/ui/Icons";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
-import { getManifest, listImages, findAlbum } from "@/lib/assets";
+import { getManifest, listImages, findAlbum, getChangelog } from "@/lib/assets";
 import YearSelect from "@/components/gallery/YearSelect";
 import type { ScannedSubAlbum } from "@/lib/types";
 
@@ -37,6 +37,7 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
 
   return {
     props: {
+      changelog: await getChangelog(),
       subjectSlug: subject.slug,
       subjectTitle: subject.title,
       album,

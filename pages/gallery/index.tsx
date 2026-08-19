@@ -6,7 +6,7 @@ import Icon from "@/components/ui/Icons";
 import LinkBanner from "@/components/content/LinkBanner";
 import YearSelect from "@/components/gallery/YearSelect";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
-import { getManifest, cdnUrl, listImages } from "@/lib/assets";
+import { getManifest, cdnUrl, listImages, getChangelog } from "@/lib/assets";
 import type { ScannedAlbum, ScannedIndexSubject } from "@/lib/types";
 
 export async function getStaticProps() {
@@ -29,7 +29,10 @@ export async function getStaticProps() {
     }))
   );
 
-  return { props: { subjects: withData }, revalidate: 300 };
+  return {
+    props: { subjects: withData, changelog: await getChangelog() },
+    revalidate: 300,
+  };
 }
 
 function SubjectSection({ subject }: { subject: ScannedIndexSubject }) {

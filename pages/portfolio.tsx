@@ -1,6 +1,11 @@
 import { portfolio } from "@/lib/portfolio.config";
 import LinkBanner from "@/components/content/LinkBanner";
 import Icon from "@/components/ui/Icons";
+import { getChangelog } from "@/lib/assets";
+
+export async function getStaticProps() {
+  return { props: { changelog: await getChangelog() }, revalidate: 300 };
+}
 
 export default function Portfolio() {
   return (

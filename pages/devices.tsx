@@ -1,5 +1,5 @@
 import type { InferGetStaticPropsType } from "next";
-import { getDevices, deviceImage } from "@/lib/assets";
+import { getDevices, deviceImage, getChangelog } from "@/lib/assets";
 import Icon, { specIconFor } from "@/components/ui/Icons";
 import type { DeviceItem } from "@/lib/types";
 
@@ -37,7 +37,7 @@ function SpecDropdown({ item }: { item: DeviceItem }) {
 }
 
 export async function getStaticProps() {
-  return { props: { devices: await getDevices() }, revalidate: 300 };
+  return { props: { changelog: await getChangelog(), devices: await getDevices() }, revalidate: 300 };
 }
 
 export default function Devices({

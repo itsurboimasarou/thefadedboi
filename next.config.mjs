@@ -8,5 +8,6 @@ const nextConfig = {
       { protocol: "https", hostname: "cdn.thefadedboi.me", pathname: "/**" },
     ],  
   },
+  devIndicators: false
 };
 export default nextConfig;

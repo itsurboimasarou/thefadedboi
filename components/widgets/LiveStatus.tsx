@@ -29,6 +29,34 @@ export const StatusDot = ({ state }: { state: StatusState }) => (
   <span className={`status-dot status-dot--${state}`} aria-hidden="true" />
 );
 
-export const StatusPill = ({ state, labels }: { state: StatusState; labels: Record<StatusState, string> }) => (
-  <span className={`status-pill status-pill--${state}`}>{labels[state]}</span>
-);
+export const StatusPill = ({
+  state,
+  labels,
+  onClick,
+}: {
+  state: StatusState;
+  labels: Record<StatusState, string>;
+  onClick?: () => void;
+}) => {
+  const inner = (
+    <>
+      <StatusDot state={state} />
+      {labels[state]}
+    </>
+  );
+
+  // Only becomes interactive when a handler is supplied, so the same
+  // component still works as a plain indicator elsewhere.
+  return onClick ? (
+    <button
+      type="button"
+      className={`status-pill status-pill--${state} status-pill--action`}
+      onClick={onClick}
+      title="View changelog"
+    >
+      {inner}
+    </button>
+  ) : (
+    <span className={`status-pill status-pill--${state}`}>{inner}</span>
+  );
+};

@@ -4,6 +4,11 @@ import { ContactIcon } from "@/components/contact/ContactIcon";
 import Icon from "@/components/ui/Icons";
 
 import type { LinkItem } from "@/lib/types";
+import { getChangelog } from "@/lib/assets";
+
+export async function getStaticProps() {
+  return { props: { changelog: await getChangelog() }, revalidate: 300 };
+}
 
 function LinkCard({ item }: { item: LinkItem }) {
   return (
