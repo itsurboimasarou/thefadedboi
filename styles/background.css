@@ -1,6 +1,8 @@
 /* ═══ background.css ═══
    Background layers: video backdrop, snowfall, settled snow. */
 
+/* html, body {background: var(--bg);} */
+
 .orb-field {
   position: fixed;
   inset: 0;
@@ -99,4 +101,8 @@ html[data-theme="light"] .bg-video { opacity: 0.35; }
    only exists while the home page is mounted. */
 html.has-bg-video .sky {
   display: none;
+}
+
+html[data-theme="light"] .logo-mark {
+  background-image: url("../public/logo-dark.png");
 }

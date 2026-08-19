@@ -66,11 +66,11 @@
     aspect-ratio: 1;
     justify-content: center;
   }
-  .control-panel {
-    bottom: calc(16px + var(--nav-h, 68px) + 14px);
-    max-height: calc(100svh - var(--nav-h, 68px) - 130px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
+}
+
+@media (max-width: 720px) {
+  .control-panel.control-panel {
+    bottom: calc(16px + var(--nav-h, 68px) + 16px);
   }
 }
 
@@ -103,16 +103,17 @@ html.lite-mode *::after {
   transition-duration: 0.01ms !important;
 }
 
-/* Lite mode: no blur, no translucency — solid surfaces */
+/* Lite mode: no blur, no translucency — solid surfaces.
+   No !important here: it silently defeated the glass toggle, leaving the
+   surface translucent but unblurred (the worst of both). The background is
+   restored alongside so lite mode always lands on genuinely opaque chrome. */
 html.lite-mode .glass,
-html.lite-mode .nav-rail,
-html.lite-mode .topbar--solid,
 html.lite-mode .theme-switch,
 html.lite-mode .like-bubble,
 html.lite-mode .notice-backdrop,
 html.lite-mode .lightbox {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 html.lite-mode .theme-switch .knob { transition: none; }
 
@@ -180,26 +181,6 @@ html.lite-mode .thumb-loader::after { animation: none; }
 html.lite-mode .status-dot::after { animation: none; opacity: 0; }
 
 html.lite-mode .nav-panel-btn svg { transition: none; }
-
-/* ── Glass effect (opt-in, toggled in the control panel) ── */
-html.glass-fx .topbar--solid {
-  background: color-mix(in srgb, var(--bg) 62%, transparent);
-  backdrop-filter: blur(14px) saturate(1.25);
-  -webkit-backdrop-filter: blur(14px) saturate(1.25);
-}
-
-html.glass-fx .nav-rail {
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
-  backdrop-filter: blur(18px) saturate(1.3);
-  -webkit-backdrop-filter: blur(18px) saturate(1.3);
-}
-
-/* Lite mode overrides the preference: no live blurs at all. */
-html.lite-mode.glass-fx .topbar--solid,
-html.lite-mode.glass-fx .nav-rail {
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
 
 html.lite-mode .bg-video { opacity: 0.25; }
 html.lite-mode .control-panel { transition: none; }

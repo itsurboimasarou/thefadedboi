@@ -70,7 +70,6 @@
 .theme-switch:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-  filter: grayscale(1);
 }
 
 /* ── Snowflake shape setting ────────────────────────── */
@@ -422,8 +421,8 @@
   bottom: calc(100% + 8px);
   left: 50%;
   translate: -50% 0;
-  width: max-content;
-  max-width: 220px;
+  width: 220px;
+  max-width: calc(100vw - 32px);
   padding: 8px 12px;
   border-radius: 10px;
   background: var(--bg);
@@ -466,17 +465,18 @@
   translate: 0 4px;
 }
 
+.glance-grid .info-tip { position: static; }
+.glance-grid > div { position: relative; }
+
 /* Narrow screens: pin every bubble to the panel's own box rather than to the
    tip, so neither column can push it past an edge. */
 @media (max-width: 720px) {
-  .glance-grid .info-tip { position: static; }
   .glance-grid .info-tip-bubble {
     right: 0;
     left: 0;
     width: auto;
     max-width: none;
   }
-  .glance-grid > div { position: relative; }
 }
 
 .glance-grid .info-tip:hover .info-tip-bubble,
@@ -528,4 +528,9 @@
 }
 
 .time-pill .icn { opacity: 0.65; }
+
+/* A control switched off by another setting: dim the whole row so the label
+   reads as inactive too, not just the switch. */
+.row--disabled dt,
+.row--disabled .info-tip { opacity: 0.45; }
 

@@ -4,6 +4,7 @@ import BerlinClock from "../widgets/BerlinClock";
 import { useLiveStatus, StatusPill } from "../widgets/LiveStatus";
 import Icon from "../ui/Icons";
 import { openChangelog } from "./ControlPanel";
+import { site } from "@/lib/site.config"
 import { home } from "@/lib/home.config";
 
 export default function TopBar() {
@@ -28,7 +29,7 @@ export default function TopBar() {
   return (
     <header className={`topbar${solid ? " topbar--solid" : ""}`}>
       <Link href="/" className="logo-corner" aria-label="Home">
-        <img src="/logo.png" alt="Logo" />
+        <span className="logo-mark" role="img" aria-label={site.name} />
       </Link>
       <div className="topbar-actions">
         <StatusPill

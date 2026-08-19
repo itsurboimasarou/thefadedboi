@@ -5,7 +5,14 @@
 /* ── Overall theming ────────────────── */
 :root,
 :root[data-theme="dark"] {
-  /* Dark is pitch black by default — what OLED mode used to opt into. */
+  /* Chrome surface (top bar + nav pill) is expressed as two custom
+     properties rather than as competing rules. Only ONE backdrop-filter
+     declaration exists for each element in the whole stylesheet, so nothing
+     can override it — the mode classes just change these values. */
+  --chrome-blur: none;
+  --chrome-bg-top: color-mix(in srgb, var(--bg) 92%, transparent);
+  --chrome-bg-nav: #0a0a0a;
+  /* Dark is pitch black by default */
   --bg: #000000;
   --ink: #eaf4fb;
   --ink-dim: #8fa6bf;
@@ -26,6 +33,8 @@
 }
 
 :root[data-theme="light"] {
+  --chrome-bg-top: color-mix(in srgb, var(--bg) 92%, transparent);
+  --chrome-bg-nav: #ffffff;
   --bg: #ffffff;
   --ink: #0d2137;
   --ink-dim: #4f6883;
@@ -101,3 +110,33 @@ body {
   font-family: var(--font-body, system-ui, sans-serif);
 }
 
+/* ── Chrome surface modes ────────────────────────────
+   These are the ONLY places --chrome-blur changes. Because they are custom
+   properties on <html>, the last matching declaration wins outright — no
+   selector-specificity fight with the rules that consume them, and no
+   !important anywhere. Order matters: lite mode is declared after glass, so
+   it wins when both are on. */
+html.glass-fx {
+  --chrome-blur: blur(16px) saturate(1.3);
+  --chrome-bg-top: color-mix(in srgb, var(--bg) 60%, transparent);
+  --chrome-bg-nav: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+
+/* Lite mode (and reduced motion) force opaque chrome: a live blur repaints
+   whenever anything moves behind it. */
+html.lite-mode {
+  --chrome-blur: none;
+  --chrome-bg-top: color-mix(in srgb, var(--bg) 96%, transparent);
+  --chrome-bg-nav: var(--nav-solid);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* html.glass-fx is (0,1,1); a bare :root here would be (0,1,0) and LOSE to
+     it, leaving reduced-motion visitors with the blur they asked to avoid. */
+  html,
+  html.glass-fx {
+    --chrome-blur: none;
+    --chrome-bg-top: color-mix(in srgb, var(--bg) 96%, transparent);
+    --chrome-bg-nav: var(--nav-solid);
+  }
+}

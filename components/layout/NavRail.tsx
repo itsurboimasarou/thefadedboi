@@ -74,6 +74,18 @@ export default function NavRail() {
   const [hidden, setHidden] = useState(false);
   const [pinned, setPinned] = useState(true);
   const [panelOpen, setPanelOpen] = useState(false);
+
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const set = () =>
+      document.documentElement.style.setProperty("--nav-h", `${el.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  
   useEffect(() => {
     const h = (e: Event) => setPanelOpen((e as CustomEvent<boolean>).detail);
     window.addEventListener("control-panel-state", h);
@@ -86,6 +98,7 @@ export default function NavRail() {
   const hiddenRef = useRef(false);
   const compactRef = useRef(false);
   const suppressDismiss = useRef(false);
+  const railRef = useRef<HTMLElement>(null);
 
   useEffect(() => { pinnedRef.current = pinned; }, [pinned]);
   useEffect(() => { hiddenRef.current = hidden; }, [hidden]);
@@ -211,6 +224,7 @@ export default function NavRail() {
         />
       )}
       <nav
+        ref={railRef}
         className={`nav-rail nav-rail--${dock}${hidden ? " nav-rail--hidden" : ""}${pinned ? " nav-rail--pinned" : ""}`}
         aria-label="Primary"
         onMouseEnter={() => summon()}

@@ -83,7 +83,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dd>
           </div>
 
-          <div>
+          <div className={liteOn ? "row--disabled" : undefined}>
             <dt>
               <Icon name="display" size={15} />
               Glass effect

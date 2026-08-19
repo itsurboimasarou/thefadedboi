@@ -841,7 +841,7 @@
   margin-inline: auto;
   translate: none;
   width: min(440px, calc(100vw - 32px));
-  bottom: calc(var(--nav-h, 68px) + 26px);
+  bottom: calc(16px + var(--nav-h, 68px) + 14px);
   z-index: 55;
   padding: 14px 16px;
   border-radius: 16px;
@@ -870,7 +870,7 @@
 }
 
 .panel-title {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   margin-bottom: 10px;
 }
 
@@ -888,4 +888,8 @@
 }
 
 /* Nav docked left: nothing occupies the bottom centre, so drop the panel. */
-.app-root:has(.nav-rail--left) .control-panel { bottom: 40px; }
+/* Rail docked left: nothing occupies the bottom centre, so sit lower — and
+   shift the centring box past the rail so the panel centres on the content. */
+@media (min-width: 721px) {
+   .app-root:has(.nav-rail--left) .control-panel { bottom: 40px; }
+}
