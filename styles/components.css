@@ -30,7 +30,7 @@
   display: grid;
   place-items: center;
   z-index: 1;
-  transition: color 0.25s;
+  transition: color 0.2s;
 }
 
 .theme-switch .track-icon svg {
@@ -39,7 +39,7 @@
 }
 
 .theme-switch .track-icon--moon { left: 2px; }
-.theme-switch .track-icon--sun  { right: 3px; }
+.theme-switch .track-icon--sun  { left: 34px; right: auto; }
 
 .theme-switch[aria-checked="false"] .track-icon--moon,
 .theme-switch[aria-checked="true"]  .track-icon--sun {
@@ -492,6 +492,14 @@
    reads as inactive too, not just the switch. */
 .row--disabled dt,
 .row--disabled .info-tip { opacity: 0.45; }
+
+.row--disabled .info-tip {
+  pointer-events: none;
+}
+
+.row--disabled .info-tip-bubble {
+  display: none;
+}
 
 /* ── Status clock (top bar) ──────────────────────────
    One control, no chip: the status dot stands in for the clock icon and the

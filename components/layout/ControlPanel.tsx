@@ -90,7 +90,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dt>
             <dd className="dd-row">
               <GlassToggle />
-              <span className="info-tip" tabIndex={0} aria-label="About glass effect">
+              <span className="info-tip" tabIndex={liteOn ? -1 : 0} aria-hidden={liteOn || undefined} aria-label="About glass effect">
                 <Icon name="info" size={17} />
                 <span className="info-tip-bubble" role="tooltip">
                   Frosted blur behind the top bar and nav pill. Costs GPU when
