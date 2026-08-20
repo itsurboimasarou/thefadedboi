@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import StatusClock from "../widgets/StatusClock";
 import { openChangelog } from "./ControlPanel";
@@ -7,6 +8,7 @@ import { home } from "@/lib/home.config";
 
 export default function TopBar() {
   const [solid, setSolid] = useState(false);
+  const { pathname } = useRouter();
 
   useEffect(() => {
     let ticking = false;
@@ -21,7 +23,7 @@ export default function TopBar() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [pathname]);
 
   return (
     <header className={`topbar${solid ? " topbar--solid" : ""}`}>
