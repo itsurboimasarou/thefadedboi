@@ -1,17 +1,28 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { RAW } from "@/lib/assets";
+import { glassOn, setGlass } from "@/components/controls/GlassMode";
 
 const SRC = process.env.NEXT_PUBLIC_BG_VIDEO || `${RAW}/bg.mp4`;
 
 export default function VideoBackground() {
   const ref = useRef<HTMLVideoElement>(null);
   const [ok, setOk] = useState(true);
+  const [orbField, setOrbField] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setOrbField(document.getElementById("orb-field"));
+  }, []);
 
   useEffect(() => {
     if (!ok) return;
     const root = document.documentElement;
     root.classList.add("has-bg-video");
-    return () => root.classList.remove("has-bg-video");
+    setGlass(glassOn());
+    return () => {
+      root.classList.remove("has-bg-video");
+      setGlass(glassOn());
+    };
   }, [ok]);
 
   useEffect(() => {
@@ -24,9 +35,9 @@ export default function VideoBackground() {
     v.play().catch(() => { });
   }, []);
 
-  if (!ok) return null;
+  if (!ok || !orbField) return null;
 
-  return (
+  return createPortal(
     <video
       ref={ref}
       className="bg-video"
@@ -39,6 +50,7 @@ export default function VideoBackground() {
       aria-hidden="true"
       tabIndex={-1}
       onError={() => setOk(false)}
-    />
+    />,
+    orbField
   );
 }

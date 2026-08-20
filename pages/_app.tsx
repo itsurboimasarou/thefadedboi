@@ -41,7 +41,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
       </Head>
-      <div className="orb-field" aria-hidden="true">
+      <div id="orb-field" className="orb-field" aria-hidden="true">
         <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
           <symbol id="flake-glyph" viewBox="0 0 24 24">
             <g stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" fill="none">

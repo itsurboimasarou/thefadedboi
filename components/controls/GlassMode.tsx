@@ -11,7 +11,10 @@ export function setGlass(on: boolean) {
   document.documentElement.classList.toggle("glass-fx", on);
   try { localStorage.setItem("glass-fx", on ? "1" : "0"); } catch {}
 
-  const active = on && !document.documentElement.classList.contains("lite-mode");
+  const active =
+    on &&
+    !document.documentElement.classList.contains("lite-mode") &&
+    !document.documentElement.classList.contains("has-bg-video");
   const blur = active ? "blur(16px) saturate(1.3)" : "";
 
   for (const sel of [".topbar", ".nav-rail"]) {

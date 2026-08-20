@@ -14,6 +14,14 @@
   transition: background 0.2s ease;
 }
 
+/* The video is semi-transparent, so it blends with whatever sits behind it
+   in .orb-field. That's normally --bg (white in light theme), which washes
+   the dim video out to white instead of dark. Pin it to black so the video
+   is always dark-dimmed, matching the hero text lock in pages.css. */
+html.has-bg-video .orb-field {
+  background: #000000;
+}
+
 /* ── Night sky: snowflakes! ───────────────── */
 .sky {
   position: absolute;
@@ -87,12 +95,12 @@ html.no-snow .flake svg {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* the page reads over it, so knock it back rather than showing it raw */
-  opacity: 0.5;
+  opacity: 0.4;
+  /* Always a dim, dark backdrop — independent of light/dark theme, since
+     the home hero text is likewise locked to its dark-theme (light) colors. */
+  filter: brightness(0.55) saturate(0.9);
   pointer-events: none;
 }
-
-html[data-theme="light"] .bg-video { opacity: 0.35; }
 
 /* ── Snow vs video ───────────────────────────────────
    When a video backdrop is playing, snow on top of it reads as noise — and
@@ -105,4 +113,48 @@ html.has-bg-video .sky {
 
 html[data-theme="light"] .logo-mark {
   background-image: url("../public/logo-dark.png");
+}
+
+/* Home page: logo never swaps with theme, same reasoning as the text
+   tokens below — the always-dark video backdrop needs the light-on-dark
+   mark. */
+html.has-bg-video[data-theme="light"] .logo-mark {
+  background-image: url("../public/logo-light.png");
+}
+
+/* Home hero + status clock: pinned to the dark-theme palette regardless of
+   the site-wide theme toggle, since the video backdrop is always
+   dark-dimmed. Scoped to just these two — NOT the whole <html> — so the
+   rest of the chrome (nav rail, control panel, tooltips, switches) keeps
+   following the theme toggle normally on the home page, same as
+   everywhere else.
+
+   Deliberately NOT gated on [data-theme="light"]: dark theme's own root
+   tokens already match these values, so gating looks harmless, but it
+   isn't — it makes the rule stop matching for one frame right as the
+   theme flips. body's `color` is mid-transition at that instant (its own
+   0.35s fade), so h1 (which has no color of its own) would fall back to
+   that transitioning value and visibly dip through it before settling
+   back to light. Matching unconditionally keeps this rule in the cascade
+   continuously through the switch, so there's nothing to dip into. */
+html.has-bg-video .hero--bottom {
+  --ink: #eaf4fb;
+  --ink-dim: #8fa6bf;
+  --accent: #6fc9e8;
+  --accent-soft: #b9e6f5;
+  --accent-contrast: #06192b;
+  --glass: color-mix(in srgb, #eaf4fb 6%, #000000);
+  --glass-strong: color-mix(in srgb, #eaf4fb 9%, #000000);
+  --glass-border: rgba(180, 220, 240, 0.18);
+  /* h1's plain text ("Hi, I'm") has no color of its own, so it inherits
+     body's already-resolved color — which never sees the override above.
+     Re-asserting color here, freshly computed from this element's own
+     --ink, is what lets that inheritance pick it up. */
+  color: var(--ink);
+}
+
+html.has-bg-video .status-clock {
+  --ink: #eaf4fb;
+  --accent: #6fc9e8;
+  color: #eaf4fb;
 }

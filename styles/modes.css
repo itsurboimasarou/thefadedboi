@@ -182,5 +182,4 @@ html.lite-mode .status-dot::after { animation: none; opacity: 0; }
 
 html.lite-mode .nav-panel-btn svg { transition: none; }
 
-html.lite-mode .bg-video { opacity: 0.25; }
 html.lite-mode .control-panel { transition: none; }
