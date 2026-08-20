@@ -1,7 +1,7 @@
 import type { StatusConfig } from "./types";
 
 export const home = {
-  eyebrow: "Greetings! How was the moon today?",
+  eyebrow: "В них больше нет любви...",
   status: {
     override: null,
     timezone: "Europe/Berlin",
