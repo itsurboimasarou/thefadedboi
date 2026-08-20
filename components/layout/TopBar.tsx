@@ -1,15 +1,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import BerlinClock from "../widgets/BerlinClock";
-import { useLiveStatus, StatusPill } from "../widgets/LiveStatus";
-import Icon from "../ui/Icons";
+import StatusClock from "../widgets/StatusClock";
 import { openChangelog } from "./ControlPanel";
 import { site } from "@/lib/site.config"
 import { home } from "@/lib/home.config";
 
 export default function TopBar() {
   const [solid, setSolid] = useState(false);
-  const status = useLiveStatus(home.status);
 
   useEffect(() => {
     let ticking = false;
@@ -32,15 +29,7 @@ export default function TopBar() {
         <span className="logo-mark" role="img" aria-label={site.name} />
       </Link>
       <div className="topbar-actions">
-        <StatusPill
-          state={status}
-          labels={home.status.labels}
-          onClick={openChangelog}
-        />
-        <span className="status-pill time-pill">
-          <Icon name="clock" size={14} />
-          <BerlinClock />
-        </span>
+        <StatusClock config={home.status} onClick={openChangelog} />
       </div>
     </header>
   );
