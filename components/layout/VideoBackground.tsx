@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { CDN } from "@/lib/assets";
+import { RAW } from "@/lib/assets";
 
-const SRC = process.env.NEXT_PUBLIC_BG_VIDEO || `${CDN}/bg.mp4`;
+const SRC = process.env.NEXT_PUBLIC_BG_VIDEO || `${RAW}/bg.mp4`;
 
 export default function VideoBackground() {
   const ref = useRef<HTMLVideoElement>(null);

@@ -7,9 +7,9 @@ import type {
 
 export const CDN = "https://cdn.thefadedboi.me";
 
-export const REPO = "itsurboimasarou/prv-photos";
+export const REPO = "itsurboimasarou/site-assets";
 export const BRANCH = "main";
-const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
+export const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
 const IGNORE_PREFIX = /^_/;
