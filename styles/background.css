@@ -112,14 +112,14 @@ html.has-bg-video .sky {
 }
 
 html[data-theme="light"] .logo-mark {
-  background-image: url("../public/logo-dark.png");
+  background-image: var(--logo-custom, url("../public/logo-dark.png"));
 }
 
 /* Home page: logo never swaps with theme, same reasoning as the text
    tokens below — the always-dark video backdrop needs the light-on-dark
    mark. */
 html.has-bg-video[data-theme="light"] .logo-mark {
-  background-image: url("../public/logo-light.png");
+  background-image: var(--logo-custom, url("../public/logo-light.png"));
 }
 
 /* Home hero + status clock: pinned to the dark-theme palette regardless of
@@ -140,9 +140,13 @@ html.has-bg-video[data-theme="light"] .logo-mark {
 html.has-bg-video .hero--bottom {
   --ink: #eaf4fb;
   --ink-dim: #8fa6bf;
-  --accent: #6fc9e8;
-  --accent-soft: #b9e6f5;
-  --accent-contrast: #06192b;
+  /* Same --accent-custom override the rest of the site reads (tokens.css)
+     — without it, this dark-locked block would redeclare a fixed literal
+     here and shadow the user's accent choice for its whole subtree,
+     regardless of what's set on <html>. */
+  --accent: var(--accent-custom, #9be7ec);
+  --accent-soft: var(--accent-soft-custom, #d3f5f7);
+  --accent-contrast: var(--accent-contrast-custom, #062b2d);
   --glass: color-mix(in srgb, #eaf4fb 6%, #000000);
   --glass-strong: color-mix(in srgb, #eaf4fb 9%, #000000);
   --glass-border: rgba(180, 220, 240, 0.18);
@@ -160,7 +164,7 @@ html.has-bg-video .hero--bottom {
    produce near-invisible text on a light-mode panel. */
 html.has-bg-video .hubar .status-clock {
   --ink: #eaf4fb;
-  --accent: #6fc9e8;
+  --accent: var(--accent-custom, #9be7ec);
   color: #eaf4fb;
 }
 
@@ -179,9 +183,9 @@ html.has-bg-video .hubar .status-clock {
 html.has-bg-video .hubar {
   --ink: #eaf4fb;
   --ink-dim: #8fa6bf;
-  --accent: #6fc9e8;
-  --accent-soft: #b9e6f5;
-  --accent-contrast: #06192b;
+  --accent: var(--accent-custom, #9be7ec);
+  --accent-soft: var(--accent-soft-custom, #d3f5f7);
+  --accent-contrast: var(--accent-contrast-custom, #062b2d);
   --glass: color-mix(in srgb, #eaf4fb 6%, #000000);
   --glass-strong: color-mix(in srgb, #eaf4fb 9%, #000000);
   --glass-border: rgba(180, 220, 240, 0.18);

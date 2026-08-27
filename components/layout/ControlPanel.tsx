@@ -7,6 +7,8 @@ import GlassToggle from "../controls/GlassMode";
 import AutoHideToggle from "../controls/HuBarPinned";
 import DockControl from "../controls/HuBarDock";
 import LangSwitch from "../controls/LangSwitch";
+import AccentSwitch from "../controls/AccentSwitch";
+import LogoSwitch from "../controls/LogoSwitch";
 import StatusClock from "../widgets/StatusClock";
 import ChangelogDialog from "../content/ChangelogDialog";
 import { home } from "@/lib/home.config";
@@ -25,6 +27,7 @@ export function toggleControlPanel() {
 export default function ControlPanel({ changelog }: { changelog: string }) {
   const [open, setOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const liteOn = useLiteMode();
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +41,10 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
       window.removeEventListener(CHANGELOG_EVT, onLog);
     };
   }, []);
+
+  useEffect(() => {
+    if (!open) setThemeMenuOpen(false);
+  }, [open]);
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("control-panel-state", { detail: open }));
@@ -80,8 +87,59 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className="glance-row--mobile-only">
             <StatusClock config={home.status} onClick={openChangelog} />
           </div>
+          <div className="panel-head-actions">
+            {themeMenuOpen && (
+              <button
+                type="button"
+                className="panel-icon-btn"
+                onClick={() => setThemeMenuOpen(false)}
+                aria-label="Back"
+                title="Back"
+              >
+                <Icon name="arrowLeft" size={16} />
+              </button>
+            )}
+            <button
+              type="button"
+              className="panel-icon-btn"
+              onClick={() => setOpen(false)}
+              aria-label="Close"
+              title="Close"
+            >
+              <Icon name="close" size={16} />
+            </button>
+          </div>
         </div>
 
+        {themeMenuOpen ? (
+          <div className="theme-menu">
+            <div className="theme-menu-section">
+              <h3 className="h-with-icon theme-menu-heading">
+                <Icon name="paintbrush" size={15} />
+                Accent color
+              </h3>
+              <AccentSwitch />
+            </div>
+
+            <div className="theme-menu-section">
+              <h3 className="h-with-icon theme-menu-heading">
+                <Icon name="image" size={15} />
+                Logo
+              </h3>
+              <LogoSwitch />
+            </div>
+
+            <button
+              type="button"
+              className="text-btn text-btn--center theme-menu-back-mobile"
+              onClick={() => setThemeMenuOpen(false)}
+            >
+              <Icon name="arrowLeft" size={14} />
+              Back
+            </button>
+          </div>
+        ) : (
+        <>
         <dl className="fact-grid glance-grid">
           <div>
             <dt>
@@ -182,6 +240,17 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           </div>
 
         </dl>
+
+        <button
+          type="button"
+          className="text-btn text-btn--center"
+          onClick={() => setThemeMenuOpen(true)}
+        >
+          <Icon name="paintbrush" size={14} />
+          Customize theme
+        </button>
+        </>
+        )}
       </div>
 
       <ChangelogDialog

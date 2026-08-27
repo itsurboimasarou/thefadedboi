@@ -74,7 +74,7 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
   display: block;
   width: 40px;
   height: 40px;
-  background-image: url("../public/logo-light.png");
+  background-image: var(--logo-custom, url("../public/logo-light.png"));
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -365,11 +365,11 @@ html.glass-fx .hubar {
   .hubar--right .status-clock-label {
     display: none;
   }
-  /* HH over MM, seconds and colons dropped entirely — trying to fit
-     "14:14:04" on one narrow line (even shrunk) still pushed past the
-     84px bar, since flex items don't shrink text below its unwrapped
-     width by default (min-width:auto). Stacking two bare 2-digit numbers
-     sidesteps that instead of fighting it. */
+  /* HH over MM over SS, colons dropped — trying to fit "14:14:04" on one
+     narrow line (even shrunk) still pushed past the 84px bar, since flex
+     items don't shrink text below its unwrapped width by default
+     (min-width:auto). Stacking three bare 2-digit numbers at a smaller
+     size sidesteps that instead of fighting it. */
   .hubar--left .status-clock-time,
   .hubar--right .status-clock-time {
     flex-direction: column;
@@ -379,18 +379,23 @@ html.glass-fx .hubar {
     min-width: 0;
   }
   .hubar--left .status-clock-sep,
-  .hubar--right .status-clock-sep,
-  .hubar--left .status-clock-ss,
-  .hubar--right .status-clock-ss {
+  .hubar--right .status-clock-sep {
     display: none;
   }
   .hubar--left .status-clock-hh,
   .hubar--left .status-clock-mm,
+  .hubar--left .status-clock-ss,
   .hubar--right .status-clock-hh,
-  .hubar--right .status-clock-mm {
-    font-size: 1.05rem;
+  .hubar--right .status-clock-mm,
+  .hubar--right .status-clock-ss {
+    font-size: 0.82rem;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.25;
+  }
+  .hubar--left .status-clock-ss,
+  .hubar--right .status-clock-ss {
+    color: var(--ink-dim);
+    font-weight: 600;
   }
   .hubar--left .status-clock:hover .status-clock-time,
   .hubar--left .status-clock:focus-visible .status-clock-time,
