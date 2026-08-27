@@ -98,7 +98,7 @@ html.no-snow .flake svg {
   opacity: 0.4;
   /* Always a dim, dark backdrop — independent of light/dark theme, since
      the home hero text is likewise locked to its dark-theme (light) colors. */
-  filter: brightness(0.55) saturate(0.9);
+  filter: brightness(0.8) saturate(0.9);
   pointer-events: none;
 }
 
@@ -153,8 +153,51 @@ html.has-bg-video .hero--bottom {
   color: var(--ink);
 }
 
-html.has-bg-video .status-clock {
+/* Scoped to .hubar specifically (not any .status-clock) — on mobile a
+   second StatusClock instance also renders inside the control panel, which
+   sits on a normal var(--glass) surface and follows the theme toggle
+   normally. Locking that instance to this dark-video palette too would
+   produce near-invisible text on a light-mode panel. */
+html.has-bg-video .hubar .status-clock {
   --ink: #eaf4fb;
   --accent: #6fc9e8;
   color: #eaf4fb;
+}
+
+/* HuBar itself: same unconditional dark lock as the hero text above (glass
+   is now allowed on the home page too, per GlassMode.tsx — it should just
+   always render dark there, not follow the theme toggle). This covers
+   every HuBar state's colors (icons, border, shadow) via ordinary
+   inheritance; --chrome-bg is additionally locked for the lite-mode case
+   specifically, since that's the one state that still reads it directly.
+   The base (no glass, no lite) state's own `background` is locked too,
+   below — it reads var(--bg) directly rather than a token that's already
+   covered here, so in light theme it was rendering as a near-opaque white
+   block with no border to define its edge against the dark video. Glass's
+   own background comes from GlassMode.tsx's JS, already dark-locked there
+   via homeLocked. */
+html.has-bg-video .hubar {
+  --ink: #eaf4fb;
+  --ink-dim: #8fa6bf;
+  --accent: #6fc9e8;
+  --accent-soft: #b9e6f5;
+  --accent-contrast: #06192b;
+  --glass: color-mix(in srgb, #eaf4fb 6%, #000000);
+  --glass-strong: color-mix(in srgb, #eaf4fb 9%, #000000);
+  --glass-border: rgba(180, 220, 240, 0.18);
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  background: color-mix(in srgb, #000000 40%, transparent);
+}
+html.has-bg-video.lite-mode .hubar {
+  --chrome-bg: #0a0a0a;
+}
+
+/* The page-name hover tooltip's text already inherits the dark lock above
+   (color: var(--ink), now light) — but its own background still read
+   var(--bg) directly, which is white in light theme. Light text on a
+   white tooltip was reading as nearly invisible specifically on home +
+   light theme. Reuse --glass-strong, already dark-locked above, instead
+   of introducing a second one-off dark value. */
+html.has-bg-video .hubar-item .tip {
+  background: var(--glass-strong);
 }

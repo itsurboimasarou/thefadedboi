@@ -5,13 +5,12 @@
 /* ── Overall theming ────────────────── */
 :root,
 :root[data-theme="dark"] {
-  /* Chrome surface (top bar + nav pill) is expressed as two custom
-     properties rather than as competing rules. Only ONE backdrop-filter
-     declaration exists for each element in the whole stylesheet, so nothing
-     can override it — the mode classes just change these values. */
+  /* HuBar's chrome surface is expressed as a custom property rather than a
+     competing rule. Only ONE backdrop-filter declaration exists for this
+     element in the whole stylesheet, so nothing can override it — the mode
+     classes just change these values. */
   --chrome-blur: none;
-  --chrome-bg-top: color-mix(in srgb, var(--bg) 92%, transparent);
-  --chrome-bg-nav: #0a0a0a;
+  --chrome-bg: color-mix(in srgb, var(--bg) 92%, transparent);
   /* Dark is pitch black by default */
   --bg: #000000;
   --ink: #eaf4fb;
@@ -24,17 +23,16 @@
   /* borders carry the separation that background contrast used to */
   --glass-border: rgba(180, 220, 240, 0.18);
   --shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
-  --nav-solid: #0a0a0a;
-  /* bottom-docked pill height — the control panel stacks above it */
-  --nav-h: 68px;
+  --hubar-solid: #0a0a0a;
+  /* HuBar's own footprint — the control panel and .main's padding
+     reservation stack off of this. */
+  --hubar-h: 68px;
   --radius: 20px;
-  --nav-w: 84px;
-  --nav-bg: #0a0a0a;
+  --hubar-w: 84px;
 }
 
 :root[data-theme="light"] {
-  --chrome-bg-top: color-mix(in srgb, var(--bg) 92%, transparent);
-  --chrome-bg-nav: #ffffff;
+  --chrome-bg: color-mix(in srgb, var(--bg) 92%, transparent);
   --bg: #ffffff;
   --ink: #0d2137;
   --ink-dim: #4f6883;
@@ -45,8 +43,7 @@
   --glass-strong: #ffffff;
   --glass-border: rgba(16, 19, 24, 0.1);
   --shadow: 0 4px 14px rgba(30, 60, 100, 0.10);
-  --nav-solid: #ffffff;
-  --nav-bg: #ffffff;
+  --hubar-solid: #ffffff;
   color-scheme: light;
 }
 
@@ -72,7 +69,7 @@
 }
 
 :root[data-theme="light"] .notice-backdrop {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.89);
 }
 
 :root[data-theme="light"] .link-banner--solid {
@@ -118,16 +115,14 @@ body {
    it wins when both are on. */
 html.glass-fx {
   --chrome-blur: blur(16px) saturate(1.3);
-  --chrome-bg-top: color-mix(in srgb, var(--bg) 60%, transparent);
-  --chrome-bg-nav: color-mix(in srgb, var(--bg) 55%, transparent);
+  --chrome-bg: color-mix(in srgb, var(--bg) 58%, transparent);
 }
 
 /* Lite mode (and reduced motion) force opaque chrome: a live blur repaints
    whenever anything moves behind it. */
 html.lite-mode {
   --chrome-blur: none;
-  --chrome-bg-top: color-mix(in srgb, var(--bg) 96%, transparent);
-  --chrome-bg-nav: var(--nav-solid);
+  --chrome-bg: var(--hubar-solid);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -136,7 +131,6 @@ html.lite-mode {
   html,
   html.glass-fx {
     --chrome-blur: none;
-    --chrome-bg-top: color-mix(in srgb, var(--bg) 96%, transparent);
-    --chrome-bg-nav: var(--nav-solid);
+    --chrome-bg: var(--hubar-solid);
   }
 }

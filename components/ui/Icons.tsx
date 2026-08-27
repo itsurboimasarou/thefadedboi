@@ -57,6 +57,16 @@ const icons: Record<string, JSX.Element> = {
   moon: <svg {...p}><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" /></svg>,
   snow: <svg {...p}>{snowPaths}</svg>,
   dot: <svg {...p}><circle cx="12" cy="12" r="3.5" /></svg>,
+  // frickin nav
+  home: <svg {...p}><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /><path d="M9.5 21v-6h5v6" /></svg>,
+  contacts: <svg {...p}><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m4 7 8 6 8-6" /></svg>,
+  portfolio: <svg {...p}><rect x="3" y="7" width="18" height="13" rx="3" /><path d="M8.5 7V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V7" /><path d="M3 12.5h18" /></svg>,
+  devices: <svg {...p}><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8" /><path d="M12 16v4" /></svg>,
+  thumbtack: <svg {...p}><path d="M9 4h6l-1 6 3 3v2H7v-2l3-3-1-6Z" /><path d="M12 15v6" /></svg>,
+  dockTop: <svg {...p}><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M3 9h18" /><rect x="7" y="5" width="10" height="2" rx="1" fill="currentColor" stroke="none" /></svg>,
+  dockBottom: <svg {...p}><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M3 15h18" /><rect x="7" y="17" width="10" height="2" rx="1" fill="currentColor" stroke="none" /></svg>,
+  dockLeft: <svg {...p}><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M9 3v18" /><rect x="5" y="7" width="2" height="10" rx="1" fill="currentColor" stroke="none" /></svg>,
+  dockRight: <svg {...p}><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M15 3v18" /><rect x="17" y="7" width="2" height="10" rx="1" fill="currentColor" stroke="none" /></svg>,
 };
 
 const specMap: ReadonlyArray<readonly [string, string]> = [

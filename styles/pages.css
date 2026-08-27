@@ -832,8 +832,10 @@
 }
 
 /* ── Control panel ───────────────────────────────────
-   Flies up from behind the nav pill. Transform + opacity only, so the whole
-   transition is compositor work — no layout, no repaint. */
+   Flies out from behind HuBar. Transform + opacity only, so the whole
+   transition is compositor work — no layout, no repaint. Base rule is the
+   Bottom-dock case (the pre-existing default); Top/Left/Right below
+   override the anchor edge and transform direction to match. */
 .control-panel {
   position: fixed;
   left: 0;
@@ -841,8 +843,14 @@
   margin-inline: auto;
   translate: none;
   width: min(440px, calc(100vw - 32px));
-  bottom: calc(16px + var(--nav-h, 68px) + 14px);
-  z-index: 55;
+  bottom: calc(16px + var(--hubar-h, 68px) + 14px);
+  /* Above .hubar (z-index: 60) — the panel is its own stacking context, so
+     a child's z-index (like .info-tip-bubble's) only ranks it within the
+     panel; it can never outrank a sibling context like HuBar no matter how
+     high it's set. The panel itself has to outrank HuBar for anything
+     escaping its bounds — the tooltip flies up past the panel's own box —
+     to actually paint on top of it. */
+  z-index: 65;
   padding: 14px 16px;
   border-radius: 16px;
   background: var(--glass);
@@ -869,9 +877,22 @@
     visibility 0s;
 }
 
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
 .panel-title {
   font-size: 1.05rem;
-  margin-bottom: 10px;
+  margin-bottom: 0;
+}
+
+/* Desktop: StatusClock already lives in HuBar itself, not the panel. */
+.panel-head .glance-row--mobile-only {
+  display: none;
 }
 
 .control-panel .glance-grid {
@@ -887,13 +908,26 @@
   margin-top: 4px;
 }
 
-/* Rail docked left: the "at a glance" trigger lives in a vertically-centred
-   pill on the left edge, not at the bottom — so the panel follows it there
-   and flies in from the side, instead of staying centred across the whole
-   viewport and flying up from the bottom. */
+/* HuBar docked top: nothing occupies the bottom, so the panel flies down
+   from behind HuBar instead of up. */
+.app-root:has(.hubar--top) .control-panel {
+  bottom: auto;
+  top: calc(16px + var(--hubar-h, 68px) + 14px);
+  transform: translateY(-24px) scale(0.98);
+  transform-origin: top center;
+}
+.app-root:has(.hubar--top) .control-panel--open {
+  transform: translateY(0) scale(1);
+}
+
+/* HuBar docked left/right: the trigger lives in a vertically-centred pill
+   on the screen edge, not at the top or bottom — so the panel follows it
+   there and flies in from the side, instead of staying centred across the
+   whole viewport. Desktop-only: Left/Right are never reachable on mobile
+   (HuBar.tsx forces Top/Bottom there). */
 @media (min-width: 721px) {
-  .app-root:has(.nav-rail--left) .control-panel {
-    left: calc(16px + var(--nav-w) + 16px);
+  .app-root:has(.hubar--left) .control-panel {
+    left: calc(16px + var(--hubar-w) + 16px);
     right: auto;
     margin-inline: 0;
     bottom: auto;
@@ -901,11 +935,25 @@
     /* The vertical centering has to live inside this same `transform` (not
        a separate `translate` property) — the build's CSS minifier drops a
        standalone `translate` declaration whenever `transform` is also set
-       on the same rule. */
+       on the same rule. This applies to every block here, not just this
+       one — it's a real, previously-hit bug. */
     transform: translate(-16px, -50%) scale(0.98);
     transform-origin: left center;
   }
-  .app-root:has(.nav-rail--left) .control-panel--open {
+  .app-root:has(.hubar--left) .control-panel--open {
+    transform: translate(0, -50%) scale(1);
+  }
+
+  .app-root:has(.hubar--right) .control-panel {
+    right: calc(16px + var(--hubar-w) + 16px);
+    left: auto;
+    margin-inline: 0;
+    bottom: auto;
+    top: 50%;
+    transform: translate(16px, -50%) scale(0.98);
+    transform-origin: right center;
+  }
+  .app-root:has(.hubar--right) .control-panel--open {
     transform: translate(0, -50%) scale(1);
   }
 }

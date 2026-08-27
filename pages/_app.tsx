@@ -11,9 +11,8 @@ import "@/styles/modes.css";
 import Head from "next/head";
 import type { AppProps } from "next/app";
 import { useEffect } from "react";
-import { Work_Sans, IBM_Plex_Sans, Momo_Signature } from "next/font/google";
-import TopBar from "@/components/layout/TopBar";
-import NavRail from "@/components/layout/NavRail";
+import { Work_Sans, IBM_Plex_Sans, Momo_Signature, Space_Grotesk } from "next/font/google";
+import HuBar from "@/components/layout/HuBar";
 import { site } from "@/lib/site.config";
 import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
@@ -24,18 +23,19 @@ import { snowPaths } from "@/components/ui/Icons";
 const display = Work_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
 const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-body" });
 const script = Momo_Signature({ subsets: ["latin"], weight: "400", display: "swap", variable: "--font-script" });
+const mono = Space_Grotesk({ subsets: ["latin"], weight: ["500", "700"], display: "swap", variable: "--font-lang" });
 
 export default function App({ Component, pageProps }: AppProps) {
   const changelog: string = (pageProps as { changelog?: string }).changelog ?? "";
   const [footerPre, footerPost] = site.footer.split(site.handle);
 
   useEffect(() => {
-    document.body.classList.add(display.variable, body.variable, script.variable);
-    return () => document.body.classList.remove(display.variable, body.variable, script.variable);
+    document.body.classList.add(display.variable, body.variable, script.variable, mono.variable);
+    return () => document.body.classList.remove(display.variable, body.variable, script.variable, mono.variable);
   }, []);
 
   return (
-    <div className={`app-root ${display.variable} ${body.variable} ${script.variable}`}>
+    <div className={`app-root ${display.variable} ${body.variable} ${script.variable} ${mono.variable}`}>
       <Head>
         <title>{`${site.name}`}</title>
         <meta name="description" content={site.tagline} />
@@ -52,7 +52,6 @@ export default function App({ Component, pageProps }: AppProps) {
         </svg>
         <Snowfall />
       </div>
-      <TopBar />
       <div className="shell">
         <main className="main">
           <Component {...pageProps} />
@@ -63,7 +62,7 @@ export default function App({ Component, pageProps }: AppProps) {
           </footer>
         </main>
       </div>
-      <NavRail />
+      <HuBar />
       <ControlPanel changelog={changelog} />
       <LiteNotice />
       <PageLoader />

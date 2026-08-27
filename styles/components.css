@@ -38,11 +38,11 @@
   height: 16px;
 }
 
-.theme-switch .track-icon--moon { left: 2px; }
-.theme-switch .track-icon--sun  { left: 34px; right: auto; }
+.theme-switch .track-icon--left  { left: 2px; }
+.theme-switch .track-icon--right { left: 34px; right: auto; }
 
-.theme-switch[aria-checked="false"] .track-icon--moon,
-.theme-switch[aria-checked="true"]  .track-icon--sun {
+.theme-switch[aria-checked="false"] .track-icon--left,
+.theme-switch[aria-checked="true"]  .track-icon--right {
   color: var(--accent-contrast);
 }
 
@@ -72,6 +72,45 @@
   cursor: not-allowed;
 }
 
+/* Text labels (LangSwitch) instead of icon glyphs — same slider shell,
+   just a size up with a wider (pill, not circular) knob so two-letter
+   labels sit comfortably on it. Declared after the .theme-switch block
+   above (not just higher-specificity) since some of these — like the
+   knob's own size/radius — tie with the base rule at equal specificity
+   and would otherwise lose to it by source order.
+
+   Rounded rectangle, not a full pill: track radius 12px, inset 3px, knob
+   radius 9px (12 - 3) — matching the inset so the knob's corner curve is
+   concentric with the track's inner corner instead of leaving a gap. */
+.lang-switch {
+  width: 78px;
+  height: 34px;
+  border-radius: 12px;
+}
+
+.lang-switch .track-icon {
+  top: 2px;
+  width: 36px;
+  height: 28px;
+  font-family: var(--font-lang), monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.lang-switch .track-icon--left { left: 3px; }
+.lang-switch .track-icon--right { left: 38px; }
+
+.lang-switch .knob {
+  top: 3px;
+  left: 3px;
+  width: 36px;
+  height: 26px;
+  border-radius: 9px;
+}
+.lang-switch[aria-checked="true"] .knob {
+  translate: 34px 0;
+}
+
 /* ── Snowflake shape setting ────────────────────────── */
 .shape-toggle {
   display: grid;
@@ -90,14 +129,6 @@
   color: var(--accent);
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 14%, transparent);
-}
-
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  margin-left: auto;
 }
 
 /* ── Glass panels ───────────────────────────────────── */
@@ -213,6 +244,20 @@
 .glance-grid {
   grid-template-columns: 1fr 1fr;
 }
+
+/* Status clock + language rows only show inside the panel on mobile — on
+   desktop they live in HuBar's own end-group instead. Shown via the
+   compact media query in modes.css (loaded after this, so it wins). */
+.glance-row--mobile-only {
+  display: none;
+}
+
+.dock-control {
+  display: flex;
+  gap: 6px;
+}
+
+.dock-control-item--disabled { opacity: 0.45; }
 
 /* ── Icons / headings ───────────────────────────────── */
 .icn {
@@ -521,9 +566,12 @@
   border-radius: 8px;
 }
 
-/* Only the label carries the state colour; the time stays readable ink. */
+/* Only the label carries the state colour; the time stays readable ink.
+   inline-flex (not a single text node) so a vertical dock can stack HH
+   over MM and hide the seconds/colons — see layout.css. */
 .status-clock-time {
-  display: block;
+  display: inline-flex;
+  align-items: baseline;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }

@@ -40,8 +40,8 @@ export default function ThemeToggle() {
       aria-label="Toggle theme"
     >
       <span className="knob" aria-hidden="true" />
-      <span className="track-icon track-icon--moon">{moon}</span>
-      <span className="track-icon track-icon--sun">{sun}</span>
+      <span className="track-icon track-icon--left">{moon}</span>
+      <span className="track-icon track-icon--right">{sun}</span>
     </button>
   );
 }

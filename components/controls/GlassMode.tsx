@@ -11,19 +11,16 @@ export function setGlass(on: boolean) {
   document.documentElement.classList.toggle("glass-fx", on);
   try { localStorage.setItem("glass-fx", on ? "1" : "0"); } catch {}
 
-  const active =
-    on &&
-    !document.documentElement.classList.contains("lite-mode") &&
-    !document.documentElement.classList.contains("has-bg-video");
+  const homeLocked = document.documentElement.classList.contains("has-bg-video");
+  const active = on && !document.documentElement.classList.contains("lite-mode");
   const blur = active ? "blur(16px) saturate(1.3)" : "";
 
-  for (const sel of [".topbar", ".nav-rail"]) {
-    const el = document.querySelector<HTMLElement>(sel);
-    if (!el) continue;
+  const el = document.querySelector<HTMLElement>(".hubar");
+  if (el) {
     el.style.backdropFilter = blur;
     el.style.setProperty("-webkit-backdrop-filter", blur);
     el.style.background = active
-      ? "color-mix(in srgb, var(--bg) 58%, transparent)"
+      ? `color-mix(in srgb, ${homeLocked ? "#000000" : "var(--bg)"} 58%, transparent)`
       : "";
   }
   window.dispatchEvent(new CustomEvent(EVT, { detail: on }));

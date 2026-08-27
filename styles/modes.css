@@ -24,29 +24,65 @@
     font-size: 0.72rem;
   }
 
-  .nav-rail {
-    top: auto;
-    bottom: 14px;
+  /* HuBar.tsx already resolves effectiveDock to "top" or "bottom" only at
+     this breakpoint, so this is purely positioning for whichever of those
+     two classes is actually present — no override-a-wrong-class logic
+     needed (that's what the old unconditional .nav-rail rule here had to
+     do, back when NavRail always rendered its own dock class regardless of
+     viewport). */
+  .hubar--top {
+    top: 16px;
     left: 50%;
     translate: -50% 0;
-    flex-direction: row;
     padding: 8px 10px;
   }
+  .hubar--top.hubar--hidden {
+    translate: -50% calc(-100% - 7px);
+    opacity: 0.6;
+  }
+  .hubar--bottom {
+    top: auto;
+    bottom: 16px;
+    left: 50%;
+    translate: -50% 0;
+    padding: 8px 10px;
+  }
+  .hubar--bottom.hubar--hidden {
+    translate: -50% calc(100% + 6px);
+    opacity: 0.6;
+  }
 
-  .nav-item .tip {
+  .hubar-item .tip {
     display: none;
   }
 
-  .nav-dock-btn, .nav-pin-btn, .nav-divider { display: none; }
+  .hubar-hotzone { display: none; }
 
-  .nav-hotzone { display: none; }
+  /* Trigger swaps from the logo mark to a rotating chevron on mobile (see
+     HuBarTrigger.tsx — both render, this is what picks between them). */
+  .hubar-trigger .logo-mark { display: none; }
+  .hubar-trigger-arrow { display: block; }
+  .hubar--top .hubar-trigger-arrow svg { rotate: 180deg; }
+  .hubar--top .hubar-trigger--open .hubar-trigger-arrow svg { rotate: 0deg; }
+  .hubar--bottom .hubar-trigger--open .hubar-trigger-arrow svg { rotate: 180deg; }
+
+  /* HuBar shows only the left-side (trigger + page) group on mobile — the
+     end-group's contents (status clock, language) move into "At a glance"
+     instead, via the mobile-only rows below. */
+  .hubar-group--end { display: none; }
+  .glance-row--mobile-only { display: block; }
+  /* Status specifically sits beside the "At a glance" title instead of
+     its own grid row — an inline flex item there, not a block row. */
+  .panel-head .glance-row--mobile-only { display: flex; align-items: center; }
 
   .main {
     padding-left: clamp(20px, 5vw, 64px);
     padding-right: clamp(20px, 5vw, 64px);
-    padding-top: 84px;
-    padding-bottom: 110px;
   }
+  /* Top's reservation comes from the unconditional :has(.hubar--top) rule
+     in layout.css (calc(), driven by the live-measured --hubar-h — already
+     correct at this breakpoint too). Bottom's mobile-specific reservation
+     lives there as well, right next to it. */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -69,8 +105,17 @@
 }
 
 @media (max-width: 720px) {
-  .control-panel.control-panel {
-    bottom: calc(16px + var(--nav-h, 68px) + 16px);
+  .app-root:has(.hubar--bottom) .control-panel.control-panel {
+    bottom: calc(16px + var(--hubar-h, 68px) + 16px);
+  }
+  .app-root:has(.hubar--top) .control-panel.control-panel {
+    top: calc(16px + var(--hubar-h, 68px) + 16px);
+    bottom: auto;
+    transform: translateY(-24px) scale(0.98);
+    transform-origin: top center;
+  }
+  .app-root:has(.hubar--top) .control-panel--open.control-panel--open {
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -90,7 +135,7 @@
 }
 
 @media (hover: none), (pointer: coarse) {
-  .nav-item .tip { display: none !important; }
+  .hubar-item .tip { display: none !important; }
 }
 
 /* Lite mode: no animation */
@@ -129,12 +174,13 @@ html.lite-mode .contact-icon {
   background: color-mix(in srgb, var(--ink) 6%, var(--bg));
 }
 
-html.lite-mode .nav-rail,
-html.lite-mode .topbar--solid {
-  background: var(--bg);
+html.lite-mode .hubar {
+  background: var(--chrome-bg);
+  border-color: var(--glass-border);
+  box-shadow: var(--shadow);
   transition: none;
 }
-html.lite-mode .nav-hotzone { display: none; }
+html.lite-mode .hubar-hotzone { display: none; }
 
 html.lite-mode .version-pill:hover { transform: none; }
 
@@ -147,11 +193,6 @@ html.lite-mode[data-theme="light"] .glass,
 html.lite-mode[data-theme="light"] .gear-card,
 html.lite-mode[data-theme="light"] .spec-item summary,
 html.lite-mode[data-theme="light"] .contact-icon {
-  background: #ffffff;
-}
-
-html.lite-mode[data-theme="light"] .nav-rail,
-html.lite-mode[data-theme="light"] .topbar--solid {
   background: #ffffff;
 }
 
@@ -180,6 +221,6 @@ html.lite-mode .thumb-loader::after { animation: none; }
 /* Lite mode: stop the only permanently-running animation on the page. */
 html.lite-mode .status-dot::after { animation: none; opacity: 0; }
 
-html.lite-mode .nav-panel-btn svg { transition: none; }
+html.lite-mode .hubar-trigger-arrow svg { transition: none; }
 
 html.lite-mode .control-panel { transition: none; }

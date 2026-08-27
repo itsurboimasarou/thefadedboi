@@ -12,6 +12,7 @@ export default function StatusClock({
   const state = useLiveStatus(config);
   const [hover, setHover] = useState(false);
   const [time, setTime] = useState("--:--:--");
+  const [hh, mm, ss] = time.split(":");
 
   useEffect(() => {
     const fmt = new Intl.DateTimeFormat("en-GB", {
@@ -63,7 +64,11 @@ export default function StatusClock({
         {config.labels[state]}
       </span>
       <span className="status-clock-time" suppressHydrationWarning>
-        {time}
+        <span className="status-clock-hh">{hh}</span>
+        <span className="status-clock-sep">:</span>
+        <span className="status-clock-mm">{mm}</span>
+        <span className="status-clock-sep">:</span>
+        <span className="status-clock-ss">{ss}</span>
       </span>
     </button>
   );

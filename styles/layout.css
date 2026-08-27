@@ -13,7 +13,6 @@
   flex-direction: column;
   min-height: 100vh;
   padding: clamp(24px, 5vw, 64px);
-  padding-top: calc(64px + clamp(16px, 3vw, 40px));
   padding-left: clamp(24px, 5vw, 64px);
   /* padding-bottom: clamp(24px, 5vw, 64px); */
   max-width: 1360px;
@@ -21,6 +20,26 @@
   width: 100%;
   animation: page-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   overflow-x: clip;
+}
+
+/* HuBar reserves space only on whichever side it's actually docked to —
+   unlike the old topbar+nav-rail pair (always both mounted, so top AND
+   bottom padding were both always reserved), HuBar is one bar in one spot
+   at a time. Unconditional (not gated to a viewport range) since Top is
+   also the mobile default and --hubar-h is the live measured height at
+   whatever size the bar renders. */
+.app-root:has(.hubar--top) .main { padding-top: calc(16px + var(--hubar-h, 68px) + 16px); }
+/* A bit more clearance on other pages specifically — home's hero is
+   bottom-anchored inside a fixed-height viewport (html.no-scroll), so
+   extra top padding there would eat into its own vertical space rather
+   than just adding a gap; everywhere else it's pure breathing room. */
+html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px + var(--hubar-h, 68px) + 32px); }
+/* Bottom is pin-gated (only reserved when auto-hide is off) on desktop
+   below, matching the old nav-rail's behavior; on mobile the compact
+   override keeps the bar effectively always-visible regardless of pinned
+   state, so it's reserved unconditionally there instead. */
+@media (max-width: 720px), (max-height: 600px) {
+  .app-root:has(.hubar--bottom) .main { padding-bottom: 110px; }
 }
 
 @keyframes page-in {
@@ -41,41 +60,16 @@
     padding-right: clamp(24px, 5vw, 64px);
     transition: padding 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  /* pinned + docked bottom: reserve footer clearance instead */
-  .app-root:has(.nav-rail--pinned.nav-rail--bottom) .main {
+  /* pinned + docked bottom: reserve footer clearance instead. Unpinned
+     (auto-hide on) reserves nothing — content is free to use that space
+     since the bar mostly stays out of the way. */
+  .app-root:has(.hubar--bottom.hubar--pinned) .main {
     padding-bottom: 110px;
   }
   html.lite-mode .main { transition: none; }
 }
 
-/* ── Top bar ────────────────────────────────────────── */
-.topbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px clamp(16px, 3vw, 28px);
-  background: transparent;
-  border-bottom: 1px solid transparent;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.topbar--solid {
-  background: var(--chrome-bg-top);
-  border-bottom: 1px solid var(--glass-border);
-  /* the ONLY backdrop-filter on this element anywhere */
-  backdrop-filter: var(--chrome-blur);
-  -webkit-backdrop-filter: var(--chrome-blur);
-}
-
-.topbar .logo-corner {
-  display: block;
-  line-height: 0;
-}
+/* ── Logo mark ──────────────────────────────────────── */
 .logo-mark {
   display: block;
   width: 40px;
@@ -86,30 +80,83 @@
   background-position: center;
 }
 
-/* ── Nav pill ───────────────────────────────────────── */
-.nav-rail {
+/* ── HuBar ──────────────────────────────────────────────
+   One floating bar, four dock positions. Shape is a rounded rectangle
+   (not the old full-pill capsule) with a thin accent-tinted border.
+
+   Three states, no scroll-dependent fourth one: a soft low-opacity tint
+   by default (every dock, not just Top — plain var(--bg) so it's already
+   theme-correct without a light/dark override), a stronger surface when
+   Glass Effect is on (border/shadow here; background/blur are JS inline
+   — see GlassMode.tsx), or solid when Lite mode is on (modes.css). */
+.hubar {
   position: fixed;
-  left: 16px;
-  top: 50%;
-  translate: 0 -50%;
+  z-index: 60;
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 10px 8px;
-  border-radius: 999px;
-  background: var(--chrome-bg-nav);
-  /* the ONLY backdrop-filter on this element anywhere */
-  backdrop-filter: var(--chrome-blur);
-  -webkit-backdrop-filter: var(--chrome-blur);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow);
-  z-index: 58;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  border: 1px solid transparent;
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--glass-border));
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
 }
 
-.nav-item:active,
-.nav-item {
+html.glass-fx .hubar {
+  box-shadow: var(--shadow);
+}
+
+/* .control-panel sits above .hubar (z-index 65 vs 60, in pages.css) so its
+   own info-tips can escape its box without getting clipped by the bar.
+   But a page-name tooltip lives INSIDE .hubar, nested in .hubar's own
+   stacking context — no z-index on the tooltip itself can ever outrank a
+   sibling context like the panel, only .hubar as a whole can. Bumping
+   .hubar's z-index outright would just flip which one wins in general and
+   re-break the panel's tooltips, so this only applies while a HuBar
+   tooltip is actually showing (hover/focus), leaving the normal case
+   (panel above bar) intact the rest of the time. */
+.hubar:has(.hubar-item:hover),
+.hubar:has(.hubar-item:focus-visible) {
+  z-index: 70;
+}
+
+.hubar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Top/Bottom: horizontal island, groups sit at opposite ends. */
+.hubar--top,
+.hubar--bottom {
+  flex-direction: row;
+  width: min(760px, calc(100vw - 48px));
+  padding: 6px 12px;
+  justify-content: space-between;
+}
+.hubar--top .hubar-group,
+.hubar--bottom .hubar-group {
+  flex-direction: row;
+}
+
+/* Left/Right: vertical capsule, start-group on top, end-group on bottom. */
+.hubar--left,
+.hubar--right {
+  flex-direction: column;
+  width: 62px;
+  padding: 10px 7px;
+  justify-content: space-between;
+}
+.hubar--left .hubar-group,
+.hubar--right .hubar-group {
+  flex-direction: column;
+}
+
+.hubar-item:active,
+.hubar-item {
   position: relative;
   width: 44px;
   height: 44px;
@@ -121,25 +168,26 @@
   border: none;
   cursor: pointer;
   font: inherit;
+  flex-shrink: 0;
   transition: color 0.2s, background 0.2s;
 }
 
-.nav-item:hover {
+.hubar-item:hover {
   color: var(--ink);
 }
 
-.nav-item[aria-current="page"] {
+.hubar-item[aria-current="page"] {
   color: var(--accent);
   background: var(--glass-strong);
   box-shadow: inset 0 0 0 1px var(--glass-border);
 }
 
-.nav-item svg {
+.hubar-item .icn {
   width: 22px;
   height: 22px;
 }
 
-.nav-item .tip {
+.hubar-item .tip {
   position: absolute;
   left: calc(100% + 12px);
   top: 50%;
@@ -147,6 +195,11 @@
   border-radius: 8px;
   background: var(--bg);
   border: 1px solid var(--glass-border);
+  /* Without a shadow this can blend straight into a same-toned page —
+     a light-mode tooltip over a white page card was reading as almost
+     blank (border alpha is fairly low, --glass-border ~0.1 in light
+     theme). The shadow is what actually separates it from the page. */
+  box-shadow: var(--shadow);
   font-size: 12.5px;
   color: var(--ink);
   white-space: nowrap;
@@ -157,104 +210,229 @@
   display: none;
 }
 
-.nav-item:hover .tip,
-.nav-item:focus-visible .tip {
+.hubar-item:hover .tip,
+.hubar-item:focus-visible .tip {
   display: block;
 }
 
-.nav-item:focus-visible {
+.hubar-item:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.nav-pin-btn--on {
-  color: var(--accent);
-  background: var(--glass-strong);
+/* ── HuBar trigger (logo / mobile arrow) ──────────────
+   Same 44px cell as the other items. Desktop shows the logo mark; the
+   arrow only appears (and only then does it need rotation) on mobile,
+   handled in the compact media query below. */
+.hubar-trigger {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-dim);
+  flex-shrink: 0;
 }
-.nav-pin-btn--on svg path:first-child { fill: currentColor; }
+.hubar-trigger:hover { color: var(--ink); }
+.hubar-trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.hubar-trigger--open { color: var(--accent); }
+.hubar-trigger-arrow { display: none; }
+.hubar-trigger-arrow svg { transition: rotate 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
+
+.hubar-divider {
+  width: 1px;
+  height: 26px;
+  background: var(--glass-border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+.hubar--left .hubar-divider,
+.hubar--right .hubar-divider {
+  width: 26px;
+  height: 1px;
+  margin: 4px 0;
+}
 
 @media (min-width: 721px) and (min-height: 601px) {
-  .nav-rail--left {
-    left: 16px;
-    top: 50%;
-    translate: 0 -50%;
-    flex-direction: column;
-    transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+  .hubar--top {
+    top: 16px;
+    left: 50%;
+    translate: -50% 0;
   }
-
-  .nav-rail--left.nav-rail--hidden {
-    translate: calc(-100% - 7px) -50%;
+  .hubar--top.hubar--hidden {
+    translate: -50% calc(-100% - 7px);
     opacity: 0.6;
   }
 
-  /* Docked left, the panel opens to the side instead of upward — so the
-     chevron points right (toward where it'll appear) instead of up, and
-     swings to point left (back toward the pill) once open. */
-  .app-root:has(.nav-rail--left) .nav-panel-btn svg { rotate: 90deg; }
-  .app-root:has(.nav-rail--left) .nav-panel-btn--open svg { rotate: -90deg; }
-
-  .nav-divider {
-    width: 26px;
-    height: 1px;
-    background: var(--glass-border);
-    margin: 4px 0;
-  }
-
-  .nav-rail--bottom {
+  .hubar--bottom {
     left: 50%;
-    top: auto;
     bottom: 16px;
     translate: -50% 0;
-    flex-direction: row;
-    transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
   }
-
-  .nav-rail--bottom.nav-rail--hidden {
+  .hubar--bottom.hubar--hidden {
     translate: -50% calc(100% + 6px);
     opacity: 0.6;
   }
 
-  .nav-rail--bottom .nav-divider {
-    width: 1px;
-    height: 26px;
-    margin: 0 4px;
+  .hubar--left {
+    left: 16px;
+    top: 50%;
+    translate: 0 -50%;
+  }
+  .hubar--left.hubar--hidden {
+    translate: calc(-100% - 7px) -50%;
+    opacity: 0.6;
   }
 
-  .nav-rail--bottom .nav-item .tip {
-    translate: -50% 0;
+  .hubar--right {
+    right: 16px;
+    top: 50%;
+    translate: 0 -50%;
+  }
+  .hubar--right.hubar--hidden {
+    translate: calc(100% + 7px) -50%;
+    opacity: 0.6;
+  }
+
+  /* Tooltip direction follows which side of the item's own bar the tip
+     needs to clear. Left's default (right-pointing) rule above already
+     covers .hubar--left. */
+  .hubar--right .hubar-item .tip {
+    left: auto;
+    right: calc(100% + 12px);
+    translate: 0 -50%;
+  }
+
+  .hubar--top .hubar-item .tip,
+  .hubar--bottom .hubar-item .tip {
     left: 50%;
     top: auto;
-    bottom: calc(100% + 12px);
     translate: -50% 4px;
   }
-
-  .nav-rail--bottom .nav-item:hover .tip {
+  .hubar--top .hubar-item .tip {
+    top: calc(100% + 12px);
+  }
+  .hubar--bottom .hubar-item .tip {
+    bottom: calc(100% + 12px);
+  }
+  .hubar--top .hubar-item:hover .tip,
+  .hubar--bottom .hubar-item:hover .tip {
     display: block;
     translate: -50% 0;
   }
 
-  .app-root:has(.nav-rail--bottom) .main {
-    padding-left: clamp(24px, 5vw, 64px);
-    padding-bottom: 100px;
-  }
-
-  .nav-hotzone {
+  .hubar-hotzone {
     position: fixed;
     z-index: 49;
   }
-
-  .nav-hotzone--left {
-    left: 0;
-    top: 0;
-    bottom: 0;
+  .hubar-hotzone--top {
+    top: 0; left: 0; right: 0;
+    height: 14px;
+  }
+  .hubar-hotzone--bottom {
+    left: 0; right: 0; bottom: 0;
+    height: 14px;
+  }
+  .hubar-hotzone--left {
+    left: 0; top: 0; bottom: 0;
+    width: 14px;
+  }
+  .hubar-hotzone--right {
+    right: 0; top: 0; bottom: 0;
     width: 14px;
   }
 
-  .nav-hotzone--bottom {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 14px;
+  /* StatusClock is built as a horizontal row (dot, label, time) for the
+     horizontal docks — in a vertical bar that reads sideways, so it stacks
+     instead. The hover-reveal label and hover/focus color shift exist to
+     save horizontal space in a wide bar; neither makes sense in an
+     already-narrow 84px column, so both are dropped here too. */
+  .hubar--left .status-clock,
+  .hubar--right .status-clock {
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 2px;
+    width: 100%;
+  }
+  .hubar--left .status-clock-label,
+  .hubar--right .status-clock-label {
+    display: none;
+  }
+  /* HH over MM, seconds and colons dropped entirely — trying to fit
+     "14:14:04" on one narrow line (even shrunk) still pushed past the
+     84px bar, since flex items don't shrink text below its unwrapped
+     width by default (min-width:auto). Stacking two bare 2-digit numbers
+     sidesteps that instead of fighting it. */
+  .hubar--left .status-clock-time,
+  .hubar--right .status-clock-time {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    min-width: 0;
+  }
+  .hubar--left .status-clock-sep,
+  .hubar--right .status-clock-sep,
+  .hubar--left .status-clock-ss,
+  .hubar--right .status-clock-ss {
+    display: none;
+  }
+  .hubar--left .status-clock-hh,
+  .hubar--left .status-clock-mm,
+  .hubar--right .status-clock-hh,
+  .hubar--right .status-clock-mm {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .hubar--left .status-clock:hover .status-clock-time,
+  .hubar--left .status-clock:focus-visible .status-clock-time,
+  .hubar--right .status-clock:hover .status-clock-time,
+  .hubar--right .status-clock:focus-visible .status-clock-time {
+    color: var(--ink);
+  }
+
+  /* LangSwitch: same slider, rotated to a vertical track instead of
+     using an actual CSS rotate() — that would keep reserving its original
+     78px-wide layout box (transforms don't affect layout), which is what
+     was overflowing the 84px bar. Swapping the track/knob/label geometry
+     to run top-to-bottom instead is a real resize, not a paint trick. */
+  .hubar--left .lang-switch,
+  .hubar--right .lang-switch {
+    width: 34px;
+    height: 78px;
+  }
+  .hubar--left .lang-switch .track-icon,
+  .hubar--right .lang-switch .track-icon {
+    width: 26px;
+    height: 36px;
+    left: 3px;
+  }
+  .hubar--left .lang-switch .track-icon--left,
+  .hubar--right .lang-switch .track-icon--left {
+    top: 3px;
+  }
+  .hubar--left .lang-switch .track-icon--right,
+  .hubar--right .lang-switch .track-icon--right {
+    top: 38px;
+  }
+  .hubar--left .lang-switch .knob,
+  .hubar--right .lang-switch .knob {
+    top: 3px;
+    left: 3px;
+    width: 26px;
+    height: 36px;
+  }
+  .hubar--left .lang-switch[aria-checked="true"] .knob,
+  .hubar--right .lang-switch[aria-checked="true"] .knob {
+    translate: 0 34px;
   }
 }
 
@@ -264,8 +442,8 @@
   padding-top: 20px;
   border: none;
   font-size: 0.85rem;
-  color: var(--ink-dim);
-  opacity: 0.6;
+  color: #fff;
+  opacity: 0.5;
   text-align: center;
 }
 
@@ -281,14 +459,6 @@
   color: var(--accent);
   text-decoration-color: currentColor;
 }
-
-/* ── Control-panel button in the nav pill ─────────────
-   Same 44px cell as the other items; only the glyph rotates. */
-.nav-panel-btn svg {
-  transition: rotate 0.34s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.nav-panel-btn--open svg { rotate: 180deg; }
-.nav-panel-btn--open { color: var(--accent); }
 
 /* ── Home: single-screen layout ──────────────────────
    .main normally stretches to 100vh and lets content push past it. On home
