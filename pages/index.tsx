@@ -4,6 +4,7 @@ import { site } from "@/lib/site.config";
 import { home } from "@/lib/home.config";
 import { getChangelog } from "@/lib/assets";
 import VideoBackground from "@/components/layout/VideoBackground";
+import Icon from "@/components/ui/Icons";
 
 export async function getStaticProps() {
   return { props: { changelog: await getChangelog() }, revalidate: 300 };
@@ -44,8 +45,14 @@ export default function Home() {
           {site.role}. {site.tagline}
         </p>
         <div className="hero-actions">
-          <Link href="/gallery" className="btn">View my gallery →</Link>
-          <Link href="/about" className="btn btn--ghost">About me</Link>
+          <Link href="/gallery" className="btn">
+            <Icon name="image" size={18} />
+            View gallery →
+          </Link>
+          <Link href="/about" className="btn btn--ghost">
+            <Icon name="user" size={18} />
+            About me
+          </Link>
         </div>
       </section>
     </>

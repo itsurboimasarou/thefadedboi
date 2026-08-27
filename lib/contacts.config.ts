@@ -2,7 +2,7 @@ import type { LinkItem } from "./types";
 
 export const contacts = {
   email: "itsurboimasarou@gmail.com",
-  donateUrl: "#",
+  donateUrl: "https://me.momo.vn/masarou",
   direct: [
     { label: "GitHub", value: "@itsurboimasarou", href: "https://github.com/thefadedboi" },
     { label: "LinkedIn", value: "???", href: "https://linkedin.com/in/#" },

@@ -887,9 +887,25 @@
   margin-top: 4px;
 }
 
-/* Nav docked left: nothing occupies the bottom centre, so drop the panel. */
-/* Rail docked left: nothing occupies the bottom centre, so sit lower — and
-   shift the centring box past the rail so the panel centres on the content. */
+/* Rail docked left: the "at a glance" trigger lives in a vertically-centred
+   pill on the left edge, not at the bottom — so the panel follows it there
+   and flies in from the side, instead of staying centred across the whole
+   viewport and flying up from the bottom. */
 @media (min-width: 721px) {
-   .app-root:has(.nav-rail--left) .control-panel { bottom: 40px; }
+  .app-root:has(.nav-rail--left) .control-panel {
+    left: calc(16px + var(--nav-w) + 16px);
+    right: auto;
+    margin-inline: 0;
+    bottom: auto;
+    top: 50%;
+    /* The vertical centering has to live inside this same `transform` (not
+       a separate `translate` property) — the build's CSS minifier drops a
+       standalone `translate` declaration whenever `transform` is also set
+       on the same rule. */
+    transform: translate(-16px, -50%) scale(0.98);
+    transform-origin: left center;
+  }
+  .app-root:has(.nav-rail--left) .control-panel--open {
+    transform: translate(0, -50%) scale(1);
+  }
 }

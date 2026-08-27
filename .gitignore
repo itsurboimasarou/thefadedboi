@@ -3,7 +3,8 @@ node_modules
 next-env.d.ts
 .vercel
 .env*
-scripts*
+AGENTS.md
+CLAUDE.md
 
 # photos synced at build time from the private photo repo
 public/albums/

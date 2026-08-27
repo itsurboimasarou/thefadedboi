@@ -27,6 +27,7 @@ const script = Momo_Signature({ subsets: ["latin"], weight: "400", display: "swa
 
 export default function App({ Component, pageProps }: AppProps) {
   const changelog: string = (pageProps as { changelog?: string }).changelog ?? "";
+  const [footerPre, footerPost] = site.footer.split(site.handle);
 
   useEffect(() => {
     document.body.classList.add(display.variable, body.variable, script.variable);
@@ -55,7 +56,11 @@ export default function App({ Component, pageProps }: AppProps) {
       <div className="shell">
         <main className="main">
           <Component {...pageProps} />
-          <footer className="footer">{site.footer}</footer>
+          <footer className="footer">
+            {footerPre}
+            <a href={site.github} target="_blank" rel="noopener noreferrer">{site.handle}</a>
+            {footerPost}
+          </footer>
         </main>
       </div>
       <NavRail />

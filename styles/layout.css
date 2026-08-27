@@ -41,11 +41,6 @@
     padding-right: clamp(24px, 5vw, 64px);
     transition: padding 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  /* pinned + docked left: reserve the side gutter (both sides, stays centered) */
-  .app-root:has(.nav-rail--pinned.nav-rail--left) .main {
-    padding-left: calc(var(--nav-w) + clamp(24px, 5vw, 64px));
-    padding-right: calc(var(--nav-w) + clamp(24px, 5vw, 64px));
-  }
   /* pinned + docked bottom: reserve footer clearance instead */
   .app-root:has(.nav-rail--pinned.nav-rail--bottom) .main {
     padding-bottom: 110px;
@@ -192,6 +187,12 @@
     opacity: 0.6;
   }
 
+  /* Docked left, the panel opens to the side instead of upward — so the
+     chevron points right (toward where it'll appear) instead of up, and
+     swings to point left (back toward the pill) once open. */
+  .app-root:has(.nav-rail--left) .nav-panel-btn svg { rotate: 90deg; }
+  .app-root:has(.nav-rail--left) .nav-panel-btn--open svg { rotate: -90deg; }
+
   .nav-divider {
     width: 26px;
     height: 1px;
@@ -266,6 +267,19 @@
   color: var(--ink-dim);
   opacity: 0.6;
   text-align: center;
+}
+
+.footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s ease, color 0.2s ease;
+}
+
+.footer a:hover,
+.footer a:focus-visible {
+  color: var(--accent);
+  text-decoration-color: currentColor;
 }
 
 /* ── Control-panel button in the nav pill ─────────────
