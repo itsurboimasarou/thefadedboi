@@ -1,81 +1,145 @@
 import { useEffect, useState } from "react";
 import Icon from "../ui/Icons";
-import { accents } from "@/lib/accents.config";
+import { accentSets, DEFAULT_SET, type AccentSetDef } from "@/lib/accents.config";
+import { THEME_EVT } from "./ThemeToggle";
 
-const EVT = "accent-change";
-const KEY = "accent-element";
-export const DEFAULT_ACCENT = "cryo";
+export const SET_EVT = "accent-set-change";
+const ACCENT_EVT = "accent-change";
+const SET_KEY = "accent-set";
+const elementKeyFor = (setKey: string) => `accent-element-${setKey}`;
 
-function apply(def: typeof accents[number] | undefined) {
+function currentTheme(): "light" | "dark" {
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+}
+
+export function findSet(key: string | null): AccentSetDef {
+  return accentSets.find((s) => s.key === key) ?? accentSets.find((s) => s.key === DEFAULT_SET)!;
+}
+
+function isCssFallback(setKey: string, colorKey: string) {
+  return setKey === DEFAULT_SET && colorKey === findSet(DEFAULT_SET).defaultKey;
+}
+
+function apply(setKey: string, colorKey: string) {
   const root = document.documentElement.style;
-  if (!def) {
+  if (isCssFallback(setKey, colorKey)) {
     root.removeProperty("--accent-custom");
     root.removeProperty("--accent-soft-custom");
     root.removeProperty("--accent-contrast-custom");
-  } else {
-    root.setProperty("--accent-custom", def.accent);
-    root.setProperty("--accent-soft-custom", def.soft);
-    root.setProperty("--accent-contrast-custom", def.contrast);
+    return;
+  }
+  const set = findSet(setKey);
+  const def = set.colors.find((c) => c.key === colorKey) ?? set.colors.find((c) => c.key === set.defaultKey)!;
+  const v = currentTheme() === "light" ? def.light : def.dark;
+  root.setProperty("--accent-custom", v.accent);
+  root.setProperty("--accent-soft-custom", v.soft);
+  root.setProperty("--accent-contrast-custom", v.contrast);
+}
+
+export function getAccentSet(): AccentSetDef {
+  if (typeof window === "undefined") return findSet(DEFAULT_SET);
+  try {
+    return findSet(localStorage.getItem(SET_KEY));
+  } catch {
+    return findSet(DEFAULT_SET);
   }
 }
 
 export function getAccent(): string {
-  if (typeof window === "undefined") return DEFAULT_ACCENT;
+  const set = getAccentSet();
+  if (typeof window === "undefined") return set.defaultKey;
   try {
-    const v = localStorage.getItem(KEY);
-    return v && accents.some((a) => a.key === v) ? v : DEFAULT_ACCENT;
+    const v = localStorage.getItem(elementKeyFor(set.key));
+    return v && set.colors.some((c) => c.key === v) ? v : set.defaultKey;
   } catch {
-    return DEFAULT_ACCENT;
+    return set.defaultKey;
   }
 }
 
 export function setAccent(key: string) {
-  const isDefault = key === DEFAULT_ACCENT;
-  apply(isDefault ? undefined : accents.find((a) => a.key === key));
-  try {
-    if (isDefault) localStorage.removeItem(KEY);
-    else localStorage.setItem(KEY, key);
-  } catch {}
-  window.dispatchEvent(new CustomEvent(EVT, { detail: key }));
+  const set = getAccentSet();
+  apply(set.key, key);
+  try { localStorage.setItem(elementKeyFor(set.key), key); } catch {}
+  window.dispatchEvent(new CustomEvent(ACCENT_EVT, { detail: key }));
+}
+
+export function setAccentSetKey(key: string) {
+  const set = findSet(key);
+  try { localStorage.setItem(SET_KEY, set.key); } catch {}
+  const remembered = getAccent();
+  apply(set.key, remembered);
+  window.dispatchEvent(new CustomEvent(SET_EVT, { detail: set.key }));
+  window.dispatchEvent(new CustomEvent(ACCENT_EVT, { detail: remembered }));
+}
+
+export function useAccentSet() {
+  const [set, setSetState] = useState<AccentSetDef>(() => findSet(DEFAULT_SET));
+  useEffect(() => {
+    setSetState(getAccentSet());
+    const h = (e: Event) => setSetState(findSet((e as CustomEvent<string>).detail));
+    window.addEventListener(SET_EVT, h);
+    return () => window.removeEventListener(SET_EVT, h);
+  }, []);
+  return set;
 }
 
 export function useAccent() {
-  const [accent, setAccentState] = useState<string>(DEFAULT_ACCENT);
+  const [accent, setAccentState] = useState<string>(() => findSet(DEFAULT_SET).defaultKey);
   useEffect(() => {
     setAccentState(getAccent());
     const h = (e: Event) => setAccentState((e as CustomEvent<string>).detail);
-    window.addEventListener(EVT, h);
-    return () => window.removeEventListener(EVT, h);
+    window.addEventListener(ACCENT_EVT, h);
+    return () => window.removeEventListener(ACCENT_EVT, h);
   }, []);
   return accent;
 }
 
+export function reapplyAccentForTheme() {
+  const set = getAccentSet();
+  apply(set.key, getAccent());
+}
+
 export default function AccentSwitch() {
+  const set = useAccentSet();
   const active = useAccent();
+  const [theme, setThemeState] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    setThemeState(currentTheme());
+    const h = (e: Event) => setThemeState((e as CustomEvent<"light" | "dark">).detail);
+    window.addEventListener(THEME_EVT, h);
+    return () => window.removeEventListener(THEME_EVT, h);
+  }, []);
+
+  const mix = theme === "light" ? "white" : "black";
 
   return (
     <div className="accent-grid" role="group" aria-label="Accent color">
-      {accents.map((a) => (
-        <button
-          key={a.key}
-          type="button"
-          className={`accent-swatch${active === a.key ? " accent-swatch--on" : ""}`}
-          style={{ background: `linear-gradient(135deg, ${a.accent}, ${a.soft})` }}
-          aria-pressed={active === a.key}
-          aria-label={a.label}
-          title={a.label}
-          onClick={() => setAccent(a.key)}
-        />
-      ))}
+      {set.colors.map((a) => {
+        const v = theme === "light" ? a.light : a.dark;
+        return (
+          <button
+            key={a.key}
+            type="button"
+            className={`accent-swatch${active === a.key ? " accent-swatch--on" : ""}`}
+            style={{ background: `linear-gradient(135deg, ${v.accent}, color-mix(in srgb, ${v.accent} 65%, ${mix}))` }}
+            aria-pressed={active === a.key}
+            aria-label={a.label}
+            onClick={() => setAccent(a.key)}
+          >
+            <span className="tip--up" aria-hidden="true">{a.label}</span>
+          </button>
+        );
+      })}
       <button
         type="button"
         className="accent-swatch accent-swatch--reset"
-        disabled={active === DEFAULT_ACCENT}
+        disabled={active === set.defaultKey}
         aria-label="Reset to default"
         title="Reset to default"
-        onClick={() => setAccent(DEFAULT_ACCENT)}
+        onClick={() => setAccent(set.defaultKey)}
       >
-        <Icon name="undo" size={13} />
+        <Icon name="circleArrow" size={13} />
       </button>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import ThemeToggle from "../controls/ThemeToggle";
 import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
@@ -8,10 +8,12 @@ import AutoHideToggle from "../controls/HuBarPinned";
 import DockControl from "../controls/HuBarDock";
 import LangSwitch from "../controls/LangSwitch";
 import AccentSwitch from "../controls/AccentSwitch";
+import AccentSetSwitch from "../controls/AccentSetSwitch";
 import LogoSwitch from "../controls/LogoSwitch";
 import StatusClock from "../widgets/StatusClock";
 import ChangelogDialog from "../content/ChangelogDialog";
 import { home } from "@/lib/home.config";
+import { accentSets } from "@/lib/accents.config";
 
 export const PANEL_EVT = "control-panel-toggle";
 export const CHANGELOG_EVT = "changelog-open";
@@ -24,12 +26,28 @@ export function toggleControlPanel() {
   window.dispatchEvent(new CustomEvent(PANEL_EVT));
 }
 
+function resetAllToDefault() {
+  const keys = [
+    "theme", "glass-fx", "lite-mode", "snow", "hubar-pinned", "hubar-dock",
+    "lang", "logo-custom", "accent-set",
+    ...accentSets.map((s) => `accent-element-${s.key}`),
+  ];
+  try {
+    for (const k of keys) localStorage.removeItem(k);
+  } catch {}
+  window.location.reload();
+}
+
 export default function ControlPanel({ changelog }: { changelog: string }) {
   const [open, setOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const liteOn = useLiteMode();
+  const [sliding, setSliding] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const viewsRef = useRef<HTMLDivElement>(null);
+  const mainViewRef = useRef<HTMLDivElement>(null);
+  const themeViewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onToggle = () => setOpen((v) => !v);
@@ -45,6 +63,39 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   useEffect(() => {
     if (!open) setThemeMenuOpen(false);
   }, [open]);
+
+  useEffect(() => {
+    setSliding(true);
+    const t = setTimeout(() => setSliding(false), 340);
+    return () => clearTimeout(t);
+  }, [themeMenuOpen]);
+
+  useLayoutEffect(() => {
+    const wrap = viewsRef.current;
+    const main = mainViewRef.current;
+    const theme = themeViewRef.current;
+    if (!wrap || !main || !theme) return;
+    const sync = () => {
+      const active = themeMenuOpen ? theme : main;
+      let height = active.scrollHeight;
+      const openMenu = active.querySelector<HTMLElement>(".set-menu");
+      if (openMenu) {
+        const extent = openMenu.getBoundingClientRect().bottom - active.getBoundingClientRect().top;
+        height = Math.max(height, extent);
+      }
+      wrap.style.height = `${height}px`;
+    };
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(main);
+    ro.observe(theme);
+    const mo = new MutationObserver(sync);
+    mo.observe(theme, { childList: true, subtree: true });
+    return () => {
+      ro.disconnect();
+      mo.disconnect();
+    };
+  }, [themeMenuOpen]);
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("control-panel-state", { detail: open }));
@@ -91,14 +142,23 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             {themeMenuOpen && (
               <button
                 type="button"
-                className="panel-icon-btn"
+                className="panel-back-btn"
                 onClick={() => setThemeMenuOpen(false)}
                 aria-label="Back"
-                title="Back"
               >
-                <Icon name="arrowLeft" size={16} />
+                <Icon name="arrowLeft" size={14} />
+                Back
               </button>
             )}
+            <button
+              type="button"
+              className="panel-icon-btn"
+              onClick={resetAllToDefault}
+              aria-label="Reset all to default"
+              title="Reset all to default"
+            >
+              <Icon name="circleArrow" size={16} />
+            </button>
             <button
               type="button"
               className="panel-icon-btn"
@@ -111,35 +171,12 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           </div>
         </div>
 
-        {themeMenuOpen ? (
-          <div className="theme-menu">
-            <div className="theme-menu-section">
-              <h3 className="h-with-icon theme-menu-heading">
-                <Icon name="paintbrush" size={15} />
-                Accent color
-              </h3>
-              <AccentSwitch />
-            </div>
-
-            <div className="theme-menu-section">
-              <h3 className="h-with-icon theme-menu-heading">
-                <Icon name="image" size={15} />
-                Logo
-              </h3>
-              <LogoSwitch />
-            </div>
-
-            <button
-              type="button"
-              className="text-btn text-btn--center theme-menu-back-mobile"
-              onClick={() => setThemeMenuOpen(false)}
-            >
-              <Icon name="arrowLeft" size={14} />
-              Back
-            </button>
-          </div>
-        ) : (
-        <>
+        <div className={`panel-views${sliding ? " panel-views--sliding" : ""}`} ref={viewsRef}>
+        <div
+          className={`panel-view-slide panel-view-slide--main${themeMenuOpen ? " panel-view-slide--behind" : ""}`}
+          ref={mainViewRef}
+          aria-hidden={themeMenuOpen}
+        >
         <dl className="fact-grid glance-grid">
           <div>
             <dt>
@@ -231,7 +268,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
 
           <div className="glance-row--mobile-only">
             <dt>
-              <Icon name="share" size={15} />
+              <Icon name="globe" size={15} />
               Language
             </dt>
             <dd className="dd-row">
@@ -249,8 +286,47 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <Icon name="paintbrush" size={14} />
           Customize theme
         </button>
-        </>
-        )}
+        </div>
+
+        <div
+          className={`theme-menu panel-view-slide panel-view-slide--theme${themeMenuOpen ? " panel-view-slide--front" : ""}`}
+          ref={themeViewRef}
+          aria-hidden={!themeMenuOpen}
+        >
+          <div className="theme-menu-section">
+            <h3 className="h-with-icon theme-menu-heading">
+              <Icon name="layers" size={15} />
+              Sets
+            </h3>
+            <AccentSetSwitch />
+          </div>
+
+          <div className="theme-menu-section">
+            <h3 className="h-with-icon theme-menu-heading">
+              <Icon name="paintbrush" size={15} />
+              Accent color
+            </h3>
+            <AccentSwitch />
+          </div>
+
+          <div className="theme-menu-section theme-menu-section--logo">
+            <h3 className="h-with-icon theme-menu-heading">
+              <Icon name="image" size={15} />
+              Logo
+            </h3>
+            <LogoSwitch />
+          </div>
+
+          <button
+            type="button"
+            className="text-btn text-btn--center theme-menu-back-mobile"
+            onClick={() => setThemeMenuOpen(false)}
+          >
+            <Icon name="arrowLeft" size={14} />
+            Back
+          </button>
+        </div>
+        </div>
       </div>
 
       <ChangelogDialog

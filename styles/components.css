@@ -85,7 +85,7 @@
 .lang-switch {
   width: 78px;
   height: 34px;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .lang-switch .track-icon {
@@ -105,7 +105,7 @@
   left: 3px;
   width: 36px;
   height: 26px;
-  border-radius: 9px;
+  border-radius: 6px;
 }
 .lang-switch[aria-checked="true"] .knob {
   translate: 34px 0;
@@ -256,8 +256,6 @@
   display: flex;
   gap: 6px;
 }
-
-.dock-control-item--disabled { opacity: 0.45; }
 
 /* ── Icons / headings ───────────────────────────────── */
 .icn {
@@ -639,12 +637,13 @@
   border-top: 1px solid var(--glass-border);
 }
 
-/* ── Panel head actions (Back / Close) ───────────────
-   Desktop only — the icon pair lives top-right of "At a glance", Back
-   appearing before Close only while the theme menu is showing. On mobile
-   this whole cluster is hidden; Back instead sits as a bottom-center text
-   link inside the theme menu itself (.theme-menu-back-mobile below),
-   matching how "Customize theme" sits under the glance grid. */
+/* ── Panel head actions (Back / Reset / Close) ───────
+   Desktop only — this cluster lives top-right of "At a glance": Reset
+   and Close always show, Back joins before them only while the theme
+   menu is showing. On mobile the whole cluster is hidden; Back instead
+   sits as a bottom-center text link inside the theme menu itself
+   (.theme-menu-back-mobile below), matching how "Customize theme" sits
+   under the glance grid. */
 .panel-head-actions {
   display: flex;
   align-items: center;
@@ -674,10 +673,116 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-.panel-icon-btn .icn svg { width: 15px; height: 15px; }
+.panel-icon-btn .icn svg { width: 16px; height: 16px; }
+
+/* Same icon+label shape as the mobile Back link (.theme-menu-back-mobile)
+   — a pill, not a bare circle like Reset/Close next to it — just sized to
+   sit inline in this row instead of centered under the theme menu. */
+.panel-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 12px 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: none;
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.panel-back-btn:hover,
+.panel-back-btn:focus-visible {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.panel-back-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 @media (max-width: 720px) {
   .panel-head-actions { display: none; }
+}
+
+/* Both "At a glance" views stay mounted permanently (ControlPanel.tsx) so
+   their controls keep live state across a switch instead of re-syncing
+   from storage on every remount. They sit stacked here and slide via
+   transform, "push"/"pop" style — height is set inline by ControlPanel.tsx
+   (a ResizeObserver-driven pixel value, since the two views' natural
+   heights differ and position:absolute children can't size their parent
+   on their own), and that same transition on this wrapper is what makes
+   the height change animate alongside the slide instead of snapping.
+
+   No permanent overflow:hidden here — that would also clip anything
+   that's supposed to escape a view's own box, like an info-tip-bubble
+   popped open near the top of the main menu. ControlPanel.tsx instead
+   adds --sliding only for the ~0.32s the transform is actually animating,
+   just long enough to keep the horizontal push/pop contained to the
+   panel's rounded corners without clipping content at rest. */
+.panel-views {
+  position: relative;
+  transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.panel-views--sliding {
+  overflow: hidden;
+}
+
+/* visibility, not overflow, is what actually keeps the inactive view from
+   showing at rest: with no permanent clip on .panel-views, a view parked
+   at translateX(-100%/100%) still has a sliver inside the viewport
+   whenever the panel itself doesn't span full-bleed (it never does — see
+   .control-panel's width) — overflow:hidden would've clipped that sliver,
+   but it'd also clip an active view's own escaping content, which is the
+   whole reason it's gone. visibility:hidden hides the inactive view
+   outright regardless of where its box lands, sidestepping that.
+   --pvs-delay holds it visible for the transition's duration while
+   sliding out, so the pop-out is seen actually happening rather than
+   vanishing on the spot; sliding in drops the delay to show it
+   immediately. Kept on a variable (not redeclaring `transition` per
+   modifier) so the reduced-motion override below only has to beat the
+   base rule's specificity, not every combination of these. */
+.panel-view-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  --pvs-delay: 0s;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s var(--pvs-delay);
+}
+
+.panel-view-slide--main {
+  transform: translateX(0);
+  visibility: visible;
+}
+.panel-view-slide--main.panel-view-slide--behind {
+  transform: translateX(-100%);
+  visibility: hidden;
+  pointer-events: none;
+  --pvs-delay: 0.32s;
+}
+
+.panel-view-slide--theme {
+  transform: translateX(100%);
+  visibility: hidden;
+  pointer-events: none;
+  --pvs-delay: 0.32s;
+}
+.panel-view-slide--theme.panel-view-slide--front {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+  --pvs-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-views,
+  .panel-view-slide {
+    transition: none;
+  }
 }
 
 /* ── Theme menu (accent + logo, swapped in for the glance grid) ── */
@@ -696,6 +801,80 @@
 }
 .theme-menu-heading .icn { color: var(--accent); opacity: 0.9; }
 
+.set-select-wrap {
+  position: relative;
+}
+
+.set-select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.set-select-btn:hover { border-color: var(--accent); }
+.set-select-btn svg { flex-shrink: 0; color: var(--ink-dim); transition: rotate 0.2s; }
+.set-select-btn[aria-expanded="true"] svg { rotate: 180deg; }
+.set-select-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.set-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  animation: page-in 0.18s ease both;
+  /* Caps at a fraction of the viewport, not just a flat pixel value, so it
+     still fits (and scrolls the rest) on short screens where the panel
+     itself already takes up most of the height. */
+  max-height: min(240px, 40vh);
+  overflow-y: auto;
+}
+
+.set-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.set-option:hover { background: var(--glass-strong); }
+.set-option--on { background: var(--accent); color: var(--accent-contrast); }
+/* :hover (a class + pseudo-class) otherwise outranks --on (one class) and
+   wins the fight over `background`, leaving the selected row's own
+   accent-contrast text stranded on the plain hover fill instead of the
+   accent it was actually picked for — same fix as the option list needs
+   below (.logo-option, .accent-swatch don't hit this since neither pairs a
+   plain :hover rule against a same-specificity --on/--on class). */
+.set-option--on:hover { background: var(--accent); color: var(--accent-contrast); }
+
 .accent-grid {
   display: flex;
   flex-wrap: wrap;
@@ -703,6 +882,7 @@
 }
 
 .accent-swatch {
+  position: relative;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -721,6 +901,31 @@
   outline-offset: 2px;
 }
 
+/* Same nametip HuBar's own nav icons use (.hubar-item .tip in layout.css) —
+   same look, just anchored above the swatch instead of beside it, since
+   these sit in a tight horizontal row where a side tip would overlap the
+   next swatch. */
+.tip--up {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  font-size: 12.5px;
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+  display: none;
+}
+.accent-swatch:hover .tip--up,
+.accent-swatch:focus-visible .tip--up {
+  display: block;
+}
+
 /* Last swatch in the row: same circle, but an action (reset) rather than a
    color choice, so it gets a bare glass fill and an icon instead of a
    gradient swatch. */
@@ -731,6 +936,13 @@
   color: var(--ink-dim);
   transition: border-color 0.2s, transform 0.15s, color 0.2s;
 }
+/* Unlike the color swatches, this one's an action, not a preview — the
+   icon's own shape isn't rotationally symmetric (the arrowhead sits on
+   one side), so scaling it up on hover like the others made it read as
+   sliding sideways rather than just "growing." Color is feedback enough. */
+.accent-swatch--reset:hover {
+  transform: none;
+}
 .accent-swatch--reset:hover:not(:disabled) {
   color: var(--accent);
   border-color: var(--accent);
@@ -739,7 +951,6 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
-.accent-swatch--reset:disabled:hover { transform: none; }
 
 .logo-grid {
   display: flex;

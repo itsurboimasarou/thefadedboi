@@ -69,8 +69,11 @@ const icons: Record<string, JSX.Element> = {
   dockRight: <svg {...p}><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M15 3v18" /><rect x="17" y="7" width="2" height="10" rx="1" fill="currentColor" stroke="none" /></svg>,
   paintbrush: <svg {...p}><path d="M17.5 3.5a2.1 2.1 0 0 1 3 3L12 15l-4-1 1-4Z" /><path d="M9.5 15.5c0 2.5-1.8 4-4.5 4-.9 0-1.5-.2-2-.5 1-.6 1-1.4 1-2.3 0-1.9 1.6-3.4 3.5-3.4.9 0 1.7.3 2 .8Z" /></svg>,
   arrowLeft: <svg {...p}><path d="M19 12H5M11 6l-6 6 6 6" /></svg>,
-  undo: <svg {...p}><path d="M4 10h9a5.5 5.5 0 0 1 0 11h-3" /><path d="M8 5.5 4 10l4 4.5" /></svg>,
+  circleArrow: <svg {...p}><path d="M20 12a8 8 0 1 1-2.34-5.66" /><path d="M20 4.5v5h-5" /></svg>,
   close: <svg {...p}><path d="M6 6l12 12M18 6 6 18" /></svg>,
+  layers: <svg {...p}><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>,
+  check: <svg {...p}><path d="m5 12.5 5 5L19 7" /></svg>,
+  globe: <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9Z" /></svg>,
 };
 
 const specMap: ReadonlyArray<readonly [string, string]> = [

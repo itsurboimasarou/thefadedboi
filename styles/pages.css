@@ -857,8 +857,11 @@
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
 
-  transform: translateY(24px) scale(0.98);
-  transform-origin: bottom center;
+  /* translate only — no scale(). Scaling a box full of text and thin-stroke
+     icons makes them visibly wobble/re-snap to pixels every frame of the
+     transition; dropping it keeps the content perfectly static while the
+     panel still slides and fades in. */
+  transform: translateY(24px);
   opacity: 0;
   visibility: hidden;
   transition:
@@ -868,7 +871,7 @@
 }
 
 .control-panel--open {
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
   opacity: 1;
   visibility: visible;
   transition:
@@ -913,11 +916,10 @@
 .app-root:has(.hubar--top) .control-panel {
   bottom: auto;
   top: calc(16px + var(--hubar-h, 68px) + 14px);
-  transform: translateY(-24px) scale(0.98);
-  transform-origin: top center;
+  transform: translateY(-24px);
 }
 .app-root:has(.hubar--top) .control-panel--open {
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
 }
 
 /* HuBar docked left/right: the trigger lives in a vertically-centred pill
@@ -937,11 +939,10 @@
        standalone `translate` declaration whenever `transform` is also set
        on the same rule. This applies to every block here, not just this
        one — it's a real, previously-hit bug. */
-    transform: translate(-16px, -50%) scale(0.98);
-    transform-origin: left center;
+    transform: translate(-16px, -50%);
   }
   .app-root:has(.hubar--left) .control-panel--open {
-    transform: translate(0, -50%) scale(1);
+    transform: translate(0, -50%);
   }
 
   .app-root:has(.hubar--right) .control-panel {
@@ -950,10 +951,9 @@
     margin-inline: 0;
     bottom: auto;
     top: 50%;
-    transform: translate(16px, -50%) scale(0.98);
-    transform-origin: right center;
+    transform: translate(16px, -50%);
   }
   .app-root:has(.hubar--right) .control-panel--open {
-    transform: translate(0, -50%) scale(1);
+    transform: translate(0, -50%);
   }
 }

@@ -17,11 +17,11 @@
   --ink-dim: #8fa6bf;
   /* Accent is user-selectable (see AccentSwitch.tsx) via the --accent-custom
      trio it sets as an inline style on <html> — the same override pattern
-     as --logo-custom below. These literals are just the fallback, i.e. the
-     default accent (Cryo, for now) when nothing's been picked. */
-  --accent: var(--accent-custom, #9be7ec);
-  --accent-soft: var(--accent-soft-custom, #d3f5f7);
-  --accent-contrast: var(--accent-contrast-custom, #062b2d);
+     as --logo-custom below. These literals are just the fallback: Genshin
+     Impact's default set, Anemo — the first color in accents.config.ts. */
+  --accent: var(--accent-custom, #6fd6b4);
+  --accent-soft: var(--accent-soft-custom, #a8ecd6);
+  --accent-contrast: var(--accent-contrast-custom, #06291f);
   --glass: color-mix(in srgb, var(--ink) 6%, var(--bg));
   --glass-strong: color-mix(in srgb, var(--ink) 9%, var(--bg));
   /* borders carry the separation that background contrast used to */
@@ -40,9 +40,14 @@
   --bg: #ffffff;
   --ink: #0d2137;
   --ink-dim: #4f6883;
-  --accent: var(--accent-custom, #9be7ec);
-  --accent-soft: var(--accent-soft-custom, #d3f5f7);
-  --accent-contrast: var(--accent-contrast-custom, #062b2d);
+  /* Anemo's dark-mode pastel (#6fd6b4) all but disappears as text/icon
+     color against a white page, so the default fallback here is a bolder,
+     more saturated version of the same hue instead — light (not dark)
+     contrast text/icons on it, same as every accent's own light variant
+     (accents.config.ts). */
+  --accent: var(--accent-custom, #14966f);
+  --accent-soft: var(--accent-soft-custom, #6fd6b4);
+  --accent-contrast: var(--accent-contrast-custom, #ffffff);
   --glass: #ffffff;
   --glass-strong: #ffffff;
   --glass-border: rgba(16, 19, 24, 0.1);

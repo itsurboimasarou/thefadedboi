@@ -144,9 +144,9 @@ html.has-bg-video .hero--bottom {
      — without it, this dark-locked block would redeclare a fixed literal
      here and shadow the user's accent choice for its whole subtree,
      regardless of what's set on <html>. */
-  --accent: var(--accent-custom, #9be7ec);
-  --accent-soft: var(--accent-soft-custom, #d3f5f7);
-  --accent-contrast: var(--accent-contrast-custom, #062b2d);
+  --accent: var(--accent-custom, #6fd6b4);
+  --accent-soft: var(--accent-soft-custom, #a8ecd6);
+  --accent-contrast: var(--accent-contrast-custom, #06291f);
   --glass: color-mix(in srgb, #eaf4fb 6%, #000000);
   --glass-strong: color-mix(in srgb, #eaf4fb 9%, #000000);
   --glass-border: rgba(180, 220, 240, 0.18);
@@ -164,7 +164,7 @@ html.has-bg-video .hero--bottom {
    produce near-invisible text on a light-mode panel. */
 html.has-bg-video .hubar .status-clock {
   --ink: #eaf4fb;
-  --accent: var(--accent-custom, #9be7ec);
+  --accent: var(--accent-custom, #6fd6b4);
   color: #eaf4fb;
 }
 
@@ -183,17 +183,24 @@ html.has-bg-video .hubar .status-clock {
 html.has-bg-video .hubar {
   --ink: #eaf4fb;
   --ink-dim: #8fa6bf;
-  --accent: var(--accent-custom, #9be7ec);
-  --accent-soft: var(--accent-soft-custom, #d3f5f7);
-  --accent-contrast: var(--accent-contrast-custom, #062b2d);
+  --accent: var(--accent-custom, #6fd6b4);
+  --accent-soft: var(--accent-soft-custom, #a8ecd6);
+  --accent-contrast: var(--accent-contrast-custom, #06291f);
   --glass: color-mix(in srgb, #eaf4fb 6%, #000000);
   --glass-strong: color-mix(in srgb, #eaf4fb 9%, #000000);
   --glass-border: rgba(180, 220, 240, 0.18);
   --shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
   background: color-mix(in srgb, #000000 40%, transparent);
 }
+/* modes.css's lite-mode rule reads --hubar-solid directly (theme-dependent:
+   white in light theme), not --chrome-bg — so on the home page, which stays
+   dark-locked regardless of the site theme toggle, that rule alone would
+   paint the bar white under light theme + Lite mode. Higher specificity
+   here (3 classes vs. 2) wins over it regardless of source order, same as
+   the rest of this dark lock. */
 html.has-bg-video.lite-mode .hubar {
   --chrome-bg: #0a0a0a;
+  background: #0a0a0a;
 }
 
 /* The page-name hover tooltip's text already inherits the dark lock above

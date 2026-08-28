@@ -51,28 +51,25 @@ const icons: Record<Dock, string> = {
 export default function DockControl() {
   const dock = useDock();
   const compact = useCompact();
+  const visible = compact ? DOCKS.filter((d) => d !== "left" && d !== "right") : DOCKS;
 
   return (
     <div className="dock-control" role="group" aria-label="HuBar position">
-      {DOCKS.map((d) => {
-        const disabled = compact && (d === "left" || d === "right");
-        return (
-          <span key={d} className={disabled ? "dock-control-item dock-control-item--disabled" : "dock-control-item"}>
-            <button
-              type="button"
-              role="radio"
-              aria-checked={dock === d}
-              aria-label={labels[d]}
-              disabled={disabled}
-              title={disabled ? "Available on larger screens" : labels[d]}
-              className={`shape-toggle${dock === d ? " shape-toggle--on" : ""}`}
-              onClick={() => setDock(d)}
-            >
-              <Icon name={icons[d]} size={16} />
-            </button>
-          </span>
-        );
-      })}
+      {visible.map((d) => (
+        <span key={d} className="dock-control-item">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={dock === d}
+            aria-label={labels[d]}
+            title={labels[d]}
+            className={`shape-toggle${dock === d ? " shape-toggle--on" : ""}`}
+            onClick={() => setDock(d)}
+          >
+            <Icon name={icons[d]} size={16} />
+          </button>
+        </span>
+      ))}
     </div>
   );
 }

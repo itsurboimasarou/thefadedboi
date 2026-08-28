@@ -83,6 +83,14 @@
      in layout.css (calc(), driven by the live-measured --hubar-h — already
      correct at this breakpoint too). Bottom's mobile-specific reservation
      lives there as well, right next to it. */
+
+  /* Logo picker swaps the HuBar mark, which isn't even visible on mobile
+     (the trigger shows a chevron there instead — see modes.css above) —
+     and Left/Right dock aren't reachable either (DockControl hides those
+     buttons at this same breakpoint). Both are desktop-only settings. */
+  .theme-menu-section--logo {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -175,9 +183,13 @@ html.lite-mode .contact-icon {
 }
 
 html.lite-mode .hubar {
-  background: var(--chrome-bg);
+  /* Solid token directly, not --chrome-bg — that variable's other values
+     (base 92%, glass-fx 58%) carry real transparency, and reading through
+     it here for a value that happens to currently be opaque is fragile.
+     Lite mode's whole point is a flat, fully opaque surface. */
+  background: var(--hubar-solid);
   border-color: var(--glass-border);
-  box-shadow: var(--shadow);
+  box-shadow: none;
   transition: none;
 }
 html.lite-mode .hubar-hotzone { display: none; }

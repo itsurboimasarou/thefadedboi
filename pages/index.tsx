@@ -47,7 +47,7 @@ export default function Home() {
         <div className="hero-actions">
           <Link href="/gallery" className="btn">
             <Icon name="image" size={18} />
-            View gallery →
+            View gallery
           </Link>
           <Link href="/about" className="btn btn--ghost">
             <Icon name="user" size={18} />

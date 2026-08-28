@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { reapplyAccentForTheme } from "./AccentSwitch";
+
+export const THEME_EVT = "theme-change";
 
 const sun = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
@@ -28,6 +31,8 @@ export default function ThemeToggle() {
     try {
       localStorage.setItem("theme", next);
     } catch { }
+    reapplyAccentForTheme();
+    window.dispatchEvent(new CustomEvent(THEME_EVT, { detail: next }));
   }
 
   return (
