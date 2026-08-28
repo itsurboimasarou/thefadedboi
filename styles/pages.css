@@ -911,6 +911,27 @@
   margin-top: 4px;
 }
 
+/* Desktop only: a modestly larger panel. Real width/padding/font-size
+   bumps, not transform:scale — scaling this exact box already caused a
+   documented jitter bug (thin-stroke icons and text re-snapping to
+   pixels), which is why the open/close transition above is translate-only
+   in the first place. Mobile keeps its existing min(...) sizing untouched. */
+@media (min-width: 721px) {
+  .control-panel {
+    width: min(500px, calc(100vw - 32px));
+    padding: 18px 20px;
+  }
+  .panel-title {
+    font-size: 1.15rem;
+  }
+  .control-panel .glance-grid {
+    gap: 12px 22px;
+  }
+  .control-panel .glance-grid dt {
+    font-size: 0.74rem;
+  }
+}
+
 /* HuBar docked top: nothing occupies the bottom, so the panel flies down
    from behind HuBar instead of up. */
 .app-root:has(.hubar--top) .control-panel {

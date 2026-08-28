@@ -64,7 +64,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
     if (!open) setThemeMenuOpen(false);
   }, [open]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setSliding(true);
     const t = setTimeout(() => setSliding(false), 340);
     return () => clearTimeout(t);
