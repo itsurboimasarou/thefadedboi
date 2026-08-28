@@ -139,7 +139,7 @@ export default function AccentSwitch() {
         title="Reset to default"
         onClick={() => setAccent(set.defaultKey)}
       >
-        <Icon name="circleArrow" size={13} />
+        <Icon name="circleArrow" size={16} />
       </button>
     </div>
   );

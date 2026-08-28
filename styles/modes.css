@@ -1,5 +1,5 @@
 /* ═══ modes.css ═══
-   Mode overrides: mobile, reduced motion, lite mode.
+   Mode overrides: mobile, desktop, reduced motion, lite mode.
    Load LAST — these must win the cascade by order. */
 
 /* ── Mobile ─────────────────────────────────────────── */
@@ -81,8 +81,11 @@
   }
   /* Top's reservation comes from the unconditional :has(.hubar--top) rule
      in layout.css (calc(), driven by the live-measured --hubar-h — already
-     correct at this breakpoint too). Bottom's mobile-specific reservation
-     lives there as well, right next to it. */
+     correct at this breakpoint too). Bottom's reservation is unconditional
+     here (not pin-gated like the desktop version below) since the compact
+     override keeps the bar effectively always-visible regardless of pinned
+     state on mobile. */
+  .app-root:has(.hubar--bottom) .main { padding-bottom: 110px; }
 
   /* Logo picker swaps the HuBar mark, which isn't even visible on mobile
      (the trigger shows a chevron there instead — see modes.css above) —
@@ -101,6 +104,32 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  /* html.glass-fx is (0,1,1); a bare :root here would be (0,1,0) and LOSE to
+     it, leaving reduced-motion visitors with the blur they asked to avoid
+     (see tokens.css's own html.glass-fx rule, loaded earlier — this still
+     needs to win over it, which holds since this file loads last). */
+  html,
+  html.glass-fx {
+    --chrome-blur: none;
+    --chrome-bg: var(--hubar-solid);
+  }
+
+  .panel-views,
+  .panel-view-slide {
+    transition: none;
+  }
+}
+
+/* Gallery grid column counts, narrowest to widest. .album-cards' own
+   max-width:720px override (auto-fill, below) is what actually wins at
+   viewports ≤720px (equal specificity, later in this file) — these two
+   only take effect between 720 and 900px, same as before this file held
+   all of them (they lived in pages.css, loaded entirely before this file,
+   so they already lost that overlap the same way pre-move). */
+@media (max-width: 900px) {
+  .album-grid { grid-template-columns: repeat(3, 1fr); }
+  .album-cards { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 720px) {
@@ -110,9 +139,7 @@
     aspect-ratio: 1;
     justify-content: center;
   }
-}
 
-@media (max-width: 720px) {
   .app-root:has(.hubar--bottom) .control-panel.control-panel {
     bottom: calc(16px + var(--hubar-h, 68px) + 16px);
   }
@@ -124,6 +151,25 @@
   }
   .app-root:has(.hubar--top) .control-panel--open.control-panel--open {
     transform: translateY(0) scale(1);
+  }
+
+  .panel-head-actions { display: none; }
+
+  .page-loader { top: auto; bottom: 96px; left: 50%; right: auto; }
+  .album-cards { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+
+  .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
+
+  .theme-switch .track-icon--left { left: 1px}
+  .theme-switch .track-icon--right { left: 33px }
+  .lang-switch .track-icon--left { left: 3px }
+  .lang-switch .track-icon--right { left: 37px }
+
+  .glance-grid .info-tip-bubble {
+    right: 0;
+    left: 0;
+    width: auto;
+    max-width: none;
   }
 }
 
@@ -140,10 +186,279 @@
     align-self: stretch;       /* full-width button reads better when stacked */
     justify-content: center;
   }
+
+  /* Same overlap note as the max-width:900px block above — .album-cards
+     here loses to the max-width:720px block's auto-fill rule right above
+     (equal specificity, that one's later), exactly as it already did back
+     when this pair lived in pages.css instead. */
+  .album-grid { grid-template-columns: repeat(2, 1fr); }
+  .album-cards { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (hover: none), (pointer: coarse) {
   .hubar-item .tip { display: none !important; }
+  /* Touch devices have no hover: show the status clock's label
+     permanently rather than leaving it stuck open after a tap. */
+  .status-clock-label { max-width: 90px; opacity: 1; transition: none; }
+}
+
+/* ── Desktop ────────────────────────────────────────── */
+@media (min-width: 701px) and (min-height: 601px) {
+  .main {
+    padding-left: clamp(24px, 5vw, 64px);
+    padding-right: clamp(24px, 5vw, 64px);
+    transition: padding 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* pinned + docked bottom: reserve footer clearance instead. Unpinned
+     (auto-hide on) reserves nothing — content is free to use that space
+     since the bar mostly stays out of the way. */
+  .app-root:has(.hubar--bottom.hubar--pinned) .main {
+    padding-bottom: 110px;
+  }
+  html.lite-mode .main { transition: none; }
+}
+
+@media (min-width: 721px) and (min-height: 601px) {
+  .hubar--top {
+    top: 16px;
+    left: 50%;
+    translate: -50% 0;
+  }
+  .hubar--top.hubar--hidden {
+    translate: -50% calc(-100% - 7px);
+    opacity: 0.6;
+  }
+
+  .hubar--bottom {
+    left: 50%;
+    bottom: 16px;
+    translate: -50% 0;
+  }
+  .hubar--bottom.hubar--hidden {
+    translate: -50% calc(100% + 6px);
+    opacity: 0.6;
+  }
+
+  .hubar--left {
+    left: 16px;
+    top: 50%;
+    translate: 0 -50%;
+  }
+  .hubar--left.hubar--hidden {
+    translate: calc(-100% - 7px) -50%;
+    opacity: 0.6;
+  }
+
+  .hubar--right {
+    right: 16px;
+    top: 50%;
+    translate: 0 -50%;
+  }
+  .hubar--right.hubar--hidden {
+    translate: calc(100% + 7px) -50%;
+    opacity: 0.6;
+  }
+
+  /* Tooltip direction follows which side of the item's own bar the tip
+     needs to clear. Left's default (right-pointing) rule above already
+     covers .hubar--left. */
+  .hubar--right .hubar-item .tip {
+    left: auto;
+    right: calc(100% + 12px);
+    translate: 0 -50%;
+  }
+
+  .hubar--top .hubar-item .tip,
+  .hubar--bottom .hubar-item .tip {
+    left: 50%;
+    top: auto;
+    translate: -50% 4px;
+  }
+  .hubar--top .hubar-item .tip {
+    top: calc(100% + 12px);
+  }
+  .hubar--bottom .hubar-item .tip {
+    bottom: calc(100% + 12px);
+  }
+  .hubar--top .hubar-item:hover .tip,
+  .hubar--bottom .hubar-item:hover .tip {
+    display: block;
+    translate: -50% 0;
+  }
+
+  .hubar-hotzone {
+    position: fixed;
+    z-index: 49;
+  }
+  .hubar-hotzone--top {
+    top: 0; left: 0; right: 0;
+    height: 14px;
+  }
+  .hubar-hotzone--bottom {
+    left: 0; right: 0; bottom: 0;
+    height: 14px;
+  }
+  .hubar-hotzone--left {
+    left: 0; top: 0; bottom: 0;
+    width: 14px;
+  }
+  .hubar-hotzone--right {
+    right: 0; top: 0; bottom: 0;
+    width: 14px;
+  }
+
+  /* StatusClock is built as a horizontal row (dot, label, time) for the
+     horizontal docks — in a vertical bar that reads sideways, so it stacks
+     instead. The hover-reveal label and hover/focus color shift exist to
+     save horizontal space in a wide bar; neither makes sense in an
+     already-narrow 84px column, so both are dropped here too. */
+  .hubar--left .status-clock,
+  .hubar--right .status-clock {
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 2px;
+    width: 100%;
+  }
+  .hubar--left .status-clock-label,
+  .hubar--right .status-clock-label {
+    display: none;
+  }
+  /* HH over MM over SS, colons dropped — trying to fit "14:14:04" on one
+     narrow line (even shrunk) still pushed past the 84px bar, since flex
+     items don't shrink text below its unwrapped width by default
+     (min-width:auto). Stacking three bare 2-digit numbers at a smaller
+     size sidesteps that instead of fighting it. */
+  .hubar--left .status-clock-time,
+  .hubar--right .status-clock-time {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    min-width: 0;
+  }
+  .hubar--left .status-clock-sep,
+  .hubar--right .status-clock-sep {
+    display: none;
+  }
+  .hubar--left .status-clock-hh,
+  .hubar--left .status-clock-mm,
+  .hubar--left .status-clock-ss,
+  .hubar--right .status-clock-hh,
+  .hubar--right .status-clock-mm,
+  .hubar--right .status-clock-ss {
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .hubar--left .status-clock-ss,
+  .hubar--right .status-clock-ss {
+    color: var(--ink-dim);
+    font-weight: 600;
+  }
+  .hubar--left .status-clock:hover .status-clock-time,
+  .hubar--left .status-clock:focus-visible .status-clock-time,
+  .hubar--right .status-clock:hover .status-clock-time,
+  .hubar--right .status-clock:focus-visible .status-clock-time {
+    color: var(--ink);
+  }
+
+  /* LangSwitch: same slider, rotated to a vertical track instead of
+     using an actual CSS rotate() — that would keep reserving its original
+     78px-wide layout box (transforms don't affect layout), which is what
+     was overflowing the 84px bar. Swapping the track/knob/label geometry
+     to run top-to-bottom instead is a real resize, not a paint trick. */
+  .hubar--left .lang-switch,
+  .hubar--right .lang-switch {
+    width: 34px;
+    height: 78px;
+  }
+  .hubar--left .lang-switch .track-icon,
+  .hubar--right .lang-switch .track-icon {
+    width: 26px;
+    height: 36px;
+    left: 3px;
+  }
+  .hubar--left .lang-switch .track-icon--left,
+  .hubar--right .lang-switch .track-icon--left {
+    top: 3px;
+  }
+  .hubar--left .lang-switch .track-icon--right,
+  .hubar--right .lang-switch .track-icon--right {
+    top: 38px;
+  }
+  .hubar--left .lang-switch .knob,
+  .hubar--right .lang-switch .knob {
+    top: 3px;
+    left: 3px;
+    width: 26px;
+    height: 36px;
+  }
+  .hubar--left .lang-switch[aria-checked="true"] .knob,
+  .hubar--right .lang-switch[aria-checked="true"] .knob {
+    translate: 0 34px;
+  }
+}
+
+@media (min-width: 721px) {
+  .theme-menu-back-mobile { display: none; }
+
+  /* Matches the glance grid's own bump right below. */
+  .theme-menu-heading {
+    font-size: 0.85rem;
+  }
+
+  /* A modestly larger panel. Real width/padding/font-size bumps, not
+     transform:scale — scaling this exact box already caused a documented
+     jitter bug (thin-stroke icons and text re-snapping to pixels), which
+     is why the open/close transition is translate-only in the first
+     place. Mobile keeps its existing min(...) sizing untouched. */
+  .control-panel {
+    width: min(500px, calc(100vw - 32px));
+    padding: 18px 20px;
+  }
+  .panel-title {
+    font-size: 1.15rem;
+  }
+  .control-panel .glance-grid {
+    gap: 12px 22px;
+  }
+  .control-panel .glance-grid dt {
+    font-size: 0.74rem;
+  }
+
+  /* HuBar docked left/right: the trigger lives in a vertically-centred
+     pill on the screen edge, not at the top or bottom — so the panel
+     follows it there and flies in from the side, instead of staying
+     centred across the whole viewport. Left/Right are never reachable on
+     mobile (HuBar.tsx forces Top/Bottom there), hence desktop-only here. */
+  .app-root:has(.hubar--left) .control-panel {
+    left: calc(16px + var(--hubar-w) + 16px);
+    right: auto;
+    margin-inline: 0;
+    bottom: auto;
+    top: 50%;
+    /* The vertical centering has to live inside this same `transform` (not
+       a separate `translate` property) — the build's CSS minifier drops a
+       standalone `translate` declaration whenever `transform` is also set
+       on the same rule. This applies to every block here, not just this
+       one — it's a real, previously-hit bug. */
+    transform: translate(-16px, -50%);
+  }
+  .app-root:has(.hubar--left) .control-panel--open {
+    transform: translate(0, -50%);
+  }
+
+  .app-root:has(.hubar--right) .control-panel {
+    right: calc(16px + var(--hubar-w) + 16px);
+    left: auto;
+    margin-inline: 0;
+    bottom: auto;
+    top: 50%;
+    transform: translate(16px, -50%);
+  }
+  .app-root:has(.hubar--right) .control-panel--open {
+    transform: translate(0, -50%);
+  }
 }
 
 /* Lite mode: no animation */
@@ -196,7 +511,7 @@ html.lite-mode .hubar-hotzone { display: none; }
 
 html.lite-mode .version-pill:hover { transform: none; }
 
-html.lite-mode .sky .flake { display: none; }  
+html.lite-mode .sky .flake { display: none; }
 
 html.lite-mode .year-menu { animation: none; }
 

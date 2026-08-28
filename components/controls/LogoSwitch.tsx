@@ -73,7 +73,7 @@ export default function LogoSwitch() {
         </button>
       ))}
       {files.length === 0 && (
-        <p className="logo-grid-empty">Drop images into /public/logo to see them here.</p>
+        <p className="logo-grid-empty">No logo presented.</p>
       )}
     </div>
   );

@@ -134,12 +134,8 @@ html.lite-mode {
   --chrome-bg: var(--hubar-solid);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  /* html.glass-fx is (0,1,1); a bare :root here would be (0,1,0) and LOSE to
-     it, leaving reduced-motion visitors with the blur they asked to avoid. */
-  html,
-  html.glass-fx {
-    --chrome-blur: none;
-    --chrome-bg: var(--hubar-solid);
-  }
-}
+/* The reduced-motion override for these same two tokens lives in
+   modes.css now, with the rest of the @media rules — it still needs to
+   come after this html.glass-fx rule in overall cascade order (equal
+   specificity, source order decides), which holds since modes.css loads
+   after this file unconditionally. */

@@ -52,6 +52,14 @@ export default function useHuBarAutoHide(
   const hiddenRef = useRef(false);
   const compactRef = useRef(false);
   const suppressDismiss = useRef(false);
+  // usePinned() (like every other persisted-setting hook here) starts at a
+  // fixed default and corrects to the real localStorage value in its own
+  // mount effect, to stay SSR-safe — so `pinned` itself changes once on
+  // load even with no user interaction at all. That correction lands
+  // within the same effects flush, well under a human's reaction time, so
+  // a short real-clock guard (not just "skip the very first render") is
+  // what actually tells it apart from a genuine click on the switch.
+  const pinnedSettled = useRef(false);
 
   useEffect(() => { pinnedRef.current = pinned; }, [pinned]);
   useEffect(() => { hiddenRef.current = hidden; }, [hidden]);
@@ -84,6 +92,21 @@ export default function useHuBarAutoHide(
   useEffect(() => {
     if (compact) summon();
   }, [compact, summon]);
+
+  useEffect(() => {
+    const t = setTimeout(() => { pinnedSettled.current = true; }, 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!pinnedSettled.current) return;
+    if (pinned) {
+      summon();
+    } else if (!compactRef.current) {
+      cancel();
+      setHidden(true);
+    }
+  }, [pinned, summon, cancel]);
 
   useEffect(() => {
     const touch = window.matchMedia(TOUCH_MQ);

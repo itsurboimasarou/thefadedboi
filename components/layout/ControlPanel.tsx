@@ -191,7 +191,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className={liteOn ? "row--disabled" : undefined}>
             <dt>
               <Icon name="display" size={15} />
-              Glass effect
+              Glass blur
             </dt>
             <dd className="dd-row">
               <GlassToggle />
@@ -296,7 +296,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className="theme-menu-section">
             <h3 className="h-with-icon theme-menu-heading">
               <Icon name="layers" size={15} />
-              Sets
+              Color sets
             </h3>
             <AccentSetSwitch />
           </div>

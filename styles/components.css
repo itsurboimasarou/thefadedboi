@@ -494,17 +494,6 @@
 .glance-grid .info-tip { position: static; }
 .glance-grid > div { position: relative; }
 
-/* Narrow screens: pin every bubble to the panel's own box rather than to the
-   tip, so neither column can push it past an edge. */
-@media (max-width: 720px) {
-  .glance-grid .info-tip-bubble {
-    right: 0;
-    left: 0;
-    width: auto;
-    max-width: none;
-  }
-}
-
 .glance-grid .info-tip:hover .info-tip-bubble,
 .glance-grid .info-tip:focus-visible .info-tip-bubble {
   translate: 0 0;
@@ -601,10 +590,7 @@
 }
 
 /* Touch devices have no hover: show the label permanently rather than
-   leaving it stuck open after a tap. */
-@media (hover: none), (pointer: coarse) {
-  .status-clock-label { max-width: 90px; opacity: 1; transition: none; }
-}
+   leaving it stuck open after a tap — see modes.css's hover:none block. */
 
 /* ── Text button (Theme customize row) ───────────────── */
 .text-btn {
@@ -704,10 +690,6 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 720px) {
-  .panel-head-actions { display: none; }
-}
-
 /* Both "At a glance" views stay mounted permanently (ControlPanel.tsx) so
    their controls keep live state across a switch instead of re-syncing
    from storage on every remount. They sit stacked here and slide via
@@ -754,9 +736,16 @@
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s var(--pvs-delay);
 }
 
+/* The active side uses `inherit`, never a hard `visible` — a hard value
+   here would out-rank .control-panel's own closed-state `visibility:
+   hidden` (an explicit child declaration always beats an inherited
+   ancestor one), leaving whichever view is "active" fully hit-testable —
+   and blocking clicks on whatever sits underneath — even while the panel
+   itself is supposedly closed. `inherit` defers to the panel's own current
+   visibility instead of asserting one of its own. */
 .panel-view-slide--main {
   transform: translateX(0);
-  visibility: visible;
+  visibility: inherit;
 }
 .panel-view-slide--main.panel-view-slide--behind {
   transform: translateX(-100%);
@@ -773,22 +762,14 @@
 }
 .panel-view-slide--theme.panel-view-slide--front {
   transform: translateX(0);
-  visibility: visible;
+  visibility: inherit;
   pointer-events: auto;
   --pvs-delay: 0s;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .panel-views,
-  .panel-view-slide {
-    transition: none;
-  }
-}
+/* Reduced-motion override for these lives in modes.css now. */
 
 /* ── Theme menu (accent + logo, swapped in for the glance grid) ── */
-@media (min-width: 721px) {
-  .theme-menu-back-mobile { display: none; }
-}
 
 .theme-menu-section + .theme-menu-section { margin-top: 16px; }
 
@@ -800,13 +781,8 @@
   margin-bottom: 8px;
 }
 .theme-menu-heading .icn { color: var(--accent); opacity: 0.9; }
-
-/* Matches the glance grid's own desktop-only bump in pages.css. */
-@media (min-width: 721px) {
-  .theme-menu-heading {
-    font-size: 0.85rem;
-  }
-}
+/* Desktop-only size bump (matches the glance grid's own) lives in
+   modes.css now, alongside the rest of the @media rules. */
 
 .set-select-wrap {
   position: relative;

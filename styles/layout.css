@@ -37,10 +37,8 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
 /* Bottom is pin-gated (only reserved when auto-hide is off) on desktop
    below, matching the old nav-rail's behavior; on mobile the compact
    override keeps the bar effectively always-visible regardless of pinned
-   state, so it's reserved unconditionally there instead. */
-@media (max-width: 720px), (max-height: 600px) {
-  .app-root:has(.hubar--bottom) .main { padding-bottom: 110px; }
-}
+   state, so it's reserved unconditionally there instead — see modes.css's
+   mobile block for that override. */
 
 @keyframes page-in {
   from {
@@ -54,20 +52,9 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
   }
 }
 
-@media (min-width: 701px) and (min-height: 601px) {
-  .main {
-    padding-left: clamp(24px, 5vw, 64px);
-    padding-right: clamp(24px, 5vw, 64px);
-    transition: padding 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  /* pinned + docked bottom: reserve footer clearance instead. Unpinned
-     (auto-hide on) reserves nothing — content is free to use that space
-     since the bar mostly stays out of the way. */
-  .app-root:has(.hubar--bottom.hubar--pinned) .main {
-    padding-bottom: 110px;
-  }
-  html.lite-mode .main { transition: none; }
-}
+/* This breakpoint's .main rules (padding transition, pinned+bottom footer
+   clearance) live in modes.css now, alongside the rest of the @media
+   rules. */
 
 /* ── Logo mark ──────────────────────────────────────── */
 .logo-mark {
@@ -263,186 +250,9 @@ html.glass-fx .hubar {
   margin: 4px 0;
 }
 
-@media (min-width: 721px) and (min-height: 601px) {
-  .hubar--top {
-    top: 16px;
-    left: 50%;
-    translate: -50% 0;
-  }
-  .hubar--top.hubar--hidden {
-    translate: -50% calc(-100% - 7px);
-    opacity: 0.6;
-  }
-
-  .hubar--bottom {
-    left: 50%;
-    bottom: 16px;
-    translate: -50% 0;
-  }
-  .hubar--bottom.hubar--hidden {
-    translate: -50% calc(100% + 6px);
-    opacity: 0.6;
-  }
-
-  .hubar--left {
-    left: 16px;
-    top: 50%;
-    translate: 0 -50%;
-  }
-  .hubar--left.hubar--hidden {
-    translate: calc(-100% - 7px) -50%;
-    opacity: 0.6;
-  }
-
-  .hubar--right {
-    right: 16px;
-    top: 50%;
-    translate: 0 -50%;
-  }
-  .hubar--right.hubar--hidden {
-    translate: calc(100% + 7px) -50%;
-    opacity: 0.6;
-  }
-
-  /* Tooltip direction follows which side of the item's own bar the tip
-     needs to clear. Left's default (right-pointing) rule above already
-     covers .hubar--left. */
-  .hubar--right .hubar-item .tip {
-    left: auto;
-    right: calc(100% + 12px);
-    translate: 0 -50%;
-  }
-
-  .hubar--top .hubar-item .tip,
-  .hubar--bottom .hubar-item .tip {
-    left: 50%;
-    top: auto;
-    translate: -50% 4px;
-  }
-  .hubar--top .hubar-item .tip {
-    top: calc(100% + 12px);
-  }
-  .hubar--bottom .hubar-item .tip {
-    bottom: calc(100% + 12px);
-  }
-  .hubar--top .hubar-item:hover .tip,
-  .hubar--bottom .hubar-item:hover .tip {
-    display: block;
-    translate: -50% 0;
-  }
-
-  .hubar-hotzone {
-    position: fixed;
-    z-index: 49;
-  }
-  .hubar-hotzone--top {
-    top: 0; left: 0; right: 0;
-    height: 14px;
-  }
-  .hubar-hotzone--bottom {
-    left: 0; right: 0; bottom: 0;
-    height: 14px;
-  }
-  .hubar-hotzone--left {
-    left: 0; top: 0; bottom: 0;
-    width: 14px;
-  }
-  .hubar-hotzone--right {
-    right: 0; top: 0; bottom: 0;
-    width: 14px;
-  }
-
-  /* StatusClock is built as a horizontal row (dot, label, time) for the
-     horizontal docks — in a vertical bar that reads sideways, so it stacks
-     instead. The hover-reveal label and hover/focus color shift exist to
-     save horizontal space in a wide bar; neither makes sense in an
-     already-narrow 84px column, so both are dropped here too. */
-  .hubar--left .status-clock,
-  .hubar--right .status-clock {
-    flex-direction: column;
-    gap: 6px;
-    padding: 4px 2px;
-    width: 100%;
-  }
-  .hubar--left .status-clock-label,
-  .hubar--right .status-clock-label {
-    display: none;
-  }
-  /* HH over MM over SS, colons dropped — trying to fit "14:14:04" on one
-     narrow line (even shrunk) still pushed past the 84px bar, since flex
-     items don't shrink text below its unwrapped width by default
-     (min-width:auto). Stacking three bare 2-digit numbers at a smaller
-     size sidesteps that instead of fighting it. */
-  .hubar--left .status-clock-time,
-  .hubar--right .status-clock-time {
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-    width: 100%;
-    min-width: 0;
-  }
-  .hubar--left .status-clock-sep,
-  .hubar--right .status-clock-sep {
-    display: none;
-  }
-  .hubar--left .status-clock-hh,
-  .hubar--left .status-clock-mm,
-  .hubar--left .status-clock-ss,
-  .hubar--right .status-clock-hh,
-  .hubar--right .status-clock-mm,
-  .hubar--right .status-clock-ss {
-    font-size: 0.82rem;
-    font-weight: 700;
-    line-height: 1.25;
-  }
-  .hubar--left .status-clock-ss,
-  .hubar--right .status-clock-ss {
-    color: var(--ink-dim);
-    font-weight: 600;
-  }
-  .hubar--left .status-clock:hover .status-clock-time,
-  .hubar--left .status-clock:focus-visible .status-clock-time,
-  .hubar--right .status-clock:hover .status-clock-time,
-  .hubar--right .status-clock:focus-visible .status-clock-time {
-    color: var(--ink);
-  }
-
-  /* LangSwitch: same slider, rotated to a vertical track instead of
-     using an actual CSS rotate() — that would keep reserving its original
-     78px-wide layout box (transforms don't affect layout), which is what
-     was overflowing the 84px bar. Swapping the track/knob/label geometry
-     to run top-to-bottom instead is a real resize, not a paint trick. */
-  .hubar--left .lang-switch,
-  .hubar--right .lang-switch {
-    width: 34px;
-    height: 78px;
-  }
-  .hubar--left .lang-switch .track-icon,
-  .hubar--right .lang-switch .track-icon {
-    width: 26px;
-    height: 36px;
-    left: 3px;
-  }
-  .hubar--left .lang-switch .track-icon--left,
-  .hubar--right .lang-switch .track-icon--left {
-    top: 3px;
-  }
-  .hubar--left .lang-switch .track-icon--right,
-  .hubar--right .lang-switch .track-icon--right {
-    top: 38px;
-  }
-  .hubar--left .lang-switch .knob,
-  .hubar--right .lang-switch .knob {
-    top: 3px;
-    left: 3px;
-    width: 26px;
-    height: 36px;
-  }
-  .hubar--left .lang-switch[aria-checked="true"] .knob,
-  .hubar--right .lang-switch[aria-checked="true"] .knob {
-    translate: 0 34px;
-  }
-}
+/* Desktop dock positioning/tooltips, hotzones, and the Left/Right vertical
+   StatusClock + LangSwitch geometry for this breakpoint all live in
+   modes.css now, alongside the rest of the @media rules. */
 
 /* ── Footer ─────────────────────────────────────────── */
 .footer {

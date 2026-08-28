@@ -206,18 +206,8 @@
   /* max 4 per row */
   gap: 12px;
 }
-
-@media (max-width: 900px) {
-  .album-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .album-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+/* Responsive column counts live in modes.css now, alongside the rest of
+   the @media rules. */
 
 .album-thumb {
   padding: 0;
@@ -625,8 +615,8 @@
   grid-template-columns: repeat(5, 1fr);
   gap: 14px;
 }
-@media (max-width: 900px) { .album-cards { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 600px) { .album-cards { grid-template-columns: repeat(2, 1fr); } }
+/* Responsive column counts live in modes.css now, alongside the rest of
+   the @media rules (and the .album-grid ones just above). */
 
 .album-card {
   display: flex;
@@ -739,10 +729,6 @@
   border: 0;
 }
 
-@media (max-width: 720px) {
-  .page-loader { top: auto; bottom: 96px; left: 50%; right: auto; }
-  .album-cards { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-}
 
 /* ── Per-thumbnail loading / failure states ─────────── */
 .album-thumb { position: relative; }
@@ -827,10 +813,6 @@
   margin-top: 26px;
 }
 
-@media (max-width: 720px) {
-  .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
-}
-
 /* ── Control panel ───────────────────────────────────
    Flies out from behind HuBar. Transform + opacity only, so the whole
    transition is compositor work — no layout, no repaint. Base rule is the
@@ -911,26 +893,9 @@
   margin-top: 4px;
 }
 
-/* Desktop only: a modestly larger panel. Real width/padding/font-size
-   bumps, not transform:scale — scaling this exact box already caused a
-   documented jitter bug (thin-stroke icons and text re-snapping to
-   pixels), which is why the open/close transition above is translate-only
-   in the first place. Mobile keeps its existing min(...) sizing untouched. */
-@media (min-width: 721px) {
-  .control-panel {
-    width: min(500px, calc(100vw - 32px));
-    padding: 18px 20px;
-  }
-  .panel-title {
-    font-size: 1.15rem;
-  }
-  .control-panel .glance-grid {
-    gap: 12px 22px;
-  }
-  .control-panel .glance-grid dt {
-    font-size: 0.74rem;
-  }
-}
+/* Desktop-only larger panel sizing, and the Left/Right dock's flies-in-
+   from-the-side positioning, both live in modes.css now, alongside the
+   rest of the @media rules. */
 
 /* HuBar docked top: nothing occupies the bottom, so the panel flies down
    from behind HuBar instead of up. */
@@ -941,40 +906,4 @@
 }
 .app-root:has(.hubar--top) .control-panel--open {
   transform: translateY(0);
-}
-
-/* HuBar docked left/right: the trigger lives in a vertically-centred pill
-   on the screen edge, not at the top or bottom — so the panel follows it
-   there and flies in from the side, instead of staying centred across the
-   whole viewport. Desktop-only: Left/Right are never reachable on mobile
-   (HuBar.tsx forces Top/Bottom there). */
-@media (min-width: 721px) {
-  .app-root:has(.hubar--left) .control-panel {
-    left: calc(16px + var(--hubar-w) + 16px);
-    right: auto;
-    margin-inline: 0;
-    bottom: auto;
-    top: 50%;
-    /* The vertical centering has to live inside this same `transform` (not
-       a separate `translate` property) — the build's CSS minifier drops a
-       standalone `translate` declaration whenever `transform` is also set
-       on the same rule. This applies to every block here, not just this
-       one — it's a real, previously-hit bug. */
-    transform: translate(-16px, -50%);
-  }
-  .app-root:has(.hubar--left) .control-panel--open {
-    transform: translate(0, -50%);
-  }
-
-  .app-root:has(.hubar--right) .control-panel {
-    right: calc(16px + var(--hubar-w) + 16px);
-    left: auto;
-    margin-inline: 0;
-    bottom: auto;
-    top: 50%;
-    transform: translate(16px, -50%);
-  }
-  .app-root:has(.hubar--right) .control-panel--open {
-    transform: translate(0, -50%);
-  }
 }
