@@ -3,6 +3,9 @@ import type {
   Subject,
   Album,
   DeviceSection,
+  MusicManifest,
+  Playlist,
+  TrackMeta,
 } from "./types";
 
 export const CDN = "https://cdn.thefadedboi.me";
@@ -17,11 +20,14 @@ const IGNORE_PREFIX = /^_/;
 const encPath = (p: string) =>
   p.split(/[\/\\]/).map(encodeURIComponent).join("/");
 
-export const cdnUrl = (folder: string, file: string) =>
-  `${CDN}/albums/${encPath(folder)}/${encodeURIComponent(file)}`;
+const assetUrl = (kind: string, folder: string, file: string) =>
+  `${CDN}/${kind}/${encPath(folder)}/${encodeURIComponent(file)}`;
 
-const indexUrl = (folder: string) =>
-  `${CDN}/albums/${encPath(folder)}/index.json`;
+export const cdnUrl = (folder: string, file: string) =>
+  assetUrl("albums", folder, file);
+
+export const trackUrl = (folder: string, file: string) =>
+  assetUrl("tracks", folder, file);
 
 export const USE_THUMBS = process.env.PHOTOS_THUMBS === "1";
 
@@ -29,6 +35,37 @@ export const thumbUrl = (folder: string, file: string) =>
   USE_THUMBS
     ? `${CDN}/thumbs/${encPath(folder)}/${encodeURIComponent(file)}`
     : cdnUrl(folder, file);
+
+const indexUrl = (folder: string) =>
+  `${CDN}/albums/${encPath(folder)}/index.json`;
+
+async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
+  try {
+    const res = await fetch(indexUrl(folder));
+    if (!res.ok) {
+      console.warn(
+        `[assets] ${res.status} reading albums/${folder}/index.json — ` +
+          `run "npm run sync-photos" to regenerate it`
+      );
+      return [];
+    }
+    const data = await res.json();
+    const names: string[] = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.files)
+        ? data.files
+        : [];
+
+    return names
+      .filter(
+        (n) => typeof n === "string" && ext.test(n) && !IGNORE_PREFIX.test(n)
+      )
+      .sort();
+  } catch (err) {
+    console.warn(`[assets] failed reading albums/${folder}/index.json:`, err);
+    return [];
+  }
+}
 
 export const deviceImage = (file: string) =>
   `${RAW}/devices/${encodeURIComponent(file)}`;
@@ -63,36 +100,11 @@ async function fetchJson<T = any>(path: string): Promise<T | null> {
 export async function listImages(
   folder: string
 ): Promise<{ full: string; thumb: string }[]> {
-  try {
-    const res = await fetch(indexUrl(folder));
-    if (!res.ok) {
-      console.warn(
-        `[assets] ${res.status} reading albums/${folder}/index.json — ` +
-          `run "npm run sync-photos" to regenerate it`
-      );
-      return [];
-    }
-    const data = await res.json();
-    const names: string[] = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.files)
-        ? data.files
-        : [];
-
-    return names
-      .filter(
-        (n) =>
-          typeof n === "string" && IMAGE_EXT.test(n) && !IGNORE_PREFIX.test(n)
-      )
-      .sort()
-      .map((name) => ({
-        full: cdnUrl(folder, name),
-        thumb: thumbUrl(folder, name),
-      }));
-  } catch (err) {
-    console.warn(`[assets] failed reading albums/${folder}/index.json:`, err);
-    return [];
-  }
+  const names = await listFiles(folder, IMAGE_EXT);
+  return names.map((name) => ({
+    full: cdnUrl(folder, name),
+    thumb: thumbUrl(folder, name),
+  }));
 }
 
 function validateSubjects(raw: any): Subject[] {
@@ -127,6 +139,31 @@ export async function getManifest(): Promise<Manifest> {
   const raw = await fetchJson("gallery.json");
   if (!raw) return { version: 2, subjects: [] };
   return { version: raw.version ?? 2, subjects: validateSubjects(raw) };
+}
+
+const okTrack = (t: any): t is TrackMeta =>
+  t && typeof t.file === "string" && typeof t.title === "string";
+
+function validatePlaylists(raw: any): Playlist[] {
+  if (!raw || !Array.isArray(raw.playlists)) return [];
+  return raw.playlists
+    .filter(
+      (p: any) =>
+        p &&
+        typeof p.slug === "string" &&
+        typeof p.title === "string" &&
+        typeof p.folder === "string"
+    )
+    .map((p: any) => ({
+      ...p,
+      tracks: Array.isArray(p.tracks) ? p.tracks.filter(okTrack) : [],
+    }));
+}
+
+export async function getMusicManifest(): Promise<MusicManifest> {
+  const raw = await fetchJson("music.json");
+  if (!raw) return { version: 1, playlists: [] };
+  return { version: raw.version ?? 1, playlists: validatePlaylists(raw) };
 }
 
 export function findAlbum(

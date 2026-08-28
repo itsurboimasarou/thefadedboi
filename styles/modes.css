@@ -30,6 +30,23 @@
      needed (that's what the old unconditional .nav-rail rule here had to
      do, back when NavRail always rendered its own dock class regardless of
      viewport). */
+  /* layout.css's width: min(760px, calc(100vw - 48px)) only shrinks with a
+     narrow viewport — it does nothing for the other half of this query's
+     condition, a short-but-wide landscape phone (max-height: 600px can
+     match at any width), where the bar was ballooning out toward 760px.
+     This caps both axes outright so the bar never exceeds a fixed size in
+     compact mode, landscape or portrait, and never shrinks past a floor
+     either. container-type turns the bar itself into the reference box for
+     the cell/icon sizing below, so they track its real rendered width (already
+     clamped to this min/max) instead of a separate, easy-to-desync vw formula. */
+  .hubar--top,
+  .hubar--bottom {
+    min-width: 301px;
+    min-height: 51px;
+    max-width: 385px;
+    max-height: 62px;
+    container-type: inline-size;
+  }
   .hubar--top {
     top: 16px;
     left: 50%;
@@ -58,22 +75,104 @@
 
   .hubar-hotzone { display: none; }
 
-  /* Trigger swaps from the logo mark to a rotating chevron on mobile (see
-     HuBarTrigger.tsx — both render, this is what picks between them). */
-  .hubar-trigger .logo-mark { display: none; }
-  .hubar-trigger-arrow { display: block; }
-  .hubar--top .hubar-trigger-arrow svg { rotate: 180deg; }
-  .hubar--top .hubar-trigger--open .hubar-trigger-arrow svg { rotate: 0deg; }
-  .hubar--bottom .hubar-trigger--open .hubar-trigger-arrow svg { rotate: 180deg; }
+  /* .hubar-item/.hubar-trigger are a fixed 44px in layout.css — fine on
+     desktop where the bar has slack, but on mobile only the start-group
+     (trigger + divider + 6 nav items = 7 fixed cells) shows, and at the
+     bar's own min-width (301px, above) 7 fixed 44px cells (flex-shrink:0
+     stops them yielding) would overflow it, pushing icons visibly past the
+     rounded edge. Sized in container query units (100cqw = the bar's own
+     current width, already clamped to [301px, 385px] above) instead of vw,
+     so this is the exact fit at *any* width the bar can actually be — no
+     separate formula to keep in sync with its min/max the way a vw-based
+     clamp would need. Content width is cqw minus the fixed 71px overhead
+     (1px divider + 8px its margin + 7 × 6px gaps + 20px h-padding), split
+     7 ways; min() just stops it exceeding the normal 44px at the bar's cap.
+     The :active duplicate matches layout.css's own .hubar-item:active,
+     .hubar-item selector — without it, :active's higher specificity would
+     win while a nav item is being pressed and snap the cell back to that
+     unclamped 44px until release, which read as a glitch. */
+  .hubar-item:active,
+  .hubar-item,
+  .hubar-trigger {
+    width: min(44px, calc((100cqw - 71px) / 7));
+    height: min(44px, calc((100cqw - 71px) / 7));
+  }
+  .hubar-item .icn {
+    width: min(22px, calc((100cqw - 71px) / 14));
+    height: min(22px, calc((100cqw - 71px) / 14));
+  }
 
   /* HuBar shows only the left-side (trigger + page) group on mobile — the
      end-group's contents (status clock, language) move into "At a glance"
-     instead, via the mobile-only rows below. */
+     instead, via the mobile-only rows below. With .hubar-group--end gone,
+     layout.css's justify-content: space-between has only one child left to
+     "space between" — it just pins that lone group to the start edge
+     instead, which read as off-centre. Center it directly now that it's
+     the only thing left in the row. */
   .hubar-group--end { display: none; }
+  .hubar--top,
+  .hubar--bottom {
+    justify-content: center;
+  }
   .glance-row--mobile-only { display: block; }
   /* Status specifically sits beside the "At a glance" title instead of
      its own grid row — an inline flex item there, not a block row. */
   .panel-head .glance-row--mobile-only { display: flex; align-items: center; }
+
+  /* The "always show the label" fallback below (@media hover:none/pointer:
+     coarse) relies on browsers reporting touch capability correctly —
+     Chromium mobile does, but Firefox Mobile (and some others) can report
+     hover:hover/pointer:fine even on a touchscreen, leaving the clock
+     retracted like the desktop hover-only version. This viewport-width
+     breakpoint is the one signal every mobile browser agrees on, so it's
+     the authoritative source of truth here, same as the rest of this file. */
+  .status-clock-label { max-width: 90px; opacity: 1; transition: none; }
+
+  .panel-swipe-hint { display: block; }
+
+  /* Mobile-only, and only while .panel-switching is present (both add it —
+     see `switching` in ControlPanel.tsx/MusicPlayer.tsx — for exactly the
+     transitions that swap controls↔player; opening from or closing to
+     nothing leaves it off, so those keep the plain vertical fly-in/out both
+     panels use everywhere else, same as "At a glance" always had). They're
+     mutually exclusive (visiblePanel in ControlPanel.tsx), so closing one
+     and opening the other happen in the same render, and animating both
+     this way at once reads as one swap. #control-panel/#music-player ids
+     are enough specificity on their own to beat the dock-aware
+     .control-panel transform overrides above, no !important needed —
+     desktop (outside this breakpoint) never sees any of this. */
+  #control-panel.panel-switching {
+    transform: translateX(calc(100% + 16px));
+    opacity: 0;
+    transition:
+      transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.15s ease,
+      visibility 0s linear 0.15s;
+  }
+  #control-panel.panel-switching.control-panel--open {
+    transform: translateX(0);
+    opacity: 1;
+    transition:
+      transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.15s ease,
+      visibility 0s;
+  }
+  #music-player.player-panel.panel-switching {
+    transform: translateX(calc(-100% - 16px));
+    opacity: 0;
+    transition:
+      transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.15s ease,
+      visibility 0s linear 0.15s;
+  }
+  #music-player.player-panel.panel-switching.control-panel--open {
+    transform: translateX(0);
+    opacity: 1;
+    transition:
+      transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.15s ease,
+      visibility 0s;
+  }
 
   .main {
     padding-left: clamp(20px, 5vw, 64px);
@@ -87,13 +186,10 @@
      state on mobile. */
   .app-root:has(.hubar--bottom) .main { padding-bottom: 110px; }
 
-  /* Logo picker swaps the HuBar mark, which isn't even visible on mobile
-     (the trigger shows a chevron there instead — see modes.css above) —
-     and Left/Right dock aren't reachable either (DockControl hides those
-     buttons at this same breakpoint). Both are desktop-only settings. */
-  .theme-menu-section--logo {
-    display: none;
-  }
+  /* Left/Right dock aren't reachable on mobile (DockControl hides those
+     buttons at this same breakpoint) — desktop-only, unlike the logo
+     picker above, which now applies here too since the trigger still shows
+     the logo mark on mobile. */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -105,10 +201,6 @@
     transition-duration: 0.01ms !important;
   }
 
-  /* html.glass-fx is (0,1,1); a bare :root here would be (0,1,0) and LOSE to
-     it, leaving reduced-motion visitors with the blur they asked to avoid
-     (see tokens.css's own html.glass-fx rule, loaded earlier — this still
-     needs to win over it, which holds since this file loads last). */
   html,
   html.glass-fx {
     --chrome-blur: none;
@@ -121,12 +213,6 @@
   }
 }
 
-/* Gallery grid column counts, narrowest to widest. .album-cards' own
-   max-width:720px override (auto-fill, below) is what actually wins at
-   viewports ≤720px (equal specificity, later in this file) — these two
-   only take effect between 720 and 900px, same as before this file held
-   all of them (they lived in pages.css, loaded entirely before this file,
-   so they already lost that overlap the same way pre-move). */
 @media (max-width: 900px) {
   .album-grid { grid-template-columns: repeat(3, 1fr); }
   .album-cards { grid-template-columns: repeat(3, 1fr); }
@@ -154,16 +240,18 @@
   }
 
   .panel-head-actions { display: none; }
+  .player-panel .panel-head-actions { display: flex; }
+  .player-close-btn { display: none; }
 
   .page-loader { top: auto; bottom: 96px; left: 50%; right: auto; }
   .album-cards { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
 
   .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
 
-  .theme-switch .track-icon--left { left: 1px}
-  .theme-switch .track-icon--right { left: 33px }
-  .lang-switch .track-icon--left { left: 3px }
-  .lang-switch .track-icon--right { left: 37px }
+  .theme-switch .track-icon--left { top: 1px; left: 2px }
+  .theme-switch .track-icon--right { top: 1px; left: 34px }
+  .lang-switch .track-icon--left { top: 2px; left: 3px }
+  .lang-switch .track-icon--right { top: 2px; left: 37px }
 
   .glance-grid .info-tip-bubble {
     right: 0;
@@ -177,28 +265,22 @@
   .link-banner {
     flex-wrap: wrap;
     flex-direction: column;
-    align-items: flex-start;   /* not center — the text is left-aligned */
+    align-items: flex-start;
     gap: 12px;
   }
   .link-banner p { flex: none; }
   .link-banner .btn {
-    margin-left: 0;            /* kill any row-layout indent */
-    align-self: stretch;       /* full-width button reads better when stacked */
+    margin-left: 0;
+    align-self: stretch;
     justify-content: center;
   }
 
-  /* Same overlap note as the max-width:900px block above — .album-cards
-     here loses to the max-width:720px block's auto-fill rule right above
-     (equal specificity, that one's later), exactly as it already did back
-     when this pair lived in pages.css instead. */
   .album-grid { grid-template-columns: repeat(2, 1fr); }
   .album-cards { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (hover: none), (pointer: coarse) {
   .hubar-item .tip { display: none !important; }
-  /* Touch devices have no hover: show the status clock's label
-     permanently rather than leaving it stuck open after a tap. */
   .status-clock-label { max-width: 90px; opacity: 1; transition: none; }
 }
 
@@ -209,9 +291,6 @@
     padding-right: clamp(24px, 5vw, 64px);
     transition: padding 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  /* pinned + docked bottom: reserve footer clearance instead. Unpinned
-     (auto-hide on) reserves nothing — content is free to use that space
-     since the bar mostly stays out of the way. */
   .app-root:has(.hubar--bottom.hubar--pinned) .main {
     padding-bottom: 110px;
   }
@@ -259,9 +338,6 @@
     opacity: 0.6;
   }
 
-  /* Tooltip direction follows which side of the item's own bar the tip
-     needs to clear. Left's default (right-pointing) rule above already
-     covers .hubar--left. */
   .hubar--right .hubar-item .tip {
     left: auto;
     right: calc(100% + 12px);
@@ -307,11 +383,6 @@
     width: 14px;
   }
 
-  /* StatusClock is built as a horizontal row (dot, label, time) for the
-     horizontal docks — in a vertical bar that reads sideways, so it stacks
-     instead. The hover-reveal label and hover/focus color shift exist to
-     save horizontal space in a wide bar; neither makes sense in an
-     already-narrow 84px column, so both are dropped here too. */
   .hubar--left .status-clock,
   .hubar--right .status-clock {
     flex-direction: column;
@@ -323,11 +394,6 @@
   .hubar--right .status-clock-label {
     display: none;
   }
-  /* HH over MM over SS, colons dropped — trying to fit "14:14:04" on one
-     narrow line (even shrunk) still pushed past the 84px bar, since flex
-     items don't shrink text below its unwrapped width by default
-     (min-width:auto). Stacking three bare 2-digit numbers at a smaller
-     size sidesteps that instead of fighting it. */
   .hubar--left .status-clock-time,
   .hubar--right .status-clock-time {
     flex-direction: column;
@@ -362,11 +428,6 @@
     color: var(--ink);
   }
 
-  /* LangSwitch: same slider, rotated to a vertical track instead of
-     using an actual CSS rotate() — that would keep reserving its original
-     78px-wide layout box (transforms don't affect layout), which is what
-     was overflowing the 84px bar. Swapping the track/knob/label geometry
-     to run top-to-bottom instead is a real resize, not a paint trick. */
   .hubar--left .lang-switch,
   .hubar--right .lang-switch {
     width: 34px;
@@ -402,16 +463,10 @@
 @media (min-width: 721px) {
   .theme-menu-back-mobile { display: none; }
 
-  /* Matches the glance grid's own bump right below. */
   .theme-menu-heading {
     font-size: 0.85rem;
   }
 
-  /* A modestly larger panel. Real width/padding/font-size bumps, not
-     transform:scale — scaling this exact box already caused a documented
-     jitter bug (thin-stroke icons and text re-snapping to pixels), which
-     is why the open/close transition is translate-only in the first
-     place. Mobile keeps its existing min(...) sizing untouched. */
   .control-panel {
     width: min(500px, calc(100vw - 32px));
     padding: 18px 20px;
@@ -426,22 +481,12 @@
     font-size: 0.74rem;
   }
 
-  /* HuBar docked left/right: the trigger lives in a vertically-centred
-     pill on the screen edge, not at the top or bottom — so the panel
-     follows it there and flies in from the side, instead of staying
-     centred across the whole viewport. Left/Right are never reachable on
-     mobile (HuBar.tsx forces Top/Bottom there), hence desktop-only here. */
   .app-root:has(.hubar--left) .control-panel {
     left: calc(16px + var(--hubar-w) + 16px);
     right: auto;
     margin-inline: 0;
     bottom: auto;
     top: 50%;
-    /* The vertical centering has to live inside this same `transform` (not
-       a separate `translate` property) — the build's CSS minifier drops a
-       standalone `translate` declaration whenever `transform` is also set
-       on the same rule. This applies to every block here, not just this
-       one — it's a real, previously-hit bug. */
     transform: translate(-16px, -50%);
   }
   .app-root:has(.hubar--left) .control-panel--open {
@@ -498,10 +543,6 @@ html.lite-mode .contact-icon {
 }
 
 html.lite-mode .hubar {
-  /* Solid token directly, not --chrome-bg — that variable's other values
-     (base 92%, glass-fx 58%) carry real transparency, and reading through
-     it here for a value that happens to currently be opaque is fragile.
-     Lite mode's whole point is a flat, fully opaque surface. */
   background: var(--hubar-solid);
   border-color: var(--glass-border);
   box-shadow: none;
@@ -531,7 +572,6 @@ html.lite-mode .sky {
   transform: none;
 }
 
-/* the backdrop is the whole point of OLED — let true black dominate */
 /* Lite mode: a static ring still communicates "working" without animating. */
 html.lite-mode .page-loader-ring {
   animation: none;
@@ -540,14 +580,7 @@ html.lite-mode .page-loader-ring {
 
 html.lite-mode .thumb-loader::after { animation: none; }
 
-/* Snow off is handled in JS (Snowfall.tsx): each flake finishes its descent
-   and is then removed, so the field empties naturally instead of freezing
-   mid-air. Nothing to do here — but the ground stays, since settled snow
-   should not vanish when it stops falling. */
-
 /* Lite mode: stop the only permanently-running animation on the page. */
 html.lite-mode .status-dot::after { animation: none; opacity: 0; }
-
-html.lite-mode .hubar-trigger-arrow svg { transition: none; }
 
 html.lite-mode .control-panel { transition: none; }

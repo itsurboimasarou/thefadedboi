@@ -72,6 +72,40 @@ export type ScannedIndexSubject = Omit<Subject, "albums"> & {
 
 export type GalleryImage = string | { full: string; thumb?: string };
 
+export type AudioFormat = "MP3" | "FLAC" | "OGG" | "WAV" | "M4A";
+
+export interface TrackMeta {
+  file: string;
+  title: string;
+  format?: AudioFormat;
+  bitrate?: number;
+  bitDepth?: number;
+  sampleRate?: number;
+}
+
+export interface Playlist {
+  slug: string;
+  title: string;
+  artist?: string;
+  folder: string;
+  cover?: string;
+  tracks: TrackMeta[];
+}
+
+export interface MusicManifest {
+  version: number;
+  playlists: Playlist[];
+}
+
+export interface Track extends TrackMeta {
+  url: string;
+}
+
+export type ScannedPlaylist = Omit<Playlist, "tracks" | "cover"> & {
+  cover?: string;
+  tracks: Track[];
+};
+
 export interface Spec { label: string; value: string }
 export interface DeviceItem {
   name: string;

@@ -813,11 +813,7 @@
   margin-top: 26px;
 }
 
-/* ── Control panel ───────────────────────────────────
-   Flies out from behind HuBar. Transform + opacity only, so the whole
-   transition is compositor work — no layout, no repaint. Base rule is the
-   Bottom-dock case (the pre-existing default); Top/Left/Right below
-   override the anchor edge and transform direction to match. */
+/* ── Control panel ─────────────────────────────────── */
 .control-panel {
   position: fixed;
   left: 0;
@@ -826,12 +822,7 @@
   translate: none;
   width: min(440px, calc(100vw - 32px));
   bottom: calc(16px + var(--hubar-h, 68px) + 14px);
-  /* Above .hubar (z-index: 60) — the panel is its own stacking context, so
-     a child's z-index (like .info-tip-bubble's) only ranks it within the
-     panel; it can never outrank a sibling context like HuBar no matter how
-     high it's set. The panel itself has to outrank HuBar for anything
-     escaping its bounds — the tooltip flies up past the panel's own box —
-     to actually paint on top of it. */
+  touch-action: pan-y;
   z-index: 65;
   padding: 14px 16px;
   border-radius: 16px;
@@ -839,10 +830,6 @@
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
 
-  /* translate only — no scale(). Scaling a box full of text and thin-stroke
-     icons makes them visibly wobble/re-snap to pixels every frame of the
-     transition; dropping it keeps the content perfectly static while the
-     panel still slides and fades in. */
   transform: translateY(24px);
   opacity: 0;
   visibility: hidden;
@@ -860,6 +847,11 @@
     transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.2s ease,
     visibility 0s;
+}
+
+.control-panel--dragging {
+  transition: none !important;
+  visibility: visible !important;
 }
 
 .panel-head {

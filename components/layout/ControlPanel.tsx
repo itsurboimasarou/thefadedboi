@@ -12,14 +12,16 @@ import AccentSetSwitch from "../controls/AccentSetSwitch";
 import LogoSwitch from "../controls/LogoSwitch";
 import StatusClock from "../widgets/StatusClock";
 import ChangelogDialog from "../content/ChangelogDialog";
+import MusicPlayer from "../widgets/MusicPlayer";
 import { home } from "@/lib/home.config";
 import { accentSets } from "@/lib/accents.config";
+import { COMPACT_MQ } from "./functions/useHuBarAutoHide";
 
 export const PANEL_EVT = "control-panel-toggle";
-export const CHANGELOG_EVT = "changelog-open";
+export const MUSIC_EVT = "music-player-toggle";
 
-export function openChangelog() {
-  window.dispatchEvent(new CustomEvent(CHANGELOG_EVT));
+export function toggleMusicPlayer() {
+  window.dispatchEvent(new CustomEvent(MUSIC_EVT));
 }
 
 export function toggleControlPanel() {
@@ -38,8 +40,29 @@ function resetAllToDefault() {
   window.location.reload();
 }
 
+type PanelView = "none" | "controls" | "player";
+
 export default function ControlPanel({ changelog }: { changelog: string }) {
-  const [open, setOpen] = useState(false);
+  const [visiblePanel, setVisiblePanel] = useState<PanelView>("none");
+  const open = visiblePanel === "controls";
+  const playerOpen = visiblePanel === "player";
+  const lastPanelRef = useRef<"controls" | "player">("controls");
+  useEffect(() => {
+    if (visiblePanel !== "none") lastPanelRef.current = visiblePanel;
+  }, [visiblePanel]);
+  const visiblePanelRef = useRef<PanelView>("none");
+  useEffect(() => { visiblePanelRef.current = visiblePanel; }, [visiblePanel]);
+
+  const [transitionKind, setTransitionKind] = useState<"vertical" | "horizontal">("vertical");
+  const navigateTo = (next: PanelView) => {
+    const current = visiblePanelRef.current;
+    const isSwitch =
+      (current === "controls" && next === "player") ||
+      (current === "player" && next === "controls");
+    setTransitionKind(isSwitch ? "horizontal" : "vertical");
+    setVisiblePanel(next);
+  };
+
   const [logOpen, setLogOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const liteOn = useLiteMode();
@@ -48,15 +71,26 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   const viewsRef = useRef<HTMLDivElement>(null);
   const mainViewRef = useRef<HTMLDivElement>(null);
   const themeViewRef = useRef<HTMLDivElement>(null);
+  const [dragProgress, setDragProgress] = useState<number | null>(null);
+  const dragMetaRef = useRef<{ x: number; y: number; width: number } | null>(null);
 
   useEffect(() => {
-    const onToggle = () => setOpen((v) => !v);
-    const onLog = () => setLogOpen(true);
+    const onToggle = () => {
+      const mobile = window.matchMedia(COMPACT_MQ).matches;
+      const current = visiblePanelRef.current;
+      const next = mobile
+        ? (current === "none" ? lastPanelRef.current : "none")
+        : (current === "controls" ? "none" : "controls");
+      navigateTo(next);
+    };
+    const onPlayerToggle = () => {
+      navigateTo(visiblePanelRef.current === "player" ? "none" : "player");
+    };
     window.addEventListener(PANEL_EVT, onToggle);
-    window.addEventListener(CHANGELOG_EVT, onLog);
+    window.addEventListener(MUSIC_EVT, onPlayerToggle);
     return () => {
       window.removeEventListener(PANEL_EVT, onToggle);
-      window.removeEventListener(CHANGELOG_EVT, onLog);
+      window.removeEventListener(MUSIC_EVT, onPlayerToggle);
     };
   }, []);
 
@@ -98,37 +132,90 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   }, [themeMenuOpen]);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("control-panel-state", { detail: open }));
-  }, [open]);
+    window.dispatchEvent(new CustomEvent("control-panel-state", { detail: visiblePanel !== "none" }));
+  }, [visiblePanel]);
 
   useEffect(() => {
-    if (!open) return;
+    if (visiblePanel === "none") return;
+    const isOutside = (t: Node) =>
+      !(t as Element).closest?.(".control-panel") &&
+      !(t as Element).closest?.(".hubar-trigger") &&
+      !(t as Element).closest?.(".status-clock") &&
+      !(t as Element).closest?.(".notice-backdrop");
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape" && !logOpen) navigateTo("none");
     };
     const onDown = (e: MouseEvent) => {
-      const t = e.target as Node;
-      if (panelRef.current?.contains(t)) return;
-      if ((t as Element).closest?.(".hubar-trigger")) return;
-      setOpen(false);
+      if (isOutside(e.target as Node)) navigateTo("none");
+    };
+    const onTouch = (e: TouchEvent) => {
+      if (isOutside(e.target as Node)) navigateTo("none");
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onTouch);
     return () => {
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onTouch);
     };
-  }, [open]);
+  }, [visiblePanel, logOpen]);
+
+  const onPanelTouchStart = (e: React.TouchEvent) => {
+    if (themeMenuOpen || playerOpen || !window.matchMedia(COMPACT_MQ).matches) return;
+    const t = e.touches[0];
+    dragMetaRef.current = {
+      x: t.clientX,
+      y: t.clientY,
+      width: panelRef.current?.getBoundingClientRect().width || 1,
+    };
+  };
+  const onPanelTouchMove = (e: React.TouchEvent) => {
+    const meta = dragMetaRef.current;
+    if (!meta) return;
+    const t = e.touches[0];
+    const dx = t.clientX - meta.x;
+    const dy = t.clientY - meta.y;
+    if (dragProgress === null && (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy) * 1.2)) return;
+    setDragProgress(Math.min(1, Math.max(0, dx / meta.width)));
+  };
+  const onPanelTouchEnd = () => {
+    dragMetaRef.current = null;
+    if (dragProgress === null) return;
+    if (dragProgress > 0.35) navigateTo("player");
+    setDragProgress(null);
+  };
+
+  const wheelLockRef = useRef(false);
+  const wheelResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onPanelWheel = (e: React.WheelEvent) => {
+    if (themeMenuOpen) return;
+    if (wheelResetRef.current) clearTimeout(wheelResetRef.current);
+    wheelResetRef.current = setTimeout(() => { wheelLockRef.current = false; }, 400);
+    if (wheelLockRef.current) return;
+    if (e.deltaX < -24 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.2) {
+      wheelLockRef.current = true;
+      navigateTo("player");
+    }
+  };
 
   return (
     <>
       <div
         id="control-panel"
         ref={panelRef}
-        className={`control-panel${open ? " control-panel--open" : ""}`}
+        className={`control-panel${open ? " control-panel--open" : ""}${dragProgress !== null ? " control-panel--dragging" : ""}${transitionKind === "horizontal" ? " panel-switching" : ""}`}
+        style={dragProgress !== null ? {
+          transform: `translateX(calc(${dragProgress * 100}% + ${dragProgress * 16}px))`,
+          opacity: 1 - dragProgress,
+        } : undefined}
         role="dialog"
         aria-label="Site controls"
         aria-hidden={!open}
+        onTouchStart={onPanelTouchStart}
+        onTouchMove={onPanelTouchMove}
+        onTouchEnd={onPanelTouchEnd}
+        onWheel={onPanelWheel}
       >
         <div className="panel-head">
           <h2 className="h-with-icon panel-title">
@@ -136,10 +223,13 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             At a glance
           </h2>
           <div className="glance-row--mobile-only">
-            <StatusClock config={home.status} onClick={openChangelog} />
+            <StatusClock
+              config={home.status}
+              onClick={() => navigateTo("player")}
+            />
           </div>
           <div className="panel-head-actions">
-            {themeMenuOpen && (
+            {themeMenuOpen ? (
               <button
                 type="button"
                 className="panel-back-btn"
@@ -148,6 +238,16 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               >
                 <Icon name="arrowLeft" size={14} />
                 Back
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="panel-back-btn"
+                onClick={() => setLogOpen(true)}
+                aria-label="Changelog"
+              >
+                <Icon name="blog" size={14} />
+                Changelog
               </button>
             )}
             <button
@@ -162,7 +262,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             <button
               type="button"
               className="panel-icon-btn"
-              onClick={() => setOpen(false)}
+              onClick={() => navigateTo("none")}
               aria-label="Close"
               title="Close"
             >
@@ -278,14 +378,27 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
 
         </dl>
 
-        <button
-          type="button"
-          className="text-btn text-btn--center"
-          onClick={() => setThemeMenuOpen(true)}
-        >
-          <Icon name="paintbrush" size={14} />
-          Customize theme
-        </button>
+        <div className="panel-quick-links">
+          <div className="glance-row--mobile-only">
+            <button
+              type="button"
+              className="text-btn"
+              onClick={() => setLogOpen(true)}
+            >
+              <Icon name="blog" size={14} />
+              Changelog
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className="text-btn"
+            onClick={() => setThemeMenuOpen(true)}
+          >
+            <Icon name="paintbrush" size={14} />
+            Customize theme
+          </button>
+        </div>
         </div>
 
         <div
@@ -327,12 +440,23 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           </button>
         </div>
         </div>
+
+        {!themeMenuOpen && (
+          <p className="panel-swipe-hint">Swipe right for music player</p>
+        )}
       </div>
 
       <ChangelogDialog
         open={logOpen}
         onClose={() => setLogOpen(false)}
         changelog={changelog}
+      />
+      <MusicPlayer
+        open={playerOpen}
+        onClose={() => navigateTo("controls")}
+        dragProgress={dragProgress}
+        setDragProgress={setDragProgress}
+        switching={transitionKind === "horizontal"}
       />
     </>
   );

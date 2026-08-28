@@ -69,11 +69,21 @@ const icons: Record<string, JSX.Element> = {
   dockRight: <svg {...p}><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M15 3v18" /><rect x="17" y="7" width="2" height="10" rx="1" fill="currentColor" stroke="none" /></svg>,
   paintbrush: <svg {...p}><path d="M17.5 3.5a2.1 2.1 0 0 1 3 3L12 15l-4-1 1-4Z" /><path d="M9.5 15.5c0 2.5-1.8 4-4.5 4-.9 0-1.5-.2-2-.5 1-.6 1-1.4 1-2.3 0-1.9 1.6-3.4 3.5-3.4.9 0 1.7.3 2 .8Z" /></svg>,
   arrowLeft: <svg {...p}><path d="M19 12H5M11 6l-6 6 6 6" /></svg>,
+  chevronDown: <svg {...p}><path d="m6 9 6 6 6-6" /></svg>,
   circleArrow: <svg {...p}><path d="M20 12a8 8 0 1 1-2.34-5.66" /><path d="M20 4.5v5h-5" /></svg>,
   close: <svg {...p}><path d="M6 6l12 12M18 6 6 18" /></svg>,
   layers: <svg {...p}><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>,
   check: <svg {...p}><path d="m5 12.5 5 5L19 7" /></svg>,
   globe: <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9Z" /></svg>,
+  music: <svg {...p}><path d="M9 18V5.5l10-2v12.5" /><circle cx="6" cy="18" r="2.6" /><circle cx="16" cy="16" r="2.6" /></svg>,
+  play: <svg {...p}><path d="M7 4.5v15l13-7.5Z" /></svg>,
+  pause: <svg {...p}><rect x="6" y="4.5" width="4" height="15" rx="1" /><rect x="14" y="4.5" width="4" height="15" rx="1" /></svg>,
+  skipBack: <svg {...p}><path d="M18 5v14l-11-7Z" /><path d="M6 5v14" /></svg>,
+  skipForward: <svg {...p}><path d="M6 5v14l11-7Z" /><path d="M18 5v14" /></svg>,
+  list: <svg {...p}><path d="M8 6h13M8 12h13M8 18h13" /><path d="M3 6h.01M3 12h.01M3 18h.01" /></svg>,
+  shuffle: <svg {...p}><path d="M16 3h5v5" /><path d="M4 20 21 3" /><path d="M21 16v5h-5" /><path d="m15 15 6 6" /><path d="m4 4 5 5" /></svg>,
+  repeat: <svg {...p}><path d="m17 2 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 22-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /></svg>,
+  repeatOne: <svg {...p}><path d="m17 2 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 22-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /><text x="12" y="15.5" fontSize="7.5" fontWeight="700" fill="currentColor" stroke="none" textAnchor="middle">1</text></svg>,
 };
 
 const specMap: ReadonlyArray<readonly [string, string]> = [

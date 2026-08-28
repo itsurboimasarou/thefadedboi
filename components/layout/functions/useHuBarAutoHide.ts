@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Dock } from "../controls/HuBarDock";
+import type { Dock } from "../../controls/HuBarDock";
 
 export const HIDE_DELAY = 600;
 export const FIRST_HIDE_DELAY = 3000;
@@ -52,13 +52,6 @@ export default function useHuBarAutoHide(
   const hiddenRef = useRef(false);
   const compactRef = useRef(false);
   const suppressDismiss = useRef(false);
-  // usePinned() (like every other persisted-setting hook here) starts at a
-  // fixed default and corrects to the real localStorage value in its own
-  // mount effect, to stay SSR-safe — so `pinned` itself changes once on
-  // load even with no user interaction at all. That correction lands
-  // within the same effects flush, well under a human's reaction time, so
-  // a short real-clock guard (not just "skip the very first render") is
-  // what actually tells it apart from a genuine click on the switch.
   const pinnedSettled = useRef(false);
 
   useEffect(() => { pinnedRef.current = pinned; }, [pinned]);

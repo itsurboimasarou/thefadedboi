@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { accentSets } from "@/lib/accents.config";
 import { useAccentSet, setAccentSetKey } from "./AccentSwitch";
+import Icon from "../ui/Icons";
 
 export default function AccentSetSwitch() {
   const set = useAccentSet();
@@ -39,9 +40,7 @@ export default function AccentSetSwitch() {
         aria-label="Theme set"
       >
         {set.label}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" width="14" height="14" aria-hidden="true">
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        <Icon name="chevronDown" size={14} />
       </button>
       {open && (
         <ul className="set-menu" role="listbox">

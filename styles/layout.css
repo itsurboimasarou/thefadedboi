@@ -185,18 +185,12 @@ html.glass-fx .hubar {
   border-radius: 8px;
   background: var(--bg);
   border: 1px solid var(--glass-border);
-  /* Without a shadow this can blend straight into a same-toned page —
-     a light-mode tooltip over a white page card was reading as almost
-     blank (border alpha is fairly low, --glass-border ~0.1 in light
-     theme). The shadow is what actually separates it from the page. */
   box-shadow: var(--shadow);
   font-size: 12.5px;
   color: var(--ink);
   white-space: nowrap;
   pointer-events: none;
   translate: 0 -50%;
-  /* No transition and no opacity fade: display toggling costs one paint,
-     whereas fading animated a layer on every hover. */
   display: none;
 }
 
@@ -210,10 +204,9 @@ html.glass-fx .hubar {
   outline-offset: 2px;
 }
 
-/* ── HuBar trigger (logo / mobile arrow) ──────────────
-   Same 44px cell as the other items. Desktop shows the logo mark; the
-   arrow only appears (and only then does it need rotation) on mobile,
-   handled in the compact media query below. */
+/* ── HuBar trigger (logo mark) ─────────────────────────
+   Same 44px cell as the other items, on desktop and mobile alike — the
+   logo mark shows in both. */
 .hubar-trigger {
   position: relative;
   width: 44px;
@@ -233,8 +226,6 @@ html.glass-fx .hubar {
   outline-offset: 2px;
 }
 .hubar-trigger--open { color: var(--accent); }
-.hubar-trigger-arrow { display: none; }
-.hubar-trigger-arrow svg { transition: rotate 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
 
 .hubar-divider {
   width: 1px;

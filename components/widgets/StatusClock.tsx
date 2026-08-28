@@ -53,8 +53,8 @@ export default function StatusClock({
       onMouseLeave={() => setHover(false)}
       onFocus={() => setHover(true)}
       onBlur={() => setHover(false)}
-      title="View changelog"
-      aria-label={`${config.labels[state]} — view changelog`}
+      title={onClick ? "Open music player" : undefined}
+      aria-label={onClick ? `${config.labels[state]} — open music player` : config.labels[state]}
     >
       <StatusDot state={state} />
       <span

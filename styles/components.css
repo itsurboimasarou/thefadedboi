@@ -410,6 +410,216 @@
   -webkit-backdrop-filter: none;
 }
 
+/* ── Music player ───────────────────────────────────── */
+.player-panel {
+  position: fixed;
+}
+
+#music-player.player-panel {
+  pointer-events: none;
+}
+#music-player.player-panel.control-panel--open {
+  pointer-events: auto;
+}
+
+.player-bg-clip {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+.player-panel > :not(.player-bg-clip) {
+  position: relative;
+  z-index: 1;
+}
+
+.player-panel > .panel-head {
+  z-index: 2;
+}
+.player-bg-cover {
+  position: absolute;
+  inset: -20px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(36px) brightness(0.4) saturate(1.2);
+}
+
+.player-now-playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  margin: 10px 0 16px;
+}
+.player-cover {
+  width: min(168px, 46vw);
+  height: min(168px, 46vw);
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  margin-bottom: 8px;
+}
+.player-cover--placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: var(--ink-dim);
+}
+.player-track-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.player-track-title--empty { color: var(--ink-dim); font-weight: 600; }
+.player-track-subtext {
+  color: var(--ink-dim);
+  font-size: 0.82rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  overflow: hidden;
+}
+.player-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: inherit;
+}
+.player-time {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  color: var(--ink-dim);
+  font-size: 0.75rem;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 14px 0 4px;
+}
+.player-play-btn {
+  width: 42px;
+  height: 42px;
+}
+.panel-icon-btn--active {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.player-album-select { position: relative; z-index: 2; }
+.player-album-caret {
+  transition: transform 0.2s ease;
+}
+.player-album-select button[aria-expanded="true"] .player-album-caret {
+  transform: rotate(180deg);
+}
+.player-album-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 5;
+  min-width: 160px;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--bg);
+  opacity: 1;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.player-album-menu-empty {
+  padding: 8px 10px;
+  color: var(--ink-dim);
+  font-size: 0.82rem;
+}
+.player-album-option {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.player-album-option:hover,
+.player-album-option:focus-visible {
+  color: var(--ink);
+  background: var(--glass);
+}
+.player-album-option--active { color: var(--accent); font-weight: 600; }
+
+.player-track-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.player-track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.player-track:hover,
+.player-track:focus-visible {
+  color: var(--ink);
+  background: var(--glass);
+}
+.player-track--active { color: var(--accent); font-weight: 600; }
+.player-track-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.player-track-album {
+  flex-shrink: 0;
+  color: var(--ink-dim);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
 .version-pill {
   color: var(--accent);
   font: inherit;
@@ -623,6 +833,20 @@
   border-top: 1px solid var(--glass-border);
 }
 
+/* Changelog (mobile-only) + Customize theme: one shared row, one shared
+   divider — replaces each button carrying its own via .text-btn--center.
+   On desktop the Changelog link is hidden (.glance-row--mobile-only), so
+   this row just holds Customize theme alone, still centered. */
+.panel-quick-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 14px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--glass-border);
+}
+
 /* ── Panel head actions (Back / Reset / Close) ───────
    Desktop only — this cluster lives top-right of "At a glance": Reset
    and Close always show, Back joins before them only while the theme
@@ -690,21 +914,15 @@
   outline-offset: 2px;
 }
 
-/* Both "At a glance" views stay mounted permanently (ControlPanel.tsx) so
-   their controls keep live state across a switch instead of re-syncing
-   from storage on every remount. They sit stacked here and slide via
-   transform, "push"/"pop" style — height is set inline by ControlPanel.tsx
-   (a ResizeObserver-driven pixel value, since the two views' natural
-   heights differ and position:absolute children can't size their parent
-   on their own), and that same transition on this wrapper is what makes
-   the height change animate alongside the slide instead of snapping.
+.panel-swipe-hint {
+  display: none;
+  margin: 10px 0 0;
+  text-align: center;
+  color: var(--ink-dim);
+  font-size: 0.72rem;
+  opacity: 0.6;
+}
 
-   No permanent overflow:hidden here — that would also clip anything
-   that's supposed to escape a view's own box, like an info-tip-bubble
-   popped open near the top of the main menu. ControlPanel.tsx instead
-   adds --sliding only for the ~0.32s the transform is actually animating,
-   just long enough to keep the horizontal push/pop contained to the
-   panel's rounded corners without clipping content at rest. */
 .panel-views {
   position: relative;
   transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
@@ -713,20 +931,6 @@
   overflow: hidden;
 }
 
-/* visibility, not overflow, is what actually keeps the inactive view from
-   showing at rest: with no permanent clip on .panel-views, a view parked
-   at translateX(-100%/100%) still has a sliver inside the viewport
-   whenever the panel itself doesn't span full-bleed (it never does — see
-   .control-panel's width) — overflow:hidden would've clipped that sliver,
-   but it'd also clip an active view's own escaping content, which is the
-   whole reason it's gone. visibility:hidden hides the inactive view
-   outright regardless of where its box lands, sidestepping that.
-   --pvs-delay holds it visible for the transition's duration while
-   sliding out, so the pop-out is seen actually happening rather than
-   vanishing on the spot; sliding in drops the delay to show it
-   immediately. Kept on a variable (not redeclaring `transition` per
-   modifier) so the reduced-motion override below only has to beat the
-   base rule's specificity, not every combination of these. */
 .panel-view-slide {
   position: absolute;
   top: 0;
@@ -736,13 +940,6 @@
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s var(--pvs-delay);
 }
 
-/* The active side uses `inherit`, never a hard `visible` — a hard value
-   here would out-rank .control-panel's own closed-state `visibility:
-   hidden` (an explicit child declaration always beats an inherited
-   ancestor one), leaving whichever view is "active" fully hit-testable —
-   and blocking clicks on whatever sits underneath — even while the panel
-   itself is supposedly closed. `inherit` defers to the panel's own current
-   visibility instead of asserting one of its own. */
 .panel-view-slide--main {
   transform: translateX(0);
   visibility: inherit;
@@ -781,8 +978,6 @@
   margin-bottom: 8px;
 }
 .theme-menu-heading .icn { color: var(--accent); opacity: 0.9; }
-/* Desktop-only size bump (matches the glance grid's own) lives in
-   modes.css now, alongside the rest of the @media rules. */
 
 .set-select-wrap {
   position: relative;
@@ -826,9 +1021,6 @@
   background: var(--bg);
   box-shadow: var(--shadow);
   animation: page-in 0.18s ease both;
-  /* Caps at a fraction of the viewport, not just a flat pixel value, so it
-     still fits (and scrolls the rest) on short screens where the panel
-     itself already takes up most of the height. */
   max-height: min(240px, 40vh);
   overflow-y: auto;
 }
@@ -850,12 +1042,6 @@
 }
 .set-option:hover { background: var(--glass-strong); }
 .set-option--on { background: var(--accent); color: var(--accent-contrast); }
-/* :hover (a class + pseudo-class) otherwise outranks --on (one class) and
-   wins the fight over `background`, leaving the selected row's own
-   accent-contrast text stranded on the plain hover fill instead of the
-   accent it was actually picked for — same fix as the option list needs
-   below (.logo-option, .accent-swatch don't hit this since neither pairs a
-   plain :hover rule against a same-specificity --on/--on class). */
 .set-option--on:hover { background: var(--accent); color: var(--accent-contrast); }
 
 .accent-grid {
@@ -884,10 +1070,6 @@
   outline-offset: 2px;
 }
 
-/* Same nametip HuBar's own nav icons use (.hubar-item .tip in layout.css) —
-   same look, just anchored above the swatch instead of beside it, since
-   these sit in a tight horizontal row where a side tip would overlap the
-   next swatch. */
 .tip--up {
   position: absolute;
   bottom: calc(100% + 10px);
@@ -909,9 +1091,6 @@
   display: block;
 }
 
-/* Last swatch in the row: same circle, but an action (reset) rather than a
-   color choice, so it gets a bare glass fill and an icon instead of a
-   gradient swatch. */
 .accent-swatch--reset {
   display: grid;
   place-items: center;
@@ -919,10 +1098,6 @@
   color: var(--ink-dim);
   transition: border-color 0.2s, transform 0.15s, color 0.2s;
 }
-/* Unlike the color swatches, this one's an action, not a preview — the
-   icon's own shape isn't rotationally symmetric (the arrowhead sits on
-   one side), so scaling it up on hover like the others made it read as
-   sliding sideways rather than just "growing." Color is feedback enough. */
 .accent-swatch--reset:hover {
   transform: none;
 }

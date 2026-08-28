@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Icon from "../ui/Icons";
-import { useCompact } from "../layout/useHuBarAutoHide";
+import { useCompact } from "../layout/functions/useHuBarAutoHide";
 
 const EVT = "hubar-dock-change";
 

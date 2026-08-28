@@ -6,10 +6,10 @@ import StatusClock from "../widgets/StatusClock";
 import LangSwitch from "../controls/LangSwitch";
 import { useDock } from "../controls/HuBarDock";
 import { usePinned } from "../controls/HuBarPinned";
-import { openChangelog } from "./ControlPanel";
+import { toggleMusicPlayer } from "./ControlPanel";
 import HuBarTrigger from "./HuBarTrigger";
-import useHuBarMeasure from "./useHuBarMeasure";
-import useHuBarAutoHide, { useCompact } from "./useHuBarAutoHide";
+import useHuBarMeasure from "./functions/useHuBarMeasure";
+import useHuBarAutoHide, { useCompact } from "./functions/useHuBarAutoHide";
 import { home } from "@/lib/home.config";
 
 interface NavItem { href: string; label: string; icon: string }
@@ -74,7 +74,7 @@ export default function HuBar() {
           ))}
         </div>
         <div className="hubar-group hubar-group--end">
-          <StatusClock config={home.status} onClick={openChangelog} />
+          <StatusClock config={home.status} onClick={toggleMusicPlayer} />
           <LangSwitch />
         </div>
       </nav>
