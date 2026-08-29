@@ -521,10 +521,10 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   aria-label="Shuffle"
                   title="Shuffle"
                 >
-                  <Icon name="shuffle" size={16} />
+                  <Icon name="shuffle" size={18} />
                 </button>
                 <button type="button" className="panel-icon-btn" onClick={() => goTo(-1)} aria-label="Previous track" title="Previous track">
-                  <Icon name="skipBack" size={16} />
+                  <Icon name="skipBack" size={18} />
                 </button>
                 <button
                   type="button"
@@ -533,10 +533,10 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   aria-label={playing ? "Pause" : "Play"}
                   title={playing ? "Pause" : "Play"}
                 >
-                  <Icon name={playing ? "pause" : "play"} size={16} />
+                  <Icon name={playing ? "pause" : "play"} size={22} />
                 </button>
                 <button type="button" className="panel-icon-btn" onClick={() => goTo(1)} aria-label="Next track" title="Next track">
-                  <Icon name="skipForward" size={16} />
+                  <Icon name="skipForward" size={18} />
                 </button>
                 <button
                   type="button"
@@ -546,7 +546,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   aria-label={repeat === "one" ? "Repeat: one track" : repeat === "all" ? "Repeat: all" : "Repeat: off"}
                   title={repeat === "one" ? "Repeat: one track" : repeat === "all" ? "Repeat: all" : "Repeat: off"}
                 >
-                  <Icon name={repeat === "one" ? "repeatOne" : "repeat"} size={16} />
+                  <Icon name={repeat === "one" ? "repeatOne" : "repeat"} size={18} />
                 </button>
               </div>
         </div>

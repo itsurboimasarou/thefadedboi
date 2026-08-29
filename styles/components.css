@@ -562,18 +562,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
   margin: 14px 0 4px;
 }
-.player-play-btn {
-  width: 42px;
-  height: 42px;
-}
-.panel-icon-btn--active {
-  color: var(--accent);
-  border-color: var(--accent);
-}
 
+.player-controls .panel-icon-btn {
+  width: 38px;
+  height: 38px;
+}
+.player-controls .panel-icon-btn .icn svg {
+  width: 18px;
+  height: 18px;
+}
+.player-controls .player-play-btn {
+  width: 54px;
+  height: 54px;
+}
+.player-controls .player-play-btn .icn svg {
+  width: 22px;
+  height: 22px;
+}
 .player-album-select {
   position: relative;
   z-index: 2;
@@ -1014,6 +1022,19 @@
 .panel-icon-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Filled, not just outlined — a lit-up pill reads as "on" at a glance for
+   shuffle/repeat, rather than relying on a subtle color-only difference.
+   Declared after :hover/:focus-visible above (same (0,1,0)/(0,2,0)
+   specificity pattern) and repeated for those two states itself so it
+   stays filled even while the pointer's over it, not just at rest. */
+.panel-icon-btn--active,
+.panel-icon-btn--active:hover,
+.panel-icon-btn--active:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
 }
 .panel-icon-btn .icn svg { width: 16px; height: 16px; }
 
