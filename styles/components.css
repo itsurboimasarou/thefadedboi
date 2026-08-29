@@ -24,8 +24,8 @@
   position: absolute;
   top: 2px;
   translate: none;
-  width: 25px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
   color: var(--ink-dim);
   display: grid;
   place-items: center;
@@ -38,6 +38,11 @@
   height: 16px;
 }
 
+/* Matches the knob's own geometry exactly (top/left 2px, 24px square,
+   translate 32px 0 when checked) so the icon box always sits flush on
+   top of wherever the knob rests — no fractional-pixel remainder from a
+   mismatched box size to round differently as the switch's ancestors
+   reposition on resize. */
 .theme-switch .track-icon--left  { left: 2px; }
 .theme-switch .track-icon--right { left: 34px; right: auto; }
 
@@ -474,32 +479,67 @@
   font-size: 1.05rem;
   color: var(--ink);
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .player-track-title--empty { color: var(--ink-dim); font-weight: 600; }
 .player-track-subtext {
   color: var(--ink-dim);
   font-size: 0.82rem;
   max-width: 100%;
+}
+
+/* ── Generic single-line autoscroll ────────────────── */
+.marquee {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.marquee.is-marquee {
+  text-overflow: clip;
+}
+.marquee.is-marquee .marquee-track {
+  display: inline-block;
+  animation: marquee-scroll 15.5s ease-in-out infinite;
+}
+@keyframes marquee-scroll {
+  0%, 15% { transform: translateX(0); }
+  45%, 55% { transform: translateX(calc(-1 * var(--marquee-dist, 0px))); }
+  85%, 100% { transform: translateX(0); }
+}
 
 .player-progress {
+  position: relative;
   height: 6px;
   border-radius: 999px;
   background: var(--glass);
   border: 1px solid var(--glass-border);
   cursor: pointer;
-  overflow: hidden;
+  touch-action: none;
 }
 .player-progress-fill {
   height: 100%;
   background: var(--accent);
   border-radius: inherit;
+  pointer-events: none;
+}
+.player-progress-knob {
+  position: absolute;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  pointer-events: none;
+}
+.player-progress:hover .player-progress-knob,
+.player-progress-knob--active {
+  opacity: 1;
+}
+.player-progress-knob--active {
+  transform: translate(-50%, -50%) scale(1.15);
 }
 .player-time {
   display: flex;
@@ -525,19 +565,58 @@
   border-color: var(--accent);
 }
 
-.player-album-select { position: relative; z-index: 2; }
+.player-album-select {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.player-album-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: none;
+  color: var(--ink-dim);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.player-album-trigger:hover,
+.player-album-trigger:focus-visible {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.player-album-trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.player-album-trigger-text {
+  display: block;
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+}
 .player-album-caret {
+  flex-shrink: 0;
   transition: transform 0.2s ease;
 }
-.player-album-select button[aria-expanded="true"] .player-album-caret {
+.player-album-trigger[aria-expanded="true"] .player-album-caret {
   transform: rotate(180deg);
 }
 .player-album-menu {
   position: absolute;
   top: calc(100% + 6px);
+  left: 0;
   right: 0;
   z-index: 5;
-  min-width: 160px;
   max-height: 240px;
   overflow-y: auto;
   margin: 0;
@@ -576,6 +655,9 @@
   background: var(--glass);
 }
 .player-album-option--active { color: var(--accent); font-weight: 600; }
+.player-album-option-text {
+  display: block;
+}
 
 .player-track-list {
   list-style: none;
@@ -609,15 +691,13 @@
 .player-track-name {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-.player-track-album {
+.player-track-duration {
   flex-shrink: 0;
   color: var(--ink-dim);
   font-size: 0.75rem;
   font-weight: 400;
+  font-variant-numeric: tabular-nums;
 }
 
 .version-pill {
@@ -859,6 +939,35 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+}
+
+/* Mobile-only volume control inside the music player's own header — on
+   desktop HuBar's own now-playing/volume cluster (NowPlaying.tsx) already
+   covers this; on mobile that cluster is hidden entirely, so the player
+   panel needs its own. Hidden by default, shown by modes.css's mobile
+   block. Sits before the list/back button (panel-head-actions renders it
+   first). */
+.player-header-volume {
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+.player-header-volume-slider {
+  width: 84px;
+  height: 4px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.player-header-volume .panel-icon-btn .icn {
+  position: relative;
+  top: -1px;
+}
+/* .panel-icon-btn .icn svg below forces every icon in one of these buttons
+   to 16px regardless of the size prop passed to <Icon> — bump it back up
+   just for the volume icon here. */
+.player-header-volume .panel-icon-btn .icn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .panel-icon-btn {

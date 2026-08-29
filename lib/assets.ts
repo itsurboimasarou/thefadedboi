@@ -142,7 +142,7 @@ export async function getManifest(): Promise<Manifest> {
 }
 
 const okTrack = (t: any): t is TrackMeta =>
-  t && typeof t.file === "string" && typeof t.title === "string";
+  t && typeof t.file === "string";
 
 function validatePlaylists(raw: any): Playlist[] {
   if (!raw || !Array.isArray(raw.playlists)) return [];

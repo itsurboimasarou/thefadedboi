@@ -2,10 +2,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import type { ScannedPlaylist, Track } from "@/lib/types";
 import { COMPACT_MQ } from "../layout/functions/useHuBarAutoHide";
+import Marquee from "../ui/Marquee";
+import { useMusicPlayback, setNowPlaying, setVolume, setMuted, initMusicPrefs } from "@/lib/musicState";
 
 interface MusicPlayerProps {
   open: boolean;
   onClose: () => void;
+  onDismiss: () => void;
   dragProgress: number | null;
   setDragProgress: (p: number | null) => void;
   switching: boolean;
@@ -39,7 +42,7 @@ function randomIndex(exclude: number, len: number): number {
   return i;
 }
 
-export default function MusicPlayer({ open, onClose, dragProgress, setDragProgress, switching }: MusicPlayerProps) {
+export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, setDragProgress, switching }: MusicPlayerProps) {
   const [playlists, setPlaylists] = useState<ScannedPlaylist[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [listOpen, setListOpen] = useState(false);
@@ -52,6 +55,10 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
   const [duration, setDuration] = useState(0);
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState<RepeatMode>("off");
+  const [scrubbing, setScrubbing] = useState(false);
+  const [dragTime, setDragTime] = useState(0);
+
+  const { volume, muted } = useMusicPlayback();
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -59,7 +66,10 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
   const viewsRef = useRef<HTMLDivElement>(null);
   const playerViewRef = useRef<HTMLDivElement>(null);
   const listViewRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const dragMetaRef = useRef<{ x: number; y: number; width: number } | null>(null);
+  const durationRef = useRef(0);
+  useEffect(() => { durationRef.current = duration; }, [duration]);
 
   useLayoutEffect(() => {
     if (open) setListOpen(false);
@@ -111,6 +121,36 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
   }, [playing, current]);
 
   useEffect(() => { setProgress(0); }, [current?.url]);
+
+  useEffect(() => { initMusicPrefs(); }, []);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    if (el) el.volume = volume;
+  }, [volume]);
+  useEffect(() => {
+    const el = audioRef.current;
+    if (el) el.muted = muted;
+  }, [muted]);
+
+  useEffect(() => {
+    setNowPlaying({
+      title: current?.title ?? null,
+      artist: (current?.artist ?? currentPlaylist?.artist) ?? null,
+      albumTitle: currentPlaylist?.title ?? null,
+      cover: currentPlaylist?.cover ?? null,
+      playing: playing && !!current,
+    });
+  }, [
+    current?.file,
+    current?.title,
+    current?.artist,
+    currentPlaylist?.slug,
+    currentPlaylist?.title,
+    currentPlaylist?.artist,
+    currentPlaylist?.cover,
+    playing,
+  ]);
 
   useLayoutEffect(() => {
     setSliding(true);
@@ -180,14 +220,65 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
     setListOpen(false);
   };
 
-  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = audioRef.current;
-    if (!el || !duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
-    el.currentTime = ratio * duration;
-    setProgress(el.currentTime);
+  const ratioFromClientX = (clientX: number) => {
+    const el = progressRef.current;
+    if (!el) return 0;
+    const rect = el.getBoundingClientRect();
+    return Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
   };
+
+  const beginScrub = (clientX: number) => {
+    if (!durationRef.current) return;
+    setDragTime(ratioFromClientX(clientX) * durationRef.current);
+    setScrubbing(true);
+  };
+
+  const finishScrub = () => {
+    setScrubbing(false);
+    setDragTime((t) => {
+      const el = audioRef.current;
+      if (el) el.currentTime = t;
+      setProgress(t);
+      return t;
+    });
+  };
+
+  useEffect(() => {
+    if (!scrubbing) return;
+    const onMouseMove = (e: MouseEvent) =>
+      setDragTime(ratioFromClientX(e.clientX) * durationRef.current);
+    const onMouseUp = (e: MouseEvent) => {
+      setDragTime(ratioFromClientX(e.clientX) * durationRef.current);
+      finishScrub();
+    };
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [scrubbing]);
+
+  const onProgressMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    beginScrub(e.clientX);
+  };
+  const onProgressTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    beginScrub(e.touches[0].clientX);
+  };
+  const onProgressTouchMove = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    if (!scrubbing) return;
+    setDragTime(ratioFromClientX(e.touches[0].clientX) * durationRef.current);
+  };
+  const onProgressTouchEnd = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    finishScrub();
+  };
+
+  const displayProgress = scrubbing ? dragTime : progress;
 
   const cycleRepeat = () =>
     setRepeat((r) => (r === "off" ? "all" : r === "all" ? "one" : "off"));
@@ -225,6 +316,42 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
     setDragProgress(null);
   };
 
+  const dragProgressRef = useRef<number | null>(null);
+  useEffect(() => { dragProgressRef.current = dragProgress; }, [dragProgress]);
+  const [mouseDragging, setMouseDragging] = useState(false);
+  const onPanelMouseDown = (e: React.MouseEvent) => {
+    if (!open || !window.matchMedia(COMPACT_MQ).matches) return;
+    dragMetaRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      width: panelRef.current?.getBoundingClientRect().width || 1,
+    };
+    setMouseDragging(true);
+  };
+  useEffect(() => {
+    if (!mouseDragging) return;
+    const onMove = (e: MouseEvent) => {
+      const meta = dragMetaRef.current;
+      if (!meta) return;
+      const dx = e.clientX - meta.x;
+      const dy = e.clientY - meta.y;
+      if (dragProgressRef.current === null && (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy) * 1.2)) return;
+      setDragProgress(Math.min(1, Math.max(0, 1 + dx / meta.width)));
+    };
+    const onUp = () => {
+      dragMetaRef.current = null;
+      setMouseDragging(false);
+      if (dragProgressRef.current !== null && dragProgressRef.current < 0.65) onClose();
+      setDragProgress(null);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [mouseDragging]);
+
   const wheelLockRef = useRef(false);
   const wheelResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onPanelWheel = (e: React.WheelEvent) => {
@@ -253,6 +380,7 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
       onTouchStart={onPanelTouchStart}
       onTouchMove={onPanelTouchMove}
       onTouchEnd={onPanelTouchEnd}
+      onMouseDown={onPanelMouseDown}
       onWheel={onPanelWheel}
     >
       <div className="player-bg-clip" aria-hidden="true">
@@ -270,62 +398,42 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
           Music
         </h2>
         <div className="panel-head-actions">
+          <div className="player-header-volume">
+            <button
+              type="button"
+              className="panel-icon-btn"
+              onClick={() => setMuted(!muted)}
+              aria-pressed={muted}
+              aria-label={muted || volume === 0 ? "Unmute" : "Mute"}
+              title={muted || volume === 0 ? "Unmute" : "Mute"}
+            >
+              <Icon name={muted || volume === 0 ? "volumeMute" : "volumeHigh"} size={18} />
+            </button>
+            <input
+              type="range"
+              className="player-header-volume-slider"
+              min={0}
+              max={100}
+              value={Math.round((muted ? 0 : volume) * 100)}
+              onChange={(e) => {
+                const v = Number(e.target.value) / 100;
+                setVolume(v);
+                if (muted && v > 0) setMuted(false);
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              aria-label="Volume"
+            />
+          </div>
           {listOpen ? (
-            <>
-              <button
-                type="button"
-                className="panel-icon-btn"
-                onClick={() => setListOpen(false)}
-                aria-label="Back to player"
-                title="Back to player"
-              >
-                <Icon name="arrowLeft" size={16} />
-              </button>
-              <div className="player-album-select" ref={albumSelectRef}>
-                <button
-                  type="button"
-                  className="panel-back-btn"
-                  onClick={() => setAlbumMenuOpen((v) => !v)}
-                  aria-haspopup="listbox"
-                  aria-expanded={albumMenuOpen}
-                >
-                  {selectionLabel}
-                  <Icon name="chevronDown" size={12} className="player-album-caret" />
-                </button>
-                {albumMenuOpen && (
-                  <ul className="player-album-menu" role="listbox">
-                    {!playlists || playlists.length === 0 ? (
-                      <li className="player-album-menu-empty">No albums available.</li>
-                    ) : (
-                      <>
-                        {totalTracks > 0 && (
-                          <li>
-                            <button
-                              type="button"
-                              className={`player-album-option${queueMode === "all" ? " player-album-option--active" : ""}`}
-                              onClick={() => selectQueue("all")}
-                            >
-                              All tracks
-                            </button>
-                          </li>
-                        )}
-                        {playlists.map((pl, i) => (
-                          <li key={pl.slug}>
-                            <button
-                              type="button"
-                              className={`player-album-option${queueMode === i ? " player-album-option--active" : ""}`}
-                              onClick={() => selectQueue(i)}
-                            >
-                              {pl.title}
-                            </button>
-                          </li>
-                        ))}
-                      </>
-                    )}
-                  </ul>
-                )}
-              </div>
-            </>
+            <button
+              type="button"
+              className="panel-back-btn"
+              onClick={() => setListOpen(false)}
+              aria-label="Back"
+            >
+              <Icon name="arrowLeft" size={14} />
+              Back
+            </button>
           ) : (
             <button
               type="button"
@@ -340,7 +448,7 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
           <button
             type="button"
             className="panel-icon-btn player-close-btn"
-            onClick={onClose}
+            onClick={onDismiss}
             aria-label="Close"
             title="Close"
           >
@@ -367,25 +475,40 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
                     <Icon name="music" size={28} />
                   </span>
                 )}
-                <p className={`player-track-title${!current ? " player-track-title--empty" : ""}`}>
+                <Marquee
+                  as="p"
+                  className={`player-track-title${!current ? " player-track-title--empty" : ""}`}
+                >
                   {current ? current.title : "No current playing track"}
-                </p>
+                </Marquee>
                 {current && (
-                  <p className="player-track-subtext">
-                    {currentPlaylist?.title}
-                    {formatQuality(current) ? ` • ${formatQuality(current)}` : ""}
-                  </p>
+                  <Marquee as="p" className="player-track-subtext">
+                    {[current.artist ?? currentPlaylist?.artist, currentPlaylist?.title, formatQuality(current)]
+                      .filter(Boolean)
+                      .join(" • ")}
+                  </Marquee>
                 )}
               </div>
 
-              <div className="player-progress" onClick={seek}>
+              <div
+                className="player-progress"
+                ref={progressRef}
+                onMouseDown={onProgressMouseDown}
+                onTouchStart={onProgressTouchStart}
+                onTouchMove={onProgressTouchMove}
+                onTouchEnd={onProgressTouchEnd}
+              >
                 <div
                   className="player-progress-fill"
-                  style={{ width: duration ? `${(progress / duration) * 100}%` : "0%" }}
+                  style={{ width: duration ? `${(displayProgress / duration) * 100}%` : "0%" }}
+                />
+                <div
+                  className={`player-progress-knob${scrubbing ? " player-progress-knob--active" : ""}`}
+                  style={{ left: duration ? `${(displayProgress / duration) * 100}%` : "0%" }}
                 />
               </div>
               <div className="player-time">
-                <span>{formatTime(progress)}</span>
+                <span>{formatTime(displayProgress)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
 
@@ -433,11 +556,54 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
           ref={listViewRef}
           aria-hidden={!listOpen}
         >
+          <div className="player-album-select" ref={albumSelectRef}>
+            <button
+              type="button"
+              className="player-album-trigger"
+              onClick={() => setAlbumMenuOpen((v) => !v)}
+              aria-haspopup="listbox"
+              aria-expanded={albumMenuOpen}
+            >
+              <Marquee className="player-album-trigger-text">{selectionLabel}</Marquee>
+              <Icon name="chevronDown" size={12} className="player-album-caret" />
+            </button>
+            {albumMenuOpen && (
+              <ul className="player-album-menu" role="listbox">
+                {!playlists || playlists.length === 0 ? (
+                  <li className="player-album-menu-empty">No albums available.</li>
+                ) : (
+                  <>
+                    {totalTracks > 0 && (
+                      <li>
+                        <button
+                          type="button"
+                          className={`player-album-option${queueMode === "all" ? " player-album-option--active" : ""}`}
+                          onClick={() => selectQueue("all")}
+                        >
+                          <Marquee className="player-album-option-text">All tracks</Marquee>
+                        </button>
+                      </li>
+                    )}
+                    {playlists.map((pl, i) => (
+                      <li key={pl.slug}>
+                        <button
+                          type="button"
+                          className={`player-album-option${queueMode === i ? " player-album-option--active" : ""}`}
+                          onClick={() => selectQueue(i)}
+                        >
+                          <Marquee className="player-album-option-text">{pl.title}</Marquee>
+                        </button>
+                      </li>
+                    ))}
+                  </>
+                )}
+              </ul>
+            )}
+          </div>
+
           {queueItems.length === 0 ? (
             <p className="album-empty">
-              {playlists.length === 0
-                ? (loadError ? "Couldn't load tracks — try again later." : "No albums available.")
-                : "Tracks to be added."}
+              {loadError ? "Couldn't load tracks — try again later." : "No tracks available."}
             </p>
           ) : (
             <ul className="player-track-list">
@@ -449,9 +615,9 @@ export default function MusicPlayer({ open, onClose, dragProgress, setDragProgre
                     onClick={() => playTrackAt(i)}
                   >
                     <Icon name={activeTrack === i && playing ? "pause" : "play"} size={13} />
-                    <span className="player-track-name">{t.title}</span>
-                    {queueMode === "all" && (
-                      <span className="player-track-album">{playlists[t.playlistIdx]?.title}</span>
+                    <Marquee className="player-track-name">{t.title}</Marquee>
+                    {Number.isFinite(t.duration) && (
+                      <span className="player-track-duration">{formatTime(t.duration as number)}</span>
                     )}
                   </button>
                 </li>

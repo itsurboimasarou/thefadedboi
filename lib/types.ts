@@ -76,11 +76,13 @@ export type AudioFormat = "MP3" | "FLAC" | "OGG" | "WAV" | "M4A";
 
 export interface TrackMeta {
   file: string;
-  title: string;
+  title?: string;
+  artist?: string;
   format?: AudioFormat;
   bitrate?: number;
   bitDepth?: number;
   sampleRate?: number;
+  duration?: number;
 }
 
 export interface Playlist {
@@ -97,7 +99,8 @@ export interface MusicManifest {
   playlists: Playlist[];
 }
 
-export interface Track extends TrackMeta {
+export interface Track extends Omit<TrackMeta, "title"> {
+  title: string;
   url: string;
 }
 

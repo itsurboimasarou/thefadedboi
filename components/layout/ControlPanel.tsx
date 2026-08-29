@@ -73,6 +73,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   const themeViewRef = useRef<HTMLDivElement>(null);
   const [dragProgress, setDragProgress] = useState<number | null>(null);
   const dragMetaRef = useRef<{ x: number; y: number; width: number } | null>(null);
+  const dragProgressRef = useRef<number | null>(null);
+  useEffect(() => { dragProgressRef.current = dragProgress; }, [dragProgress]);
 
   useEffect(() => {
     const onToggle = () => {
@@ -141,6 +143,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
       !(t as Element).closest?.(".control-panel") &&
       !(t as Element).closest?.(".hubar-trigger") &&
       !(t as Element).closest?.(".status-clock") &&
+      !(t as Element).closest?.(".hubar-nowplaying-group") &&
       !(t as Element).closest?.(".notice-backdrop");
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !logOpen) navigateTo("none");
@@ -186,6 +189,40 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
     setDragProgress(null);
   };
 
+  const [mouseDragging, setMouseDragging] = useState(false);
+  const onPanelMouseDown = (e: React.MouseEvent) => {
+    if (themeMenuOpen || playerOpen || !window.matchMedia(COMPACT_MQ).matches) return;
+    dragMetaRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      width: panelRef.current?.getBoundingClientRect().width || 1,
+    };
+    setMouseDragging(true);
+  };
+  useEffect(() => {
+    if (!mouseDragging) return;
+    const onMove = (e: MouseEvent) => {
+      const meta = dragMetaRef.current;
+      if (!meta) return;
+      const dx = e.clientX - meta.x;
+      const dy = e.clientY - meta.y;
+      if (dragProgressRef.current === null && (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy) * 1.2)) return;
+      setDragProgress(Math.min(1, Math.max(0, dx / meta.width)));
+    };
+    const onUp = () => {
+      dragMetaRef.current = null;
+      setMouseDragging(false);
+      if (dragProgressRef.current !== null && dragProgressRef.current > 0.35) navigateTo("player");
+      setDragProgress(null);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [mouseDragging]);
+
   const wheelLockRef = useRef(false);
   const wheelResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onPanelWheel = (e: React.WheelEvent) => {
@@ -215,6 +252,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         onTouchStart={onPanelTouchStart}
         onTouchMove={onPanelTouchMove}
         onTouchEnd={onPanelTouchEnd}
+        onMouseDown={onPanelMouseDown}
         onWheel={onPanelWheel}
       >
         <div className="panel-head">
@@ -454,6 +492,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
       <MusicPlayer
         open={playerOpen}
         onClose={() => navigateTo("controls")}
+        onDismiss={() => navigateTo("none")}
         dragProgress={dragProgress}
         setDragProgress={setDragProgress}
         switching={transitionKind === "horizontal"}

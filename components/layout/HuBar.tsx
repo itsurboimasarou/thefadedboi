@@ -3,10 +3,10 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import StatusClock from "../widgets/StatusClock";
+import NowPlaying from "../widgets/NowPlaying";
 import LangSwitch from "../controls/LangSwitch";
 import { useDock } from "../controls/HuBarDock";
 import { usePinned } from "../controls/HuBarPinned";
-import { toggleMusicPlayer } from "./ControlPanel";
 import HuBarTrigger from "./HuBarTrigger";
 import useHuBarMeasure from "./functions/useHuBarMeasure";
 import useHuBarAutoHide, { useCompact } from "./functions/useHuBarAutoHide";
@@ -74,7 +74,8 @@ export default function HuBar() {
           ))}
         </div>
         <div className="hubar-group hubar-group--end">
-          <StatusClock config={home.status} onClick={toggleMusicPlayer} />
+          <NowPlaying />
+          <StatusClock config={home.status} />
           <LangSwitch />
         </div>
       </nav>

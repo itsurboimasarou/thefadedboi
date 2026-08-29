@@ -30,42 +30,59 @@
      needed (that's what the old unconditional .nav-rail rule here had to
      do, back when NavRail always rendered its own dock class regardless of
      viewport). */
-  /* layout.css's width: min(760px, calc(100vw - 48px)) only shrinks with a
-     narrow viewport — it does nothing for the other half of this query's
-     condition, a short-but-wide landscape phone (max-height: 600px can
-     match at any width), where the bar was ballooning out toward 760px.
-     This caps both axes outright so the bar never exceeds a fixed size in
-     compact mode, landscape or portrait, and never shrinks past a floor
+  /* layout.css's desktop width (fit-content, so the bar grows/shrinks with
+     its content) would be circular here: the icon-sizing formula below
+     measures the bar's own inline-size via cqw, but fit-content would need
+     to know the icons' size first to size itself — an unresolvable loop
+     that left the trigger/icons chopped and the bar stuck. Mobile only
+     shows the fixed nav-icon cluster (no now-playing/volume to grow for),
+     so it doesn't need fit-content at all — an explicit viewport-based
+     width breaks the loop, clamped so it never exceeds a fixed size in
+     compact mode (landscape or portrait) and never shrinks past a floor
      either. container-type turns the bar itself into the reference box for
-     the cell/icon sizing below, so they track its real rendered width (already
-     clamped to this min/max) instead of a separate, easy-to-desync vw formula. */
+     the cell/icon sizing below, so they track its real rendered width
+     (already resolved above, no longer circular) instead of a separate,
+     easy-to-desync vw formula. */
   .hubar--top,
   .hubar--bottom {
+    width: min(385px, calc(100vw - 32px));
     min-width: 301px;
     min-height: 51px;
     max-width: 385px;
     max-height: 62px;
     container-type: inline-size;
   }
+  /* Centered via left/right + margin-inline: auto (not left: 50% +
+     translate: -50%) — a percentage translate is relative to the element's
+     OWN resolved width, so it silently recomputes whenever that width
+     changes (icons settling into their cqw-based size, a viewport resize,
+     etc.), and since .hubar transitions translate for the hide/reveal
+     slide, that recompute got smoothly animated too — the bar (and with it
+     the logo) visibly creeping into place instead of just being centered.
+     margin-inline: auto doesn't depend on the element's own width via a
+     transform, so it never touches that transition; translate is now only
+     ever set for the actual hide/reveal offset below. */
   .hubar--top {
     top: 16px;
-    left: 50%;
-    translate: -50% 0;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
     padding: 8px 10px;
   }
   .hubar--top.hubar--hidden {
-    translate: -50% calc(-100% - 7px);
+    translate: 0 calc(-100% - 7px);
     opacity: 0.6;
   }
   .hubar--bottom {
     top: auto;
     bottom: 16px;
-    left: 50%;
-    translate: -50% 0;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
     padding: 8px 10px;
   }
   .hubar--bottom.hubar--hidden {
-    translate: -50% calc(100% + 6px);
+    translate: 0 calc(100% + 6px);
     opacity: 0.6;
   }
 
@@ -242,14 +259,13 @@
   .panel-head-actions { display: none; }
   .player-panel .panel-head-actions { display: flex; }
   .player-close-btn { display: none; }
+  .player-header-volume { display: flex; }
 
   .page-loader { top: auto; bottom: 96px; left: 50%; right: auto; }
   .album-cards { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
 
   .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
 
-  .theme-switch .track-icon--left { top: 1px; left: 2px }
-  .theme-switch .track-icon--right { top: 1px; left: 34px }
   .lang-switch .track-icon--left { top: 2px; left: 3px }
   .lang-switch .track-icon--right { top: 2px; left: 37px }
 
@@ -298,43 +314,51 @@
 }
 
 @media (min-width: 721px) and (min-height: 601px) {
+  /* See the matching mobile block's comment above — margin-inline/block:
+     auto centers without a width/height-relative translate, so a resize
+     (now-playing/volume appearing, icons settling, etc.) can't smoothly
+     re-animate the base position through the hide/reveal transition. */
   .hubar--top {
     top: 16px;
-    left: 50%;
-    translate: -50% 0;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
   }
   .hubar--top.hubar--hidden {
-    translate: -50% calc(-100% - 7px);
+    translate: 0 calc(-100% - 7px);
     opacity: 0.6;
   }
 
   .hubar--bottom {
-    left: 50%;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
     bottom: 16px;
-    translate: -50% 0;
   }
   .hubar--bottom.hubar--hidden {
-    translate: -50% calc(100% + 6px);
+    translate: 0 calc(100% + 6px);
     opacity: 0.6;
   }
 
   .hubar--left {
     left: 16px;
-    top: 50%;
-    translate: 0 -50%;
+    top: 0;
+    bottom: 0;
+    margin-block: auto;
   }
   .hubar--left.hubar--hidden {
-    translate: calc(-100% - 7px) -50%;
+    translate: calc(-100% - 7px) 0;
     opacity: 0.6;
   }
 
   .hubar--right {
     right: 16px;
-    top: 50%;
-    translate: 0 -50%;
+    top: 0;
+    bottom: 0;
+    margin-block: auto;
   }
   .hubar--right.hubar--hidden {
-    translate: calc(100% + 7px) -50%;
+    translate: calc(100% + 7px) 0;
     opacity: 0.6;
   }
 
@@ -458,6 +482,60 @@
   .hubar--right .lang-switch[aria-checked="true"] .knob {
     translate: 0 34px;
   }
+
+  /* Left/Right: the 62px vertical capsule has no room for a marquee title
+     row, so now-playing collapses to an icon-only circle (matching the
+     other 44px hubar-item cells) and the volume slider turns vertical. */
+  .hubar--left .hubar-nowplaying-group,
+  .hubar--right .hubar-nowplaying-group {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hubar--left .hubar-nowplaying,
+  .hubar--right .hubar-nowplaying {
+    width: 44px;
+    height: 44px;
+    max-width: none;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .hubar--left .hubar-nowplaying-text,
+  .hubar--right .hubar-nowplaying-text {
+    display: none;
+  }
+  .hubar--left .hubar-volume,
+  .hubar--right .hubar-volume {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hubar--left .hubar-volume-slider,
+  .hubar--right .hubar-volume-slider {
+    width: 4px;
+    height: 64px;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    -webkit-appearance: slider-vertical;
+    -moz-orient: vertical;
+  }
+}
+
+/* Volume needs real width on top of the nav items, StatusClock and
+   LangSwitch already in the end group. Below this the fixed-width
+   Top/Bottom bar (now sized to its content, see layout.css) can genuinely
+   run out of room, so just the volume slider steps aside rather than
+   overflowing the pill — this only matters in the narrow band just above
+   the mobile breakpoint; anything wider fits it naturally. The now-playing
+   button itself (opens the player) stays put — it's the one thing in this
+   cluster that's still useful at this width and has no other way in from
+   HuBar once StatusClock is unlinked from the player.
+   Losing HuBar's volume control here would otherwise leave no way to
+   adjust it between this width and the true mobile breakpoint (720px),
+   where the player panel's own volume control (below) picks it back up —
+   so that one's shown across this same width, not just true mobile. */
+@media (max-width: 860px) {
+  .hubar-volume { display: none; }
+  .player-header-volume { display: flex; }
 }
 
 @media (min-width: 721px) {

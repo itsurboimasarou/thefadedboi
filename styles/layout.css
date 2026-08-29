@@ -22,23 +22,8 @@
   overflow-x: clip;
 }
 
-/* HuBar reserves space only on whichever side it's actually docked to —
-   unlike the old topbar+nav-rail pair (always both mounted, so top AND
-   bottom padding were both always reserved), HuBar is one bar in one spot
-   at a time. Unconditional (not gated to a viewport range) since Top is
-   also the mobile default and --hubar-h is the live measured height at
-   whatever size the bar renders. */
 .app-root:has(.hubar--top) .main { padding-top: calc(16px + var(--hubar-h, 68px) + 16px); }
-/* A bit more clearance on other pages specifically — home's hero is
-   bottom-anchored inside a fixed-height viewport (html.no-scroll), so
-   extra top padding there would eat into its own vertical space rather
-   than just adding a gap; everywhere else it's pure breathing room. */
 html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px + var(--hubar-h, 68px) + 32px); }
-/* Bottom is pin-gated (only reserved when auto-hide is off) on desktop
-   below, matching the old nav-rail's behavior; on mobile the compact
-   override keeps the bar effectively always-visible regardless of pinned
-   state, so it's reserved unconditionally there instead — see modes.css's
-   mobile block for that override. */
 
 @keyframes page-in {
   from {
@@ -59,23 +44,15 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
 /* ── Logo mark ──────────────────────────────────────── */
 .logo-mark {
   display: block;
-  width: 40px;
-  height: 40px;
+  width: 90.9%;
+  height: 90.9%;
   background-image: var(--logo-custom, url("../public/logo-light.png"));
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-/* ── HuBar ──────────────────────────────────────────────
-   One floating bar, four dock positions. Shape is a rounded rectangle
-   (not the old full-pill capsule) with a thin accent-tinted border.
-
-   Three states, no scroll-dependent fourth one: a soft low-opacity tint
-   by default (every dock, not just Top — plain var(--bg) so it's already
-   theme-correct without a light/dark override), a stronger surface when
-   Glass Effect is on (border/shadow here; background/blur are JS inline
-   — see GlassMode.tsx), or solid when Lite mode is on (modes.css). */
+/* ── HuBar ────────────────────────────────────────────── */
 .hubar {
   position: fixed;
   z-index: 60;
@@ -92,22 +69,10 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
 }
 
-/* Glass's own border already carries the separation (see comment at the
-   top of this file), so the shadow — meant for the flat default surface —
-   is redundant once the blur is on. */
 html.glass-fx .hubar {
   box-shadow: none;
 }
 
-/* .control-panel sits above .hubar (z-index 65 vs 60, in pages.css) so its
-   own info-tips can escape its box without getting clipped by the bar.
-   But a page-name tooltip lives INSIDE .hubar, nested in .hubar's own
-   stacking context — no z-index on the tooltip itself can ever outrank a
-   sibling context like the panel, only .hubar as a whole can. Bumping
-   .hubar's z-index outright would just flip which one wins in general and
-   re-break the panel's tooltips, so this only applies while a HuBar
-   tooltip is actually showing (hover/focus), leaving the normal case
-   (panel above bar) intact the rest of the time. */
 .hubar:has(.hubar-item:hover),
 .hubar:has(.hubar-item:focus-visible) {
   z-index: 70;
@@ -119,13 +84,13 @@ html.glass-fx .hubar {
   gap: 6px;
 }
 
-/* Top/Bottom: horizontal island, groups sit at opposite ends. */
 .hubar--top,
 .hubar--bottom {
   flex-direction: row;
-  width: min(760px, calc(100vw - 48px));
+  width: fit-content;
+  max-width: calc(100vw - 48px);
   padding: 6px 12px;
-  justify-content: space-between;
+  gap: 28px;
 }
 .hubar--top .hubar-group,
 .hubar--bottom .hubar-group {
@@ -239,6 +204,117 @@ html.glass-fx .hubar {
   width: 26px;
   height: 1px;
   margin: 4px 0;
+}
+
+/* ── Now-playing + volume (top/bottom HuBar only) ─────
+   Compact by default — long titles rely on .marquee (hover/focus) rather
+   than expanding the bar. Hidden on narrow desktop widths and on the
+   Left/Right vertical docks (min-width gate + dock exclusion live in
+   modes.css) since the fixed-width bar has no room to spare there. */
+.hubar-nowplaying-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hubar-nowplaying {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 160px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink-dim);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.hubar-nowplaying:hover,
+.hubar-nowplaying:focus-visible {
+  color: var(--ink);
+  background: var(--glass);
+}
+.hubar-nowplaying:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* No track loaded yet — a bare icon circle so it still reads as "music
+   lives here", matching .hubar-volume-btn's shape instead of the
+   text-carrying pill. */
+.hubar-nowplaying--idle {
+  width: 32px;
+  height: 32px;
+  max-width: none;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+}
+.hubar-nowplaying-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--ink-dim);
+}
+.hubar-nowplaying-icon--playing {
+  color: var(--accent);
+  animation: nowplaying-pulse 1.6s ease-in-out infinite;
+}
+@keyframes nowplaying-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.hubar-nowplaying-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.hubar-nowplaying-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.hubar-nowplaying-subtitle {
+  font-size: 0.68rem;
+  color: var(--ink-dim);
+}
+
+.hubar-volume {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hubar-volume-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.hubar-volume-btn:hover,
+.hubar-volume-btn:focus-visible {
+  color: var(--ink);
+  background: var(--glass);
+}
+.hubar-volume-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.hubar-volume-btn .icn {
+  position: relative;
+  top: -1px;
+}
+.hubar-volume-slider {
+  width: 64px;
+  height: 4px;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
 /* Desktop dock positioning/tooltips, hotzones, and the Left/Right vertical
