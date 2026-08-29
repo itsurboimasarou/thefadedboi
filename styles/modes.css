@@ -3,7 +3,7 @@
    Load LAST — these must win the cascade by order. */
 
 /* ── Mobile ─────────────────────────────────────────── */
-@media (max-width: 720px), (max-height: 600px) {
+@media (max-width: 798px), (max-height: 600px) {
   html {
     font-size: 15px;
   }
@@ -86,6 +86,8 @@
   .panel-head .glance-row--mobile-only { display: flex; align-items: center; }
 
   .panel-swipe-hint { display: block; }
+
+  .panel-indicator { display: flex; }
 
   /* Mobile-only, and only while .panel-switching is present (both add it —
      see `switching` in ControlPanel.tsx/MusicPlayer.tsx — for exactly the
@@ -175,7 +177,12 @@
   .album-cards { grid-template-columns: repeat(3, 1fr); }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 798px) {
+  /* HuBar never actually auto-hides on mobile regardless of this setting
+     — useHuBarAutoHide's schedule() bails out early whenever compact is
+     true — so the toggle has nothing to control here. */
+  .glance-row--autohide { display: none; }
+
   .btn--download .btn-label { display: none; }
   .btn--download {
     padding: 8px;
@@ -184,10 +191,10 @@
   }
 
   .app-root:has(.hubar--bottom) .control-panel.control-panel {
-    bottom: calc(16px + var(--hubar-h, 68px) + 16px);
+    bottom: calc(16px + var(--hubar-h, 68px) + 52px);
   }
   .app-root:has(.hubar--top) .control-panel.control-panel {
-    top: calc(16px + var(--hubar-h, 68px) + 16px);
+    top: calc(16px + var(--hubar-h, 68px) + 52px);
     bottom: auto;
     transform: translateY(-24px) scale(0.98);
     transform-origin: top center;
@@ -252,7 +259,7 @@
   html.lite-mode .main { transition: none; }
 }
 
-@media (min-width: 721px) and (min-height: 601px) {
+@media (min-width: 799px) and (min-height: 601px) {
 
   .hubar--top {
     top: 16px;
@@ -459,15 +466,15 @@
    cluster that's still useful at this width and has no other way in from
    HuBar once StatusClock is unlinked from the player.
    Losing HuBar's volume control here would otherwise leave no way to
-   adjust it between this width and the true mobile breakpoint (720px),
+   adjust it between this width and the true mobile breakpoint (798px),
    where the player panel's own volume control (below) picks it back up —
    so that one's shown across this same width, not just true mobile. */
-@media (max-width: 860px) {
+@media (max-width: 904px) {
   .hubar-volume { display: none; }
   .player-header-volume { display: flex; }
 }
 
-@media (min-width: 721px) {
+@media (min-width: 799px) {
   .theme-menu-back-mobile { display: none; }
 
   .theme-menu-heading {

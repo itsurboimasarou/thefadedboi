@@ -144,6 +144,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
       !(t as Element).closest?.(".hubar-trigger") &&
       !(t as Element).closest?.(".status-clock") &&
       !(t as Element).closest?.(".hubar-nowplaying-group") &&
+      !(t as Element).closest?.(".panel-indicator") &&
       !(t as Element).closest?.(".notice-backdrop");
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !logOpen) navigateTo("none");
@@ -377,7 +378,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dd>
           </div>
 
-          <div>
+          <div className="glance-row--autohide">
             <dt>
               <Icon name="thumbtack" size={15} />
               Auto-hide
@@ -497,6 +498,35 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         setDragProgress={setDragProgress}
         switching={transitionKind === "horizontal"}
       />
+
+      <div
+        className={`panel-indicator${visiblePanel !== "none" ? " panel-indicator--visible" : ""}`}
+        role="tablist"
+        aria-label="Active panel"
+      >
+        <button
+          type="button"
+          role="tab"
+          className={`panel-indicator-btn${playerOpen ? " panel-indicator-btn--active" : ""}`}
+          onClick={() => navigateTo("player")}
+          aria-selected={playerOpen}
+          aria-label="Music player"
+          title="Music player"
+        >
+          <Icon name="music" size={15} />
+        </button>
+        <button
+          type="button"
+          role="tab"
+          className={`panel-indicator-btn${open ? " panel-indicator-btn--active" : ""}`}
+          onClick={() => navigateTo("controls")}
+          aria-selected={open}
+          aria-label="Site controls"
+          title="Site controls"
+        >
+          <Icon name="spark" size={15} />
+        </button>
+      </div>
     </>
   );
 }

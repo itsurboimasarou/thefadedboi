@@ -899,3 +899,71 @@
 .app-root:has(.hubar--top) .control-panel--open {
   transform: translateY(0);
 }
+
+/* ── Panel indicator (music/controls tab dots, for mobile only) ─────── */
+.panel-indicator {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  bottom: calc(16px + var(--hubar-h, 68px) + 11px);
+  z-index: 64;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.22s;
+}
+.panel-indicator--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition:
+    opacity 0.22s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
+}
+.app-root:has(.hubar--top) .panel-indicator {
+  bottom: auto;
+  top: calc(16px + var(--hubar-h, 68px) + 11px);
+}
+
+.panel-indicator-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  color: var(--ink-dim);
+  cursor: pointer;
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s, border-color 0.2s, background 0.2s;
+}
+.panel-indicator-btn:hover,
+.panel-indicator-btn:focus-visible {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.panel-indicator-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.panel-indicator-btn--active,
+.panel-indicator-btn--active:hover,
+.panel-indicator-btn--active:focus-visible {
+  transform: scale(1.25);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}

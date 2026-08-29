@@ -3,7 +3,7 @@ import type { Dock } from "../../controls/HuBarDock";
 
 export const HIDE_DELAY = 600;
 export const FIRST_HIDE_DELAY = 3000;
-export const COMPACT_MQ = "(max-width: 720px), (max-height: 600px)";
+export const COMPACT_MQ = "(max-width: 798px), (max-height: 600px)";
 const TOUCH_MQ = "(pointer: coarse)";
 const EDGE = 24;
 const SWIPE = 30;
