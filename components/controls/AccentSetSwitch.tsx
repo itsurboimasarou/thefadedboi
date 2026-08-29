@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { accentSets } from "@/lib/accents.config";
+import { accentSets } from "@/lib/configs/accents.config";
 import { useAccentSet, setAccentSetKey } from "./AccentSwitch";
 import Icon from "../ui/Icons";
 

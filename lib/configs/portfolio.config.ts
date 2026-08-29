@@ -1,4 +1,4 @@
-import type { Project, JourneyStop } from "./types";
+import type { Project, JourneyStop } from "../types";
 
 export const portfolio = {
   banner: {

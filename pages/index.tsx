@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { site } from "@/lib/site.config";
-import { home } from "@/lib/home.config";
+import { site } from "@/lib/configs/site.config";
+import { home } from "@/lib/configs/home.config";
 import { getChangelog } from "@/lib/assets";
 import VideoBackground from "@/components/layout/VideoBackground";
 import Icon from "@/components/ui/Icons";

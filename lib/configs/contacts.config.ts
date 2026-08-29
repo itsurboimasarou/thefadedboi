@@ -1,4 +1,4 @@
-import type { LinkItem } from "./types";
+import type { LinkItem } from "../types";
 
 export const contacts = {
   email: "itsurboimasarou@gmail.com",

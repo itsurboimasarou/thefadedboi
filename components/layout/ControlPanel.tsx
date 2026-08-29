@@ -13,8 +13,8 @@ import LogoSwitch from "../controls/LogoSwitch";
 import StatusClock from "../widgets/StatusClock";
 import ChangelogDialog from "../content/ChangelogDialog";
 import MusicPlayer from "../widgets/MusicPlayer";
-import { home } from "@/lib/home.config";
-import { accentSets } from "@/lib/accents.config";
+import { home } from "@/lib/configs/home.config";
+import { accentSets } from "@/lib/configs/accents.config";
 import { COMPACT_MQ } from "./functions/useHuBarAutoHide";
 
 export const PANEL_EVT = "control-panel-toggle";

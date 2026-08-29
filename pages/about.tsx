@@ -1,5 +1,5 @@
-import { site } from "../lib/site.config";
-import { details } from "../lib/details.config";
+import { site } from "@/lib/configs/site.config";
+import { details } from "@/lib/configs/details.config";
 import Icon from "@/components/ui/Icons";
 import Favourites from "@/components/content/Favourites";
 import LiveAge from "@/components/widgets/LiveAge";

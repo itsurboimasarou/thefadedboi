@@ -1,4 +1,4 @@
-import { portfolio } from "@/lib/portfolio.config";
+import { portfolio } from "@/lib/configs/portfolio.config";
 import LinkBanner from "@/components/content/LinkBanner";
 import Icon from "@/components/ui/Icons";
 import { getChangelog } from "@/lib/assets";

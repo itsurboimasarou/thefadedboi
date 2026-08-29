@@ -322,13 +322,22 @@
   animation: status-pulse 2.2s ease-out infinite;
 }
 
+/* The box-shadow ring already expanded outward, but the dot itself stayed
+   a static size throughout — barely read as "pulsing" at 10px. Scaling
+   the dot in sync with the ring gives the pulse an actual source. */
 @keyframes status-pulse {
   0% {
     box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent);
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.25);
   }
 
   70% {
     box-shadow: 0 0 0 8px transparent;
+    transform: scale(1);
   }
 
   100% {
@@ -823,10 +832,7 @@
   display: none;
 }
 
-/* ── Status clock (top bar) ──────────────────────────
-   One control, no chip: the status dot stands in for the clock icon and the
-   written state is revealed on hover. Bare — no background or border — so
-   nothing boxes it in. */
+/* ── Status clock (top bar) ────────────────────────── */
 .status-clock {
   display: inline-flex;
   align-items: center;
@@ -843,44 +849,61 @@
   border-radius: 8px;
 }
 
-/* Only the label carries the state colour; the time stays readable ink.
-   inline-flex (not a single text node) so a vertical dock can stack HH
+.status-clock-crossfade {
+  position: relative;
+  display: grid;
+}
+.status-clock-crossfade > * {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+/* inline-flex (not a single text node) so a vertical dock can stack HH
    over MM and hide the seconds/colons — see layout.css. */
 .status-clock-time {
   display: inline-flex;
   align-items: baseline;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
-}
-
-/* Collapses to zero width rather than unmounting, so the clock slides
-   instead of jumping when the label appears. */
-.status-clock-label {
-  display: block;
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  transition: max-width 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease;
-}
-
-.status-clock-label--on {
-  max-width: 90px;
   opacity: 1;
+  transition: opacity 0.18s ease;
+}
+
+.status-clock-label {
+  align-self: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
 }
 
 .status-clock:hover .status-clock-time,
 .status-clock:focus-visible .status-clock-time {
-  color: var(--accent);
+  opacity: 0;
+}
+.status-clock:hover .status-clock-label,
+.status-clock:focus-visible .status-clock-label {
+  opacity: 1;
+}
+
+/* Mobile's own StatusClock (ControlPanel's "At a glance" row, not HuBar's)
+   has no hover to crossfade with — show label and time side by side there,
+   like it always did, instead of stacked. No media query needed: this row
+   is already display: none outside the mobile breakpoint (see
+   .glance-row--mobile-only above), so this simply has no effect there. */
+.glance-row--mobile-only .status-clock-crossfade {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: baseline;
+  gap: 6px;
+}
+.glance-row--mobile-only .status-clock-label {
+  opacity: 1;
 }
 
 .status-clock:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
-
-/* Touch devices have no hover: show the label permanently rather than
-   leaving it stuck open after a tap — see modes.css's hover:none block. */
 
 /* ── Text button (Theme customize row) ───────────────── */
 .text-btn {

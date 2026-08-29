@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Icon from "../ui/Icons";
-import { accentSets, DEFAULT_SET, type AccentSetDef } from "@/lib/accents.config";
+import { accentSets, DEFAULT_SET, type AccentSetDef } from "@/lib/configs/accents.config";
 import { THEME_EVT } from "./ThemeToggle";
 
 export const SET_EVT = "accent-set-change";

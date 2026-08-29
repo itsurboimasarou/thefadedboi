@@ -10,7 +10,7 @@ import { usePinned } from "../controls/HuBarPinned";
 import HuBarTrigger from "./HuBarTrigger";
 import useHuBarMeasure from "./functions/useHuBarMeasure";
 import useHuBarAutoHide, { useCompact } from "./functions/useHuBarAutoHide";
-import { home } from "@/lib/home.config";
+import { home } from "@/lib/configs/home.config";
 
 interface NavItem { href: string; label: string; icon: string }
 const items: NavItem[] = [

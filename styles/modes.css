@@ -24,25 +24,6 @@
     font-size: 0.72rem;
   }
 
-  /* HuBar.tsx already resolves effectiveDock to "top" or "bottom" only at
-     this breakpoint, so this is purely positioning for whichever of those
-     two classes is actually present — no override-a-wrong-class logic
-     needed (that's what the old unconditional .nav-rail rule here had to
-     do, back when NavRail always rendered its own dock class regardless of
-     viewport). */
-  /* layout.css's desktop width (fit-content, so the bar grows/shrinks with
-     its content) would be circular here: the icon-sizing formula below
-     measures the bar's own inline-size via cqw, but fit-content would need
-     to know the icons' size first to size itself — an unresolvable loop
-     that left the trigger/icons chopped and the bar stuck. Mobile only
-     shows the fixed nav-icon cluster (no now-playing/volume to grow for),
-     so it doesn't need fit-content at all — an explicit viewport-based
-     width breaks the loop, clamped so it never exceeds a fixed size in
-     compact mode (landscape or portrait) and never shrinks past a floor
-     either. container-type turns the bar itself into the reference box for
-     the cell/icon sizing below, so they track its real rendered width
-     (already resolved above, no longer circular) instead of a separate,
-     easy-to-desync vw formula. */
   .hubar--top,
   .hubar--bottom {
     width: min(385px, calc(100vw - 32px));
@@ -52,16 +33,7 @@
     max-height: 62px;
     container-type: inline-size;
   }
-  /* Centered via left/right + margin-inline: auto (not left: 50% +
-     translate: -50%) — a percentage translate is relative to the element's
-     OWN resolved width, so it silently recomputes whenever that width
-     changes (icons settling into their cqw-based size, a viewport resize,
-     etc.), and since .hubar transitions translate for the hide/reveal
-     slide, that recompute got smoothly animated too — the bar (and with it
-     the logo) visibly creeping into place instead of just being centered.
-     margin-inline: auto doesn't depend on the element's own width via a
-     transform, so it never touches that transition; translate is now only
-     ever set for the actual hide/reveal offset below. */
+
   .hubar--top {
     top: 16px;
     left: 0;
@@ -92,22 +64,6 @@
 
   .hubar-hotzone { display: none; }
 
-  /* .hubar-item/.hubar-trigger are a fixed 44px in layout.css — fine on
-     desktop where the bar has slack, but on mobile only the start-group
-     (trigger + divider + 6 nav items = 7 fixed cells) shows, and at the
-     bar's own min-width (301px, above) 7 fixed 44px cells (flex-shrink:0
-     stops them yielding) would overflow it, pushing icons visibly past the
-     rounded edge. Sized in container query units (100cqw = the bar's own
-     current width, already clamped to [301px, 385px] above) instead of vw,
-     so this is the exact fit at *any* width the bar can actually be — no
-     separate formula to keep in sync with its min/max the way a vw-based
-     clamp would need. Content width is cqw minus the fixed 71px overhead
-     (1px divider + 8px its margin + 7 × 6px gaps + 20px h-padding), split
-     7 ways; min() just stops it exceeding the normal 44px at the bar's cap.
-     The :active duplicate matches layout.css's own .hubar-item:active,
-     .hubar-item selector — without it, :active's higher specificity would
-     win while a nav item is being pressed and snap the cell back to that
-     unclamped 44px until release, which read as a glitch. */
   .hubar-item:active,
   .hubar-item,
   .hubar-trigger {
@@ -119,13 +75,6 @@
     height: min(22px, calc((100cqw - 71px) / 14));
   }
 
-  /* HuBar shows only the left-side (trigger + page) group on mobile — the
-     end-group's contents (status clock, language) move into "At a glance"
-     instead, via the mobile-only rows below. With .hubar-group--end gone,
-     layout.css's justify-content: space-between has only one child left to
-     "space between" — it just pins that lone group to the start edge
-     instead, which read as off-centre. Center it directly now that it's
-     the only thing left in the row. */
   .hubar-group--end { display: none; }
   .hubar--top,
   .hubar--bottom {
@@ -135,15 +84,6 @@
   /* Status specifically sits beside the "At a glance" title instead of
      its own grid row — an inline flex item there, not a block row. */
   .panel-head .glance-row--mobile-only { display: flex; align-items: center; }
-
-  /* The "always show the label" fallback below (@media hover:none/pointer:
-     coarse) relies on browsers reporting touch capability correctly —
-     Chromium mobile does, but Firefox Mobile (and some others) can report
-     hover:hover/pointer:fine even on a touchscreen, leaving the clock
-     retracted like the desktop hover-only version. This viewport-width
-     breakpoint is the one signal every mobile browser agrees on, so it's
-     the authoritative source of truth here, same as the rest of this file. */
-  .status-clock-label { max-width: 90px; opacity: 1; transition: none; }
 
   .panel-swipe-hint { display: block; }
 
@@ -297,7 +237,6 @@
 
 @media (hover: none), (pointer: coarse) {
   .hubar-item .tip { display: none !important; }
-  .status-clock-label { max-width: 90px; opacity: 1; transition: none; }
 }
 
 /* ── Desktop ────────────────────────────────────────── */
@@ -314,10 +253,7 @@
 }
 
 @media (min-width: 721px) and (min-height: 601px) {
-  /* See the matching mobile block's comment above — margin-inline/block:
-     auto centers without a width/height-relative translate, so a resize
-     (now-playing/volume appearing, icons settling, etc.) can't smoothly
-     re-animate the base position through the hide/reveal transition. */
+
   .hubar--top {
     top: 16px;
     left: 0;
@@ -342,23 +278,21 @@
 
   .hubar--left {
     left: 16px;
-    top: 0;
-    bottom: 0;
-    margin-block: auto;
+    top: 50%;
+    translate: 0 -50%;
   }
   .hubar--left.hubar--hidden {
-    translate: calc(-100% - 7px) 0;
+    translate: calc(-100% - 7px) -50%;
     opacity: 0.6;
   }
 
   .hubar--right {
     right: 16px;
-    top: 0;
-    bottom: 0;
-    margin-block: auto;
+    top: 50%;
+    translate: 0 -50%;
   }
   .hubar--right.hubar--hidden {
-    translate: calc(100% + 7px) 0;
+    translate: calc(100% + 7px) -50%;
     opacity: 0.6;
   }
 
@@ -414,6 +348,7 @@
     padding: 4px 2px;
     width: 100%;
   }
+
   .hubar--left .status-clock-label,
   .hubar--right .status-clock-label {
     display: none;
@@ -444,12 +379,6 @@
   .hubar--right .status-clock-ss {
     color: var(--ink-dim);
     font-weight: 600;
-  }
-  .hubar--left .status-clock:hover .status-clock-time,
-  .hubar--left .status-clock:focus-visible .status-clock-time,
-  .hubar--right .status-clock:hover .status-clock-time,
-  .hubar--right .status-clock:focus-visible .status-clock-time {
-    color: var(--ink);
   }
 
   .hubar--left .lang-switch,

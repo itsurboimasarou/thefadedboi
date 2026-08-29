@@ -1,4 +1,4 @@
-import type { Like } from "./types";
+import type { Like } from "../types";
 
 export const details = {
   avatar: "/profile.png",

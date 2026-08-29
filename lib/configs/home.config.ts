@@ -1,4 +1,4 @@
-import type { StatusConfig } from "./types";
+import type { StatusConfig } from "../types";
 
 export const home = {
   eyebrow: "В них больше нет любви...",

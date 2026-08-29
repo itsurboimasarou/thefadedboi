@@ -1,5 +1,5 @@
 import { toggleControlPanel } from "./ControlPanel";
-import { site } from "@/lib/site.config";
+import { site } from "@/lib/configs/site.config";
 
 export default function HuBarTrigger({ open }: { open: boolean }) {
   return (

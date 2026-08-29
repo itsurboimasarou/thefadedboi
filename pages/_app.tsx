@@ -13,7 +13,7 @@ import type { AppProps } from "next/app";
 import { useEffect } from "react";
 import { Work_Sans, IBM_Plex_Sans, Momo_Signature, Space_Grotesk } from "next/font/google";
 import HuBar from "@/components/layout/HuBar";
-import { site } from "@/lib/site.config";
+import { site } from "@/lib/configs/site.config";
 import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
 import Snowfall from "@/components/layout/Snowfall";

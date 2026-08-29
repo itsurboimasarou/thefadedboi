@@ -10,7 +10,6 @@ export default function StatusClock({
   onClick?: () => void;
 }) {
   const state = useLiveStatus(config);
-  const [hover, setHover] = useState(false);
   const [time, setTime] = useState("--:--:--");
   const [hh, mm, ss] = time.split(":");
 
@@ -49,26 +48,21 @@ export default function StatusClock({
       type="button"
       className={`status-clock status-clock--${state}`}
       onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
       title={onClick ? "Open music player" : undefined}
       aria-label={onClick ? `${config.labels[state]} — open music player` : config.labels[state]}
     >
       <StatusDot state={state} />
-      <span
-        className={`status-clock-label${hover ? " status-clock-label--on" : ""}`}
-        aria-hidden="true"
-      >
-        {config.labels[state]}
-      </span>
-      <span className="status-clock-time" suppressHydrationWarning>
-        <span className="status-clock-hh">{hh}</span>
-        <span className="status-clock-sep">:</span>
-        <span className="status-clock-mm">{mm}</span>
-        <span className="status-clock-sep">:</span>
-        <span className="status-clock-ss">{ss}</span>
+      <span className="status-clock-crossfade">
+        <span className="status-clock-time" suppressHydrationWarning>
+          <span className="status-clock-hh">{hh}</span>
+          <span className="status-clock-sep">:</span>
+          <span className="status-clock-mm">{mm}</span>
+          <span className="status-clock-sep">:</span>
+          <span className="status-clock-ss">{ss}</span>
+        </span>
+        <span className="status-clock-label" aria-hidden="true">
+          {config.labels[state]}
+        </span>
       </span>
     </button>
   );
