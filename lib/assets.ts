@@ -1,7 +1,6 @@
 import type {
   Manifest,
-  Subject,
-  Album,
+  GalleryAlbum,
   DeviceSection,
   MusicManifest,
   Playlist,
@@ -25,23 +24,44 @@ const encPath = (p: string) =>
   p.split(/[\/\\]/).map(encodeURIComponent).join("/");
 
 const assetUrl = (kind: string, folder: string, file: string) =>
-  `${CDN}/${kind}/${encPath(folder)}/${encodeURIComponent(file)}`;
+  `${CDN}/${kind}/${encPath(folder)}/${encPath(file)}`;
 
 export const cdnUrl = (folder: string, file: string) =>
-  assetUrl("albums", folder, file);
+  `${CDN}/${encPath(folder)}/${encPath(file)}`;
 
 export const trackUrl = (folder: string, file: string) =>
   assetUrl("tracks", folder, file);
 
-export const USE_THUMBS = process.env.PHOTOS_THUMBS === "1";
-
 export const thumbUrl = (folder: string, file: string) =>
-  USE_THUMBS
-    ? `${CDN}/thumbs/${encPath(folder)}/${encodeURIComponent(file)}`
-    : cdnUrl(folder, file);
+  `/api/thumb?folder=${encodeURIComponent(folder)}&file=${encodeURIComponent(file)}`;
+
+// ── CDN proxying ────────────────────────────────────────────────────
+// Shared by both proxy routes: /api/thumb (re-encodes to AVIF) and
+// /api/photo (streams the original as a download). They exist because the
+// CDN sends no CORS headers, so the browser can't fetch it directly.
+export const CDN_HOST = new URL(CDN).host;
+
+// Parses a caller-supplied URL, returning null unless it points at our own
+// CDN. Both routes take a URL from the query string, so this check is what
+// keeps them from being usable as an open proxy for arbitrary hosts.
+export function cdnTarget(src: string): URL | null {
+  try {
+    const url = new URL(src);
+    return url.host === CDN_HOST ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+// Collapses network errors and non-2xx into a single null failure path, so
+// callers don't each have to re-implement try/catch plus an .ok check.
+export async function cdnFetch(target: URL | string): Promise<Response | null> {
+  const res = await fetch(target).catch(() => null);
+  return res?.ok ? res : null;
+}
 
 const indexUrl = (folder: string) =>
-  `${CDN}/albums/${encPath(folder)}/index.json`;
+  `${CDN}/${encPath(folder)}/index.json`;
 
 async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
   try {
@@ -55,12 +75,14 @@ async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
         : [];
 
     return names
-      .filter(
-        (n) => typeof n === "string" && ext.test(n) && !IGNORE_PREFIX.test(n)
-      )
+      .filter((n) => {
+        if (typeof n !== "string") return false;
+        const base = n.split("/").pop() ?? n;
+        return ext.test(base) && !IGNORE_PREFIX.test(base);
+      })
       .sort();
   } catch (err) {
-    console.warn(`[assets] failed reading albums/${folder}/index.json:`, err);
+    console.warn(`[assets] failed reading ${folder}/index.json:`, err);
     return [];
   }
 }
@@ -107,38 +129,17 @@ export async function listImages(
   }));
 }
 
-function validateSubjects(raw: any): Subject[] {
-  if (!raw || !Array.isArray(raw.subjects)) return [];
-
-  const okAlbum = (a: any): boolean =>
-    a &&
-    typeof a.slug === "string" &&
-    typeof a.title === "string" &&
-    typeof a.folder === "string";
-
-  return raw.subjects
-    .filter(
-      (s: any) =>
-        s && typeof s.slug === "string" && typeof s.title === "string"
-    )
-    .map((s: any) => ({
-      ...s,
-      albums: Array.isArray(s.albums)
-        ? s.albums.filter(okAlbum).map((a: any) => {
-            const { subAlbums, ...rest } = a;
-            const subs = Array.isArray(subAlbums)
-              ? subAlbums.filter(okAlbum)
-              : [];
-            return subs.length ? { ...rest, subAlbums: subs } : rest;
-          })
-        : [],
-    }));
+function validateAlbums(raw: any): GalleryAlbum[] {
+  if (!raw || !Array.isArray(raw.albums)) return [];
+  return raw.albums
+    .filter((a: any) => a && typeof a.folder === "string")
+    .map((a: any) => ({ folder: a.folder }));
 }
 
 export async function getManifest(): Promise<Manifest> {
   const raw = await fetchJson("gallery.json");
-  if (!raw) return { version: 2, subjects: [] };
-  return { version: raw.version ?? 2, subjects: validateSubjects(raw) };
+  if (!raw) return { version: 4, albums: [] };
+  return { version: raw.version ?? 4, albums: validateAlbums(raw) };
 }
 
 const okTrack = (t: any): t is TrackMeta =>
@@ -147,13 +148,7 @@ const okTrack = (t: any): t is TrackMeta =>
 function validatePlaylists(raw: any): Playlist[] {
   if (!raw || !Array.isArray(raw.playlists)) return [];
   return raw.playlists
-    .filter(
-      (p: any) =>
-        p &&
-        typeof p.slug === "string" &&
-        typeof p.title === "string" &&
-        typeof p.folder === "string"
-    )
+    .filter((p: any) => p && typeof p.folder === "string")
     .map((p: any) => ({
       ...p,
       tracks: Array.isArray(p.tracks) ? p.tracks.filter(okTrack) : [],
@@ -164,16 +159,6 @@ export async function getMusicManifest(): Promise<MusicManifest> {
   const raw = await fetchJson("music.json");
   if (!raw) return { version: 1, playlists: [] };
   return { version: raw.version ?? 1, playlists: validatePlaylists(raw) };
-}
-
-export function findAlbum(
-  subjects: Subject[],
-  subjectSlug: string,
-  albumSlug: string
-): { subject: Subject; album: Album } | null {
-  const subject = subjects.find((s) => s.slug === subjectSlug);
-  const album = subject?.albums.find((a) => a.slug === albumSlug);
-  return subject && album ? { subject, album } : null;
 }
 
 function validateDevices(raw: any): DeviceSection[] {

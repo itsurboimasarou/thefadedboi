@@ -219,7 +219,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     setNowPlaying({
       title: current?.title ?? null,
       artist: (current?.artist ?? currentPlaylist?.artist) ?? null,
-      albumTitle: (current?.album ?? currentPlaylist?.title) ?? null,
+      albumTitle: (current?.album ?? currentPlaylist?.folder) ?? null,
       cover: (current?.cover ?? currentPlaylist?.cover) ?? null,
       playing: playing && !!current,
     });
@@ -229,8 +229,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     current?.artist,
     current?.album,
     current?.cover,
-    currentPlaylist?.slug,
-    currentPlaylist?.title,
+    currentPlaylist?.folder,
     currentPlaylist?.artist,
     currentPlaylist?.cover,
     playing,
@@ -372,7 +371,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     : queueMode === "all"
       ? t.allTracks
       : typeof queueMode === "number"
-        ? (playlists[queueMode]?.title ?? t.none)
+        ? (playlists[queueMode]?.folder ?? t.none)
         : t.none;
 
   const onPanelTouchStart = (e: React.TouchEvent) => {
@@ -567,7 +566,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                 </Marquee>
                 {current && (
                   <Marquee as="p" className="player-track-subtext">
-                    {[current.artist ?? currentPlaylist?.artist, current.album ?? currentPlaylist?.title, formatQuality(current)]
+                    {[current.artist ?? currentPlaylist?.artist, current.album ?? currentPlaylist?.folder, formatQuality(current)]
                       .filter(Boolean)
                       .join(" • ")}
                   </Marquee>
@@ -669,13 +668,13 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                       </li>
                     )}
                     {playlists.map((pl, i) => (
-                      <li key={pl.slug}>
+                      <li key={pl.folder}>
                         <button
                           type="button"
                           className={`player-album-option${queueMode === i ? " player-album-option--active" : ""}`}
                           onClick={() => selectQueue(i)}
                         >
-                          <Marquee className="player-album-option-text">{pl.title}</Marquee>
+                          <Marquee className="player-album-option-text">{pl.folder}</Marquee>
                         </button>
                       </li>
                     ))}

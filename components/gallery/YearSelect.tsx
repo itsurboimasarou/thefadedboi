@@ -12,6 +12,7 @@ interface YearSelectProps {
   value: number | undefined;
   onChange: (y: number | undefined) => void;
   allowAll?: boolean;
+  direction?: "down" | "up";
 }
 
 export default function YearSelect({
@@ -19,6 +20,7 @@ export default function YearSelect({
   value,
   onChange,
   allowAll = false,
+  direction = "down",
 }: YearSelectProps) {
   const t = useLocalized(ui);
   const [open, setOpen] = useState(false);
@@ -59,7 +61,7 @@ export default function YearSelect({
         <Icon name="chevronDown" size={14} />
       </button>
       {open && (
-        <ul className="year-menu" role="listbox">
+        <ul className={`year-menu year-menu--${direction}`} role="listbox">
           {allowAll && (
             <li>
               <button

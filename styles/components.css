@@ -38,11 +38,6 @@
   height: 16px;
 }
 
-/* Matches the knob's own geometry exactly (top/left 2px, 24px square,
-   translate 32px 0 when checked) so the icon box always sits flush on
-   top of wherever the knob rests — no fractional-pixel remainder from a
-   mismatched box size to round differently as the switch's ancestors
-   reposition on resize. */
 .theme-switch .track-icon--left  { left: 2px; }
 .theme-switch .track-icon--right { left: 34px; right: auto; }
 
@@ -77,16 +72,6 @@
   cursor: not-allowed;
 }
 
-/* Text labels (LangSwitch) instead of icon glyphs — same slider shell,
-   just a size up with a wider (pill, not circular) knob so two-letter
-   labels sit comfortably on it. Declared after the .theme-switch block
-   above (not just higher-specificity) since some of these — like the
-   knob's own size/radius — tie with the base rule at equal specificity
-   and would otherwise lose to it by source order.
-
-   Rounded rectangle, not a full pill: track radius 12px, inset 3px, knob
-   radius 9px (12 - 3) — matching the inset so the knob's corner curve is
-   concentric with the track's inner corner instead of leaving a gap. */
 .lang-switch {
   width: 78px;
   height: 34px;
@@ -282,28 +267,6 @@
 .h-with-icon .icn {
   color: var(--accent);
 }
-
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: nowrap;
-  margin-bottom: 14px;
-}
-
-.section-head h2 {
-  margin-bottom: 0;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.section-head .btn {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.head-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
 /* ── Status ─────────────────────────────────────────── */
 .status {
@@ -806,27 +769,6 @@
   translate: 0 0;
 }
 
-.event-chips {
-  min-width: 0;
-  flex: 1 1 auto;
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 0;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--accent) 50%, transparent) transparent;
-}
-.event-chips .like-bubble {
-  flex-shrink: 0;
-  scroll-snap-align: start;
-}
-.event-chips::-webkit-scrollbar { height: 6px; }
-.event-chips::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--accent) 45%, transparent);
-  border-radius: 999px;
-}
-.event-chips::-webkit-scrollbar-track { background: transparent; }
-
 /* A control switched off by another setting: dim the whole row so the label
    reads as inactive too, not just the switch. */
 .row--disabled dt,
@@ -859,15 +801,12 @@
 
 .status-clock-crossfade {
   position: relative;
-  display: grid;
+  display: inline-flex;
 }
 .status-clock-crossfade > * {
-  grid-area: 1 / 1;
   white-space: nowrap;
 }
 
-/* inline-flex (not a single text node) so a vertical dock can stack HH
-   over MM and hide the seconds/colons — see layout.css. */
 .status-clock-time {
   display: inline-flex;
   align-items: baseline;
@@ -878,7 +817,11 @@
 }
 
 .status-clock-label {
-  align-self: center;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  translate: 0 -50%;
+  width: max-content;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.18s ease;
@@ -905,6 +848,9 @@
   gap: 6px;
 }
 .glance-row--mobile-only .status-clock-label {
+  position: static;
+  translate: none;
+  width: auto;
   opacity: 1;
 }
 
@@ -944,10 +890,6 @@
   border-top: 1px solid var(--glass-border);
 }
 
-/* Changelog (mobile-only) + Customize theme: one shared row, one shared
-   divider — replaces each button carrying its own via .text-btn--center.
-   On desktop the Changelog link is hidden (.glance-row--mobile-only), so
-   this row just holds Customize theme alone, still centered. */
 .panel-quick-links {
   display: flex;
   align-items: center;
@@ -958,13 +900,7 @@
   border-top: 1px solid var(--glass-border);
 }
 
-/* ── Panel head actions (Back / Reset / Close) ───────
-   Desktop only — this cluster lives top-right of "At a glance": Reset
-   and Close always show, Back joins before them only while the theme
-   menu is showing. On mobile the whole cluster is hidden; Back instead
-   sits as a bottom-center text link inside the theme menu itself
-   (.theme-menu-back-mobile below), matching how "Customize theme" sits
-   under the glance grid. */
+/* ── Panel head actions (Back / Reset / Close) ─────── */
 .panel-head-actions {
   display: flex;
   align-items: center;
@@ -972,12 +908,6 @@
   flex-shrink: 0;
 }
 
-/* Mobile-only volume control inside the music player's own header — on
-   desktop HuBar's own now-playing/volume cluster (NowPlaying.tsx) already
-   covers this; on mobile that cluster is hidden entirely, so the player
-   panel needs its own. Hidden by default, shown by modes.css's mobile
-   block. Sits before the list/back button (panel-head-actions renders it
-   first). */
 .player-header-volume {
   display: none;
   align-items: center;
@@ -993,9 +923,7 @@
   position: relative;
   top: -1px;
 }
-/* .panel-icon-btn .icn svg below forces every icon in one of these buttons
-   to 16px regardless of the size prop passed to <Icon> — bump it back up
-   just for the volume icon here. */
+
 .player-header-volume .panel-icon-btn .icn svg {
   width: 18px;
   height: 18px;
@@ -1024,12 +952,6 @@
   outline-offset: 2px;
 }
 
-/* Filled, not just outlined — a lit-up pill reads as "on" at a glance for
-   shuffle/repeat, rather than relying on a subtle color-only difference.
-   Declared after :hover/:focus-visible above (same (0,1,0)/(0,2,0)
-   specificity pattern) and repeated for those two states itself so it
-   stays filled even while the pointer's over it, not just at rest. */
-.panel-icon-btn--active,
 .panel-icon-btn--active:hover,
 .panel-icon-btn--active:focus-visible {
   background: var(--accent);
@@ -1038,9 +960,6 @@
 }
 .panel-icon-btn .icn svg { width: 16px; height: 16px; }
 
-/* Same icon+label shape as the mobile Back link (.theme-menu-back-mobile)
-   — a pill, not a bare circle like Reset/Close next to it — just sized to
-   sit inline in this row instead of centered under the theme menu. */
 .panel-back-btn {
   display: inline-flex;
   align-items: center;

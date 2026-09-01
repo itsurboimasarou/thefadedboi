@@ -23,45 +23,19 @@ export interface Project {
 export interface JourneyStop { period: string; role: string; org: string; note: string }
 export interface Like { label: string; text: string }
 
-export interface SubAlbum {
-  slug: string;
-  title: string;
-  year?: number
+export interface GalleryAlbum {
   folder: string;
-  driveUrl?: string;
 }
-
-export interface Album {
-  slug: string;
-  title: string;
-  year?: number;
-  folder: string;
-  cover?: string;
-  driveUrl?: string;
-  subAlbums?: SubAlbum[];
-}
-
-export interface Subject {
-  slug: string;
-  title: string;
-  description?: string;
-  icon?: string;
-  folder?: string;
-  albums: Album[];
-}
-
-export type ScannedSubject = Subject & { images?: GalleryImage[] };
 
 export interface Manifest {
   version: number;
-  subjects: Subject[];
+  albums: GalleryAlbum[];
 }
 
-export type ScannedSubAlbum = SubAlbum & { images: GalleryImage[] };
-export type ScannedAlbum = Album & { count: number };
-export type ScannedIndexSubject = Omit<Subject, "albums"> & {
-  images?: GalleryImage[];
-  albums: ScannedAlbum[];
+export type ScannedGalleryAlbum = GalleryAlbum & {
+  name: string;
+  year?: number;
+  images: GalleryImage[];
 };
 
 export type GalleryImage = string | { full: string; thumb?: string };
@@ -82,8 +56,6 @@ export interface TrackMeta {
 }
 
 export interface Playlist {
-  slug: string;
-  title: string;
   artist?: string;
   folder: string;
   cover?: string;

@@ -89,17 +89,6 @@
 
   .panel-indicator { display: flex; }
 
-  /* Mobile-only, and only while .panel-switching is present (both add it —
-     see `switching` in ControlPanel.tsx/MusicPlayer.tsx — for exactly the
-     transitions that swap controls↔player; opening from or closing to
-     nothing leaves it off, so those keep the plain vertical fly-in/out both
-     panels use everywhere else, same as "At a glance" always had). They're
-     mutually exclusive (visiblePanel in ControlPanel.tsx), so closing one
-     and opening the other happen in the same render, and animating both
-     this way at once reads as one swap. #control-panel/#music-player ids
-     are enough specificity on their own to beat the dock-aware
-     .control-panel transform overrides above, no !important needed —
-     desktop (outside this breakpoint) never sees any of this. */
   #control-panel.panel-switching {
     transform: translateX(calc(100% + 16px));
     opacity: 0;
@@ -137,18 +126,9 @@
     padding-left: clamp(20px, 5vw, 64px);
     padding-right: clamp(20px, 5vw, 64px);
   }
-  /* Top's reservation comes from the unconditional :has(.hubar--top) rule
-     in layout.css (calc(), driven by the live-measured --hubar-h — already
-     correct at this breakpoint too). Bottom's reservation is unconditional
-     here (not pin-gated like the desktop version below) since the compact
-     override keeps the bar effectively always-visible regardless of pinned
-     state on mobile. */
+
   .app-root:has(.hubar--bottom) .main { padding-bottom: 110px; }
 
-  /* Left/Right dock aren't reachable on mobile (DockControl hides those
-     buttons at this same breakpoint) — desktop-only, unlike the logo
-     picker above, which now applies here too since the trigger still shows
-     the logo mark on mobile. */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -173,8 +153,7 @@
 }
 
 @media (max-width: 900px) {
-  .album-grid { grid-template-columns: repeat(3, 1fr); }
-  .album-cards { grid-template-columns: repeat(3, 1fr); }
+  .album-grid { --row-h: 230px; }
 }
 
 @media (max-width: 798px) {
@@ -182,13 +161,6 @@
      — useHuBarAutoHide's schedule() bails out early whenever compact is
      true — so the toggle has nothing to control here. */
   .glance-row--autohide { display: none; }
-
-  .btn--download .btn-label { display: none; }
-  .btn--download {
-    padding: 8px;
-    aspect-ratio: 1;
-    justify-content: center;
-  }
 
   .app-root:has(.hubar--bottom) .control-panel.control-panel {
     bottom: calc(16px + var(--hubar-h, 68px) + 52px);
@@ -209,7 +181,6 @@
   .player-header-volume { display: flex; }
 
   .page-loader { top: auto; bottom: 96px; left: 50%; right: auto; }
-  .album-cards { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
 
   .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
 
@@ -222,11 +193,19 @@
     width: auto;
     max-width: none;
   }
+
+  /* Mobile: plain uniform squares, ignoring each photo's real ratio —
+     height comes from aspect-ratio: 1 against the flex-basis width, so no
+     separate img override is needed (compare desktop's fixed height). */
+  .album-thumb {
+    height: auto;
+    aspect-ratio: 1;
+    flex: 0 0 calc((100% - 24px) / 3);
+  }
 }
 
 @media (max-width: 600px) {
-  .album-grid { grid-template-columns: repeat(2, 1fr); }
-  .album-cards { grid-template-columns: repeat(2, 1fr); }
+  .album-thumb { flex-basis: calc((100% - 12px) / 2); }
 }
 
 @media (hover: none), (pointer: coarse) {
@@ -438,24 +417,10 @@
     height: 64px;
     writing-mode: vertical-lr;
     direction: rtl;
-    -webkit-appearance: slider-vertical;
     -moz-orient: vertical;
   }
 }
 
-/* Volume needs real width on top of the nav items, StatusClock and
-   LangSwitch already in the end group. Below this the fixed-width
-   Top/Bottom bar (now sized to its content, see layout.css) can genuinely
-   run out of room, so just the volume slider steps aside rather than
-   overflowing the pill — this only matters in the narrow band just above
-   the mobile breakpoint; anything wider fits it naturally. The now-playing
-   button itself (opens the player) stays put — it's the one thing in this
-   cluster that's still useful at this width and has no other way in from
-   HuBar once StatusClock is unlinked from the player.
-   Losing HuBar's volume control here would otherwise leave no way to
-   adjust it between this width and the true mobile breakpoint (798px),
-   where the player panel's own volume control (below) picks it back up —
-   so that one's shown across this same width, not just true mobile. */
 @media (max-width: 904px) {
   .hubar-volume { display: none; }
   .player-header-volume { display: flex; }
