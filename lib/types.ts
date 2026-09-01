@@ -41,19 +41,12 @@ export interface Album {
   subAlbums?: SubAlbum[];
 }
 
-export interface SubjectBanner {
-  text: string;
-  ctaLabel: string;
-  ctaHref: string;
-}
-
 export interface Subject {
   slug: string;
   title: string;
   description?: string;
   icon?: string;
   folder?: string;
-  banner?: SubjectBanner;
   albums: Album[];
 }
 

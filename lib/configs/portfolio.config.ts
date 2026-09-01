@@ -1,20 +1,12 @@
-import type { Project, JourneyStop, SubjectBanner } from "../types";
+import type { Project, JourneyStop } from "../types";
 import type { Localized } from "../i18n";
 
 export interface PortfolioContent {
-  banner: SubjectBanner & { variant: "solid"; icon: string };
   projects: Project[];
   journey: JourneyStop[];
 }
 
 const en: PortfolioContent = {
-  banner: {
-    text: "The certificates behind these projects are in my gallery.",
-    ctaLabel: "View achievements →",
-    ctaHref: "/gallery#achievements",
-    variant: "solid",
-    icon: "trophy",
-  },
   projects: [
     {
       title: "Seven Star Rising (SSR)",
@@ -73,13 +65,6 @@ const en: PortfolioContent = {
 };
 
 const vi: PortfolioContent = {
-  banner: {
-    text: "The certificates behind these projects are in my gallery.",
-    ctaLabel: "View achievements →",
-    ctaHref: "/gallery#achievements",
-    variant: "solid",
-    icon: "trophy",
-  },
   projects: [
     {
       title: "Seven Star Rising (SSR)",

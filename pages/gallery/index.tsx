@@ -3,7 +3,6 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import type { InferGetStaticPropsType } from "next";
 import Icon from "@/components/ui/Icons";
-import LinkBanner from "@/components/content/LinkBanner";
 import YearSelect from "@/components/gallery/YearSelect";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
 import { getManifest, cdnUrl, listImages, getChangelog } from "@/lib/assets";
@@ -91,15 +90,6 @@ function SubjectSection({ subject }: { subject: ScannedIndexSubject }) {
 
       {subject.description && (
         <p style={{ marginBottom: 18 }}>{subject.description}</p>
-      )}
-
-      {subject.banner && (
-        <LinkBanner
-          text={subject.banner.text}
-          ctaLabel={subject.banner.ctaLabel}
-          ctaHref={subject.banner.ctaHref}
-          icon="briefcase"
-        />
       )}
 
       {subject.folder ? (

@@ -225,19 +225,6 @@
 }
 
 @media (max-width: 600px) {
-  .link-banner {
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .link-banner p { flex: none; }
-  .link-banner .btn {
-    margin-left: 0;
-    align-self: stretch;
-    justify-content: center;
-  }
-
   .album-grid { grid-template-columns: repeat(2, 1fr); }
   .album-cards { grid-template-columns: repeat(2, 1fr); }
 }

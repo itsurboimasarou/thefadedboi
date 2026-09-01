@@ -1,19 +1,46 @@
+import type { InferGetStaticPropsType } from "next";
 import { portfolio as portfolioConfig } from "@/lib/configs/portfolio.config";
 import { useLocalized, type Localized } from "@/lib/i18n";
-import LinkBanner from "@/components/content/LinkBanner";
+import AlbumGrid from "@/components/gallery/AlbumGrid";
 import Icon from "@/components/ui/Icons";
-import { getChangelog } from "@/lib/assets";
+import { getChangelog, listImages } from "@/lib/assets";
 
 export async function getStaticProps() {
-  return { props: { changelog: await getChangelog() }, revalidate: 300 };
+  return {
+    props: {
+      changelog: await getChangelog(),
+      achievements: await listImages("achievements"),
+    },
+    revalidate: 300,
+  };
 }
 
-const ui: Localized<{ heading: string; workJourney: string }> = {
-  en: { heading: "Highlights", workJourney: "Work journey" },
-  vi: { heading: "Điểm nhấn", workJourney: "Work journey" },
+const ui: Localized<{
+  heading: string;
+  achievements: string;
+  projects: string;
+  workJourney: string;
+  photosToBeAdded: string;
+}> = {
+  en: {
+    heading: "Highlights",
+    achievements: "Achievements",
+    projects: "Projects",
+    workJourney: "Work journey",
+    photosToBeAdded: "Photos to be added.",
+  },
+  vi: {
+    heading: "Điểm nhấn",
+    achievements: "Thành tựu",
+    projects: "Dự án",
+    workJourney: "Work journey",
+    photosToBeAdded: "Ảnh sẽ được thêm sau.",
+  },
 };
 
-export default function Portfolio() {
+export default function Portfolio({
+  achievements,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const portfolio = useLocalized(portfolioConfig);
   const t = useLocalized(ui);
   return (
@@ -23,40 +50,50 @@ export default function Portfolio() {
         <h1>{t.heading}</h1>
       </header>
 
-      <LinkBanner {...portfolio.banner} />
+      <section className="glass">
+        <h2 className="h-with-icon"><Icon name="trophy" />{t.achievements}</h2>
+        {achievements.length > 0 ? (
+          <AlbumGrid images={achievements} title={t.achievements} />
+        ) : (
+          <p className="album-empty">{t.photosToBeAdded}</p>
+        )}
+      </section>
 
-      <section className="grid grid--2">
-        {portfolio.projects.map((p) => {
-          const isPrivate = p.visibility === "private";
+      <section className="glass">
+        <h2 className="h-with-icon"><Icon name="briefcase" />{t.projects}</h2>
+        <div className="grid grid--2">
+          {portfolio.projects.map((p) => {
+            const isPrivate = p.visibility === "private";
 
-          const body = (
-            <>
-              <h3 style={{ color: "var(--ink)", marginBottom: 8 }}>{p.title}</h3>
-              <p style={{ marginBottom: 14 }}>{p.description}</p>
-              <div>
-                <span className={`vis-tag vis-tag--${p.visibility}`}>{p.visibility}</span>
-                {p.tags.map((t) => <span className="chip" key={t}>{t}</span>)}
+            const body = (
+              <>
+                <h3 style={{ color: "var(--ink)", marginBottom: 8 }}>{p.title}</h3>
+                <p style={{ marginBottom: 14 }}>{p.description}</p>
+                <div>
+                  <span className={`vis-tag vis-tag--${p.visibility}`}>{p.visibility}</span>
+                  {p.tags.map((tag) => <span className="chip" key={tag}>{tag}</span>)}
+                </div>
+              </>
+            );
+
+            return isPrivate ? (
+              <div key={p.title} className="glass project-card project-card--private">
+                {body}
               </div>
-            </>
-          );
-
-          return isPrivate ? (
-            <div key={p.title} className="glass project-card project-card--private">
-              {body}
-            </div>
-          ) : (
-            <a
-              key={p.title}
-              href={p.href}
-              className="glass glass--hover project-card"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: "block" }}
-            >
-              {body}
-            </a>
-          );
-        })}
+            ) : (
+              <a
+                key={p.title}
+                href={p.href}
+                className="glass glass--hover project-card"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "block" }}
+              >
+                {body}
+              </a>
+            );
+          })}
+        </div>
       </section>
 
       <section className="glass">

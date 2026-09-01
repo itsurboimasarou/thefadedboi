@@ -81,11 +81,6 @@
   background: rgba(255, 255, 255, 0.89);
 }
 
-:root[data-theme="light"] .link-banner--solid {
-  background: #ffffff;
-  border-color: rgba(31, 33, 50, 0.14);
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
