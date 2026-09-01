@@ -2,6 +2,21 @@ import type { InferGetStaticPropsType } from "next";
 import { getDevices, deviceImage, getChangelog } from "@/lib/assets";
 import Icon, { specIconFor } from "@/components/ui/Icons";
 import type { DeviceItem } from "@/lib/types";
+import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLang } from "@/components/controls/LangSwitch";
+
+const ui: Localized<{ eyebrow: string; heading: string; description: string }> = {
+  en: {
+    eyebrow: "Devices & Equipment",
+    heading: "Techy stuffs",
+    description: "The hardware behind the work — phones, laptop, and the gears around them.",
+  },
+  vi: {
+    eyebrow: "Thiết bị & Dụng cụ",
+    heading: "Mấy món đồ công nghệ",
+    description: "Phần cứng đằng sau mọi thứ mình làm — điện thoại, laptop, và các món đồ xung quanh nó.",
+  },
+};
 
 const chevron = (
   <svg className="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
@@ -10,6 +25,7 @@ const chevron = (
 );
 
 function SpecDropdown({ item }: { item: DeviceItem }) {
+  const lang = useLang();
   return (
     <details className="spec-item" open>
       <summary>
@@ -25,8 +41,8 @@ function SpecDropdown({ item }: { item: DeviceItem }) {
         )}
         <dl className="spec-list">
           {(item.specs ?? []).map((s) => (
-            <div key={s.label}>
-              <dt><Icon name={specIconFor(s.label)} size={15} />{s.label}</dt>
+            <div key={s.label.en}>
+              <dt><Icon name={specIconFor(s.label.en)} size={15} />{s.label[lang]}</dt>
               <dd>{s.value}</dd>
             </div>
           ))}
@@ -43,19 +59,21 @@ export async function getStaticProps() {
 export default function Devices({
   devices,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const t = useLocalized(ui);
+  const lang = useLang();
   return (
     <div className="stack reveal">
       <header>
-        <p className="eyebrow">Devices &amp; Equipment</p>
-        <h1>Stuffs that I'm having</h1>
+        <p className="eyebrow">{t.eyebrow}</p>
+        <h1>{t.heading}</h1>
         <p style={{ marginTop: 12, maxWidth: "100ch" }}>
-          The hardware behind the work — phones, laptop, and the gears around them.
+          {t.description}
         </p>
       </header>
 
       {devices.map((group) => (
         <section key={group.category} className="glass">
-          <h2 className="h-with-icon"><Icon name={group.category} />{group.categoryName}</h2>
+          <h2 className="h-with-icon"><Icon name={group.category} />{group.categoryName[lang]}</h2>
           {group.items.some((i) => i.specs) ? (
             group.items.map((item) => <SpecDropdown key={item.name} item={item} />)
           ) : (
@@ -65,7 +83,7 @@ export default function Devices({
                   <Icon name={item.icon ?? "gear"} size={26} />
                   <div>
                     <h3>{item.name}</h3>
-                    <p>{item.detail}</p>
+                    <p>{item.detail?.[lang]}</p>
                   </div>
                 </div>
               ))}

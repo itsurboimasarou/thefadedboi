@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { RAW } from "@/lib/assets";
+import { bgVideoUrl } from "@/lib/assets";
 import { glassOn, setGlass } from "@/components/controls/GlassMode";
 
-const SRC = process.env.NEXT_PUBLIC_BG_VIDEO || `${RAW}/bg.mp4`;
+const SRC = process.env.NEXT_PUBLIC_BG_VIDEO || bgVideoUrl;
 
 export default function VideoBackground() {
   const ref = useRef<HTMLVideoElement>(null);

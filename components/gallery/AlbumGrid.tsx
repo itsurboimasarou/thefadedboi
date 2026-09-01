@@ -4,9 +4,40 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import type { GalleryImage } from "@/lib/types";
 import Icon from "../ui/Icons";
+import { useLocalized, type Localized } from "@/lib/i18n";
+
+const ui: Localized<{
+  photoViewer: (title: string) => string;
+  fullSizeAlt: (title: string, n: number) => string;
+  close: string;
+  previousPhoto: string;
+  nextPhoto: string;
+  viewPhotoAria: (n: number, title: string) => string;
+  photoAlt: (title: string, n: number) => string;
+}> = {
+  en: {
+    photoViewer: (title) => `${title} photo viewer`,
+    fullSizeAlt: (title, n) => `${title} — photo ${n} full size`,
+    close: "Close",
+    previousPhoto: "Previous photo",
+    nextPhoto: "Next photo",
+    viewPhotoAria: (n, title) => `View photo ${n} of ${title} full size`,
+    photoAlt: (title, n) => `${title} — photo ${n}`,
+  },
+  vi: {
+    photoViewer: (title) => `Trình xem ảnh ${title}`,
+    fullSizeAlt: (title, n) => `${title} — ảnh ${n} kích thước đầy đủ`,
+    close: "Đóng",
+    previousPhoto: "Ảnh trước",
+    nextPhoto: "Ảnh sau",
+    viewPhotoAria: (n, title) => `Xem ảnh ${n} của ${title} kích thước đầy đủ`,
+    photoAlt: (title, n) => `${title} — ảnh ${n}`,
+  },
+};
 
 interface AlbumGridProps { images: GalleryImage[]; title: string }
 export default function AlbumGrid({ images, title }: AlbumGridProps) {
+  const t = useLocalized(ui);
   const router = useRouter();
   const [index, setIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -99,7 +130,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
         className="lightbox"
         role="dialog"
         aria-modal="true"
-        aria-label={`${title} photo viewer`}
+        aria-label={t.photoViewer(title)}
         onClick={close}
       >
         <div className="lightbox-frame" onClick={(e) => e.stopPropagation()}>
@@ -113,7 +144,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
           <Image
             key={`${items[index].full}#${attempt[items[index].full] ?? 0}`}
             src={items[index].full}
-            alt={`${title} — photo ${index + 1} full size`}
+            alt={t.fullSizeAlt(title, index + 1)}
             fill
             sizes="100vw"
             quality={80}
@@ -145,20 +176,20 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
             </span>
           )}
         </div>
-        <button type="button" className="lightbox-close" onClick={close} aria-label="Close">✕</button>
+        <button type="button" className="lightbox-close" onClick={close} aria-label={t.close}>✕</button>
         {items.length > 1 && (
           <>
             <button
               type="button"
               className="lightbox-nav lightbox-nav--prev"
               onClick={(e) => { e.stopPropagation(); step(-1); }}
-              aria-label="Previous photo"
+              aria-label={t.previousPhoto}
             >‹</button>
             <button
               type="button"
               className="lightbox-nav lightbox-nav--next"
               onClick={(e) => { e.stopPropagation(); step(1); }}
-              aria-label="Next photo"
+              aria-label={t.nextPhoto}
             >›</button>
           </>
         )}
@@ -180,7 +211,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               onMouseEnter={() => warm(img.full)}
               onTouchStart={() => warm(img.full)}
               onClick={() => !dead[img.thumb] && setIndex(i)}
-              aria-label={`View photo ${i + 1} of ${title} full size`}
+              aria-label={t.viewPhotoAria(i + 1, title)}
             >
               {!ready[img.thumb] && !dead[img.thumb] && (
                 <span className="thumb-loader" aria-hidden="true" />
@@ -193,7 +224,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               <Image
                 key={`${img.thumb}#${attempt[img.thumb] ?? 0}`}
                 src={img.thumb}
-                alt={`${title} — photo ${i + 1}`}
+                alt={t.photoAlt(title, i + 1)}
                 width={400}
                 height={400}
                 sizes="(max-width: 600px) 50vw, (max-width: 900px) 33vw, 300px"

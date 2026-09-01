@@ -1,5 +1,5 @@
 import { toggleControlPanel } from "./ControlPanel";
-import { site } from "@/lib/configs/site.config";
+import { siteName } from "@/lib/configs/site.config";
 
 export default function HuBarTrigger({ open }: { open: boolean }) {
   return (
@@ -12,7 +12,7 @@ export default function HuBarTrigger({ open }: { open: boolean }) {
       aria-label={open ? "Close controls" : "At a glance"}
       title="At a glance"
     >
-      <span className="logo-mark" role="img" aria-label={site.name} />
+      <span className="logo-mark" role="img" aria-label={siteName} />
     </button>
   );
 }

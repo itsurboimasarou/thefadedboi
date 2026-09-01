@@ -7,12 +7,16 @@ import type {
   Playlist,
   TrackMeta,
 } from "./types";
+import type { Localized } from "./i18n";
+
+const isLocalizedString = (v: any): v is Localized<string> =>
+  !!v && typeof v.en === "string" && typeof v.vi === "string";
 
 export const CDN = "https://cdn.thefadedboi.me";
 
 export const REPO = "itsurboimasarou/site-assets";
 export const BRANCH = "main";
-export const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
+export const RAW = `https://gitea.com/${REPO}/raw/branch/${BRANCH}`;
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
 const IGNORE_PREFIX = /^_/;
@@ -42,13 +46,7 @@ const indexUrl = (folder: string) =>
 async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
   try {
     const res = await fetch(indexUrl(folder));
-    if (!res.ok) {
-      console.warn(
-        `[assets] ${res.status} reading albums/${folder}/index.json — ` +
-          `run "npm run sync-photos" to regenerate it`
-      );
-      return [];
-    }
+
     const data = await res.json();
     const names: string[] = Array.isArray(data)
       ? data
@@ -69,6 +67,8 @@ async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
 
 export const deviceImage = (file: string) =>
   `${RAW}/devices/${encodeURIComponent(file)}`;
+
+export const bgVideoUrl = `${CDN}/bg.mp4`;
 
 async function fetchRaw(path: string): Promise<string | null> {
   try {
@@ -181,7 +181,7 @@ function validateDevices(raw: any): DeviceSection[] {
   return raw.sections
     .filter(
       (s: any) =>
-        s && typeof s.categoryName === "string" && Array.isArray(s.items)
+        s && isLocalizedString(s.categoryName) && Array.isArray(s.items)
     )
     .map((s: any) => ({
       categoryName: s.categoryName,
@@ -189,16 +189,17 @@ function validateDevices(raw: any): DeviceSection[] {
       items: s.items
         .filter((i: any) => i && typeof i.name === "string")
         .map((i: any) => {
-          const { specs, ...rest } = i;
+          const { specs, detail, ...rest } = i;
           const ok = Array.isArray(specs)
             ? specs.filter(
                 (sp: any) =>
                   sp &&
-                  typeof sp.label === "string" &&
+                  isLocalizedString(sp.label) &&
                   typeof sp.value === "string"
               )
             : [];
-          return ok.length ? { ...rest, specs: ok } : rest;
+          const item = ok.length ? { ...rest, specs: ok } : rest;
+          return isLocalizedString(detail) ? { ...item, detail } : item;
         }),
     }))
     .filter((s: DeviceSection) => s.items.length > 0);

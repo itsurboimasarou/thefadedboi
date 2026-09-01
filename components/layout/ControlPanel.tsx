@@ -13,9 +13,102 @@ import LogoSwitch from "../controls/LogoSwitch";
 import StatusClock from "../widgets/StatusClock";
 import ChangelogDialog from "../content/ChangelogDialog";
 import MusicPlayer from "../widgets/MusicPlayer";
-import { home } from "@/lib/configs/home.config";
+import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { accentSets } from "@/lib/configs/accents.config";
 import { COMPACT_MQ } from "./functions/useHuBarAutoHide";
+import { useLocalized, type Localized } from "@/lib/i18n";
+
+const ui: Localized<{
+  atAGlance: string;
+  back: string;
+  changelog: string;
+  resetAll: string;
+  close: string;
+  appearance: string;
+  glassBlur: string;
+  aboutGlass: string;
+  glassTip: string;
+  liteMode: string;
+  aboutLite: string;
+  liteTip: string;
+  snow: string;
+  aboutSnow: string;
+  snowTip: string;
+  autoHide: string;
+  aboutAutoHide: string;
+  autoHideTip: string;
+  huBarPosition: string;
+  language: string;
+  customizeTheme: string;
+  colorSets: string;
+  accentColor: string;
+  logo: string;
+  swipeForMusic: string;
+  siteControls: string;
+  musicPlayer: string;
+  activePanel: string;
+}> = {
+  en: {
+    atAGlance: "At a glance",
+    back: "Back",
+    changelog: "Changelog",
+    resetAll: "Reset all to default",
+    close: "Close",
+    appearance: "Appearance",
+    glassBlur: "Glass blur",
+    aboutGlass: "About glass effect",
+    glassTip: "Frosted blur behind HuBar. Costs GPU when anything animates behind it.",
+    liteMode: "Lite mode",
+    aboutLite: "About Lite mode",
+    liteTip: "Turns off animations and transparency effects — recommended for older devices or weak hardware.",
+    snow: "Snow",
+    aboutSnow: "About snow",
+    snowTip: "Falling snow in the background. Turning it off immediately ends flake generation.",
+    autoHide: "Auto-hide",
+    aboutAutoHide: "About auto-hide",
+    autoHideTip: "HuBar hides itself after a moment and reappears on hover, edge-swipe, or focus. Turn this off to keep it always shown.",
+    huBarPosition: "HuBar position",
+    language: "Language",
+    customizeTheme: "Customize theme",
+    colorSets: "Theme",
+    accentColor: "Accent color",
+    logo: "Logo",
+    swipeForMusic: "Swipe right for music player",
+    siteControls: "Site controls",
+    musicPlayer: "Music player",
+    activePanel: "Active panel",
+  },
+  vi: {
+    atAGlance: "Tổng quan",
+    back: "Quay lại",
+    changelog: "Nhật ký cập nhật",
+    resetAll: "Đặt lại về mặc định",
+    close: "Đóng",
+    appearance: "Giao diện",
+    glassBlur: "Hiệu ứng kính mờ",
+    aboutGlass: "Về hiệu ứng kính mờ",
+    glassTip: "Hiệu ứng mờ sương phía sau HuBar. Tiêu tốn GPU khi có chuyển động phía sau.",
+    liteMode: "Chế độ Lite",
+    aboutLite: "Về chế độ Lite",
+    liteTip: "Tắt hiệu ứng chuyển động và độ trong suốt — khuyên dùng cho máy cũ hoặc cấu hình yếu.",
+    snow: "Tuyết rơi",
+    aboutSnow: "Về hiệu ứng tuyết rơi",
+    snowTip: "Tuyết rơi ở nền trang. Tắt đi sẽ lập tức ngừng tạo bông tuyết mới.",
+    autoHide: "Tự động ẩn",
+    aboutAutoHide: "Về tính năng tự động ẩn",
+    autoHideTip: "HuBar sẽ tự động ẩn sau một lúc và hiện lại khi di chuột tới, vuốt cạnh màn hình, hoặc focus vào. Tắt để luôn hiển thị.",
+    huBarPosition: "Vị trí HuBar",
+    language: "Ngôn ngữ",
+    customizeTheme: "Tùy chỉnh giao diện",
+    colorSets: "Chủ đề",
+    accentColor: "Màu sắc",
+    logo: "Biểu tượng",
+    swipeForMusic: "Vuốt sang phải để mở trình phát nhạc",
+    siteControls: "Điều khiển trang",
+    musicPlayer: "Trình phát nhạc",
+    activePanel: "Bảng đang mở",
+  },
+};
 
 export const PANEL_EVT = "control-panel-toggle";
 export const MUSIC_EVT = "music-player-toggle";
@@ -43,6 +136,8 @@ function resetAllToDefault() {
 type PanelView = "none" | "controls" | "player";
 
 export default function ControlPanel({ changelog }: { changelog: string }) {
+  const home = useLocalized(homeConfig);
+  const t = useLocalized(ui);
   const [visiblePanel, setVisiblePanel] = useState<PanelView>("none");
   const open = visiblePanel === "controls";
   const playerOpen = visiblePanel === "player";
@@ -248,7 +343,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           opacity: 1 - dragProgress,
         } : undefined}
         role="dialog"
-        aria-label="Site controls"
+        aria-label={t.siteControls}
         aria-hidden={!open}
         onTouchStart={onPanelTouchStart}
         onTouchMove={onPanelTouchMove}
@@ -259,11 +354,11 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         <div className="panel-head">
           <h2 className="h-with-icon panel-title">
             <Icon name="spark" size={18} />
-            At a glance
+            {t.atAGlance}
           </h2>
           <div className="glance-row--mobile-only">
             <StatusClock
-              config={home.status}
+              config={{ ...homeStatus, labels: home.statusLabels }}
               onClick={() => navigateTo("player")}
             />
           </div>
@@ -273,28 +368,28 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
                 type="button"
                 className="panel-back-btn"
                 onClick={() => setThemeMenuOpen(false)}
-                aria-label="Back"
+                aria-label={t.back}
               >
                 <Icon name="arrowLeft" size={14} />
-                Back
+                {t.back}
               </button>
             ) : (
               <button
                 type="button"
                 className="panel-back-btn"
                 onClick={() => setLogOpen(true)}
-                aria-label="Changelog"
+                aria-label={t.changelog}
               >
                 <Icon name="blog" size={14} />
-                Changelog
+                {t.changelog}
               </button>
             )}
             <button
               type="button"
               className="panel-icon-btn"
               onClick={resetAllToDefault}
-              aria-label="Reset all to default"
-              title="Reset all to default"
+              aria-label={t.resetAll}
+              title={t.resetAll}
             >
               <Icon name="circleArrow" size={16} />
             </button>
@@ -302,8 +397,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               type="button"
               className="panel-icon-btn"
               onClick={() => navigateTo("none")}
-              aria-label="Close"
-              title="Close"
+              aria-label={t.close}
+              title={t.close}
             >
               <Icon name="close" size={16} />
             </button>
@@ -320,7 +415,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div>
             <dt>
               <Icon name="moon" size={15} />
-              Appearance
+              {t.appearance}
             </dt>
             <dd className="dd-row">
               <ThemeToggle />
@@ -330,15 +425,14 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className={liteOn ? "row--disabled" : undefined}>
             <dt>
               <Icon name="display" size={15} />
-              Glass blur
+              {t.glassBlur}
             </dt>
             <dd className="dd-row">
               <GlassToggle />
-              <span className="info-tip" tabIndex={liteOn ? -1 : 0} aria-hidden={liteOn || undefined} aria-label="About glass effect">
+              <span className="info-tip" tabIndex={liteOn ? -1 : 0} aria-hidden={liteOn || undefined} aria-label={t.aboutGlass}>
                 <Icon name="info" size={17} />
                 <span className="info-tip-bubble" role="tooltip">
-                  Frosted blur behind HuBar. Costs GPU when anything animates
-                  behind it.
+                  {t.glassTip}
                 </span>
               </span>
             </dd>
@@ -347,15 +441,14 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div>
             <dt>
               <Icon name="gear" size={15} />
-              Lite mode
+              {t.liteMode}
             </dt>
             <dd className="dd-row">
               <LiteModeToggle />
-              <span className="info-tip" tabIndex={0} aria-label="About Lite mode">
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutLite}>
                 <Icon name="info" size={17} />
                 <span className="info-tip-bubble" role="tooltip">
-                  Turns off animations and transparency effects — recommended for
-                  older devices or weak hardware.
+                  {t.liteTip}
                 </span>
               </span>
             </dd>
@@ -364,15 +457,14 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className={liteOn ? "row--disabled" : undefined}>
             <dt>
               <Icon name="snow" size={15} />
-              Snow
+              {t.snow}
             </dt>
             <dd className="dd-row">
               <SnowToggle />
-              <span className="info-tip" tabIndex={0} aria-label="About snow">
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutSnow}>
                 <Icon name="info" size={17} />
                 <span className="info-tip-bubble" role="tooltip">
-                  Falling snow in the background. Turning it off ends flake
-                  generation — the last few finish their descent.
+                  {t.snowTip}
                 </span>
               </span>
             </dd>
@@ -381,15 +473,14 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className="glance-row--autohide">
             <dt>
               <Icon name="thumbtack" size={15} />
-              Auto-hide
+              {t.autoHide}
             </dt>
             <dd className="dd-row">
               <AutoHideToggle />
-              <span className="info-tip" tabIndex={0} aria-label="About auto-hide">
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutAutoHide}>
                 <Icon name="info" size={17} />
                 <span className="info-tip-bubble" role="tooltip">
-                  HuBar hides itself after a moment and reappears on hover,
-                  edge-swipe, or focus. Turn this off to keep it always shown.
+                  {t.autoHideTip}
                 </span>
               </span>
             </dd>
@@ -398,7 +489,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div>
             <dt>
               <Icon name="target" size={15} />
-              HuBar position
+              {t.huBarPosition}
             </dt>
             <dd className="dd-row">
               <DockControl />
@@ -408,7 +499,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className="glance-row--mobile-only">
             <dt>
               <Icon name="globe" size={15} />
-              Language
+              {t.language}
             </dt>
             <dd className="dd-row">
               <LangSwitch />
@@ -425,7 +516,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               onClick={() => setLogOpen(true)}
             >
               <Icon name="blog" size={14} />
-              Changelog
+              {t.changelog}
             </button>
           </div>
 
@@ -435,7 +526,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             onClick={() => setThemeMenuOpen(true)}
           >
             <Icon name="paintbrush" size={14} />
-            Customize theme
+            {t.customizeTheme}
           </button>
         </div>
         </div>
@@ -448,7 +539,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className="theme-menu-section">
             <h3 className="h-with-icon theme-menu-heading">
               <Icon name="layers" size={15} />
-              Color sets
+              {t.colorSets}
             </h3>
             <AccentSetSwitch />
           </div>
@@ -456,7 +547,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className="theme-menu-section">
             <h3 className="h-with-icon theme-menu-heading">
               <Icon name="paintbrush" size={15} />
-              Accent color
+              {t.accentColor}
             </h3>
             <AccentSwitch />
           </div>
@@ -464,7 +555,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           <div className="theme-menu-section theme-menu-section--logo">
             <h3 className="h-with-icon theme-menu-heading">
               <Icon name="image" size={15} />
-              Logo
+              {t.logo}
             </h3>
             <LogoSwitch />
           </div>
@@ -475,13 +566,13 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             onClick={() => setThemeMenuOpen(false)}
           >
             <Icon name="arrowLeft" size={14} />
-            Back
+            {t.back}
           </button>
         </div>
         </div>
 
         {!themeMenuOpen && (
-          <p className="panel-swipe-hint">Swipe right for music player</p>
+          <p className="panel-swipe-hint">{t.swipeForMusic}</p>
         )}
       </div>
 
@@ -502,7 +593,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
       <div
         className={`panel-indicator${visiblePanel !== "none" ? " panel-indicator--visible" : ""}`}
         role="tablist"
-        aria-label="Active panel"
+        aria-label={t.activePanel}
       >
         <button
           type="button"
@@ -510,8 +601,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           className={`panel-indicator-btn${playerOpen ? " panel-indicator-btn--active" : ""}`}
           onClick={() => navigateTo("player")}
           aria-selected={playerOpen}
-          aria-label="Music player"
-          title="Music player"
+          aria-label={t.musicPlayer}
+          title={t.musicPlayer}
         >
           <Icon name="music" size={15} />
         </button>
@@ -521,8 +612,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           className={`panel-indicator-btn${open ? " panel-indicator-btn--active" : ""}`}
           onClick={() => navigateTo("controls")}
           aria-selected={open}
-          aria-label="Site controls"
-          title="Site controls"
+          aria-label={t.siteControls}
+          title={t.siteControls}
         >
           <Icon name="spark" size={15} />
         </button>

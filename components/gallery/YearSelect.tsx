@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
+import { useLocalized, type Localized } from "@/lib/i18n";
+
+const ui: Localized<{ filterByYear: string; all: string }> = {
+  en: { filterByYear: "Filter by year", all: "All" },
+  vi: { filterByYear: "Lọc theo năm", all: "Tất cả" },
+};
 
 interface YearSelectProps {
   years: number[];
@@ -14,6 +20,7 @@ export default function YearSelect({
   onChange,
   allowAll = false,
 }: YearSelectProps) {
+  const t = useLocalized(ui);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -46,9 +53,9 @@ export default function YearSelect({
         onClick={() => setOpen(!open)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Filter by year"
+        aria-label={t.filterByYear}
       >
-        {value ?? "All"}
+        {value ?? t.all}
         <Icon name="chevronDown" size={14} />
       </button>
       {open && (
@@ -62,7 +69,7 @@ export default function YearSelect({
                 className={`year-option${value === undefined ? " year-option--on" : ""}`}
                 onClick={() => pick(undefined)}
               >
-                All
+                {t.all}
               </button>
             </li>
           )}

@@ -90,7 +90,7 @@ const icons: Record<string, JSX.Element> = {
 
 const specMap: ReadonlyArray<readonly [string, string]> = [
   ["display", "display"], ["screen", "display"],
-  ["chip", "chip"], ["cpu", "chip"], ["processor", "chip"],
+  ["chip", "chip"], ["cpu", "chip"], ["processor", "chip"], ["soc", "chip"],
   ["memory", "memory"], ["ram", "memory"],
   ["camera", "camera"],
   ["battery", "battery"],

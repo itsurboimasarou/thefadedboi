@@ -8,6 +8,33 @@ import YearSelect from "@/components/gallery/YearSelect";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
 import { getManifest, cdnUrl, listImages, getChangelog } from "@/lib/assets";
 import type { ScannedAlbum, ScannedIndexSubject } from "@/lib/types";
+import { useLocalized, type Localized } from "@/lib/i18n";
+
+const ui: Localized<{
+  eyebrow: string;
+  heading: string;
+  photosToBeAdded: string;
+  albumsToBeAdded: string;
+  photoCount: (n: number) => string;
+  setCount: (sets: number, photos: number) => string;
+}> = {
+  en: {
+    eyebrow: "Gallery",
+    heading: "Precious moments",
+    photosToBeAdded: "Photos to be added.",
+    albumsToBeAdded: "Albums to be added.",
+    photoCount: (n) => `${n} photo${n === 1 ? "" : "s"}`,
+    setCount: (sets, photos) => `${sets} set${sets === 1 ? "" : "s"} · ${photos} photo${photos === 1 ? "" : "s"}`,
+  },
+  vi: {
+    eyebrow: "Thư viện",
+    heading: "Những khoảnh khắc đẹp nhất",
+    photosToBeAdded: "Ảnh sẽ được thêm sau.",
+    albumsToBeAdded: "Album sẽ được thêm sau.",
+    photoCount: (n) => `${n} ảnh`,
+    setCount: (sets, photos) => `${sets} bộ · ${photos} ảnh`,
+  },
+};
 
 export async function getStaticProps() {
   const { subjects } = await getManifest();
@@ -36,6 +63,7 @@ export async function getStaticProps() {
 }
 
 function SubjectSection({ subject }: { subject: ScannedIndexSubject }) {
+  const t = useLocalized(ui);
   const years = useMemo(
     () =>
       [...new Set(subject.albums.map((a) => a.year).filter(Boolean))].sort(
@@ -78,10 +106,10 @@ function SubjectSection({ subject }: { subject: ScannedIndexSubject }) {
         subject.images && subject.images.length > 0 ? (
           <AlbumGrid images={subject.images} title={subject.title} />
         ) : (
-          <p className="album-empty">Photos to be added.</p>
+          <p className="album-empty">{t.photosToBeAdded}</p>
         )
       ) : shown.length === 0 ? (
-        <p className="album-empty">Albums to be added.</p>
+        <p className="album-empty">{t.albumsToBeAdded}</p>
       ) : (
         <div className="album-cards">
           {shown.map((album) => <AlbumCard key={album.slug} subject={subject} album={album} />)}
@@ -92,6 +120,7 @@ function SubjectSection({ subject }: { subject: ScannedIndexSubject }) {
 }
 
 function AlbumCard({ subject, album }: { subject: ScannedIndexSubject; album: ScannedAlbum }) {
+  const t = useLocalized(ui);
   const cover = album.cover ? cdnUrl(album.folder, album.cover) : null;
   const subCount = album.subAlbums?.length ?? 0;
 
@@ -116,7 +145,7 @@ function AlbumCard({ subject, album }: { subject: ScannedIndexSubject; album: Sc
       <span className="album-card-body">
         <span className="album-card-title">{album.title}</span>
         <span className="album-card-meta">
-          {subCount > 0 ? `${subCount} set${subCount > 1 ? "s" : ""} · ${album.count} photos` : `${album.count} photos`}
+          {subCount > 0 ? t.setCount(subCount, album.count) : t.photoCount(album.count)}
         </span>
       </span>
     </Link>
@@ -126,16 +155,17 @@ function AlbumCard({ subject, album }: { subject: ScannedIndexSubject; album: Sc
 export default function GalleryIndex({
   subjects,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const t = useLocalized(ui);
   return (
     <div className="stack reveal">
       <header>
-        <p className="eyebrow">Gallery</p>
-        <h1>Photos</h1>
+        <p className="eyebrow">{t.eyebrow}</p>
+        <h1>{t.heading}</h1>
       </header>
 
       {subjects.length === 0 ? (
         <section className="glass">
-          <p className="album-empty">Albums to be added.</p>
+          <p className="album-empty">{t.albumsToBeAdded}</p>
         </section>
       ) : (
         subjects.map((s) => <SubjectSection key={s.slug} subject={s} />)

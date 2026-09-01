@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { site } from "@/lib/configs/site.config";
-import { home } from "@/lib/configs/home.config";
+import { site as siteConfig, siteName } from "@/lib/configs/site.config";
+import { homeEyebrow } from "@/lib/configs/home.config";
+import { useLocalized, type Localized } from "@/lib/i18n";
 import { getChangelog } from "@/lib/assets";
 import VideoBackground from "@/components/layout/VideoBackground";
 import Icon from "@/components/ui/Icons";
@@ -10,7 +11,14 @@ export async function getStaticProps() {
   return { props: { changelog: await getChangelog() }, revalidate: 300 };
 }
 
+const ui: Localized<{ greeting: string; viewGallery: string; aboutMe: string }> = {
+  en: { greeting: "Hi, I'm", viewGallery: "View gallery", aboutMe: "About me" },
+  vi: { greeting: "Xin chào, mình là", viewGallery: "Xem thư viện", aboutMe: "Về mình" },
+};
+
 export default function Home() {
+  const site = useLocalized(siteConfig);
+  const t = useLocalized(ui);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [titleW, setTitleW] = useState<number | null>(null);
 
@@ -34,24 +42,24 @@ export default function Home() {
     <>
       <VideoBackground />
       <section className="hero hero--bottom reveal">
-        <p className="eyebrow">{home.eyebrow}</p>
+        <p className="eyebrow">{homeEyebrow}</p>
         <h1 ref={titleRef} className="hero-title">
-          Hi, I&apos;m <span className="gradient-text">{site.name}</span>
+          {t.greeting} <span className="gradient-text">{siteName}</span>
         </h1>
         <p
           className="hero-copy"
           style={titleW ? { maxWidth: titleW } : undefined}
         >
-          {site.role}. {site.tagline}
+          {site.tagline}
         </p>
         <div className="hero-actions">
           <Link href="/gallery" className="btn">
             <Icon name="image" size={18} />
-            View gallery
+            {t.viewGallery}
           </Link>
           <Link href="/about" className="btn btn--ghost">
             <Icon name="user" size={18} />
-            About me
+            {t.aboutMe}
           </Link>
         </div>
       </section>

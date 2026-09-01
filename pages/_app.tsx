@@ -13,7 +13,8 @@ import type { AppProps } from "next/app";
 import { useEffect } from "react";
 import { Work_Sans, IBM_Plex_Sans, Momo_Signature, Space_Grotesk } from "next/font/google";
 import HuBar from "@/components/layout/HuBar";
-import { site } from "@/lib/configs/site.config";
+import { site as siteConfig, siteName, siteHandle, siteFooter, siteGithub } from "@/lib/configs/site.config";
+import { useLocalized } from "@/lib/i18n";
 import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
 import Snowfall from "@/components/layout/Snowfall";
@@ -26,8 +27,9 @@ const script = Momo_Signature({ subsets: ["latin"], weight: "400", display: "swa
 const mono = Space_Grotesk({ subsets: ["latin"], weight: ["500", "700"], display: "swap", variable: "--font-lang" });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const site = useLocalized(siteConfig);
   const changelog: string = (pageProps as { changelog?: string }).changelog ?? "";
-  const [footerPre, footerPost] = site.footer.split(site.handle);
+  const [footerPre, footerPost] = siteFooter.split(siteHandle);
 
   useEffect(() => {
     document.body.classList.add(display.variable, body.variable, script.variable, mono.variable);
@@ -37,7 +39,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <div className={`app-root ${display.variable} ${body.variable} ${script.variable} ${mono.variable}`}>
       <Head>
-        <title>{`${site.name}`}</title>
+        <title>{`${siteName}`}</title>
         <meta name="description" content={site.tagline} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
@@ -57,7 +59,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
           <footer className="footer">
             {footerPre}
-            <a href={site.github} target="_blank" rel="noopener noreferrer">{site.handle}</a>
+            <a href={siteGithub} target="_blank" rel="noopener noreferrer">{siteHandle}</a>
             {footerPost}
           </footer>
         </main>

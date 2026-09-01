@@ -4,6 +4,87 @@ import type { ScannedPlaylist, Track } from "@/lib/types";
 import { COMPACT_MQ } from "../layout/functions/useHuBarAutoHide";
 import Marquee from "../ui/Marquee";
 import { useMusicPlayback, setNowPlaying, setVolume, setMuted, initMusicPrefs } from "@/lib/musicState";
+import { useLocalized, type Localized } from "@/lib/i18n";
+
+const ui: Localized<{
+  music: string;
+  mute: string;
+  unmute: string;
+  volume: string;
+  back: string;
+  trackList: string;
+  close: string;
+  loading: string;
+  noTrackPlaying: string;
+  shuffle: string;
+  previousTrack: string;
+  play: string;
+  pause: string;
+  nextTrack: string;
+  repeatOff: string;
+  repeatAll: string;
+  repeatOne: string;
+  none: string;
+  allTracks: string;
+  noAlbums: string;
+  loadError: string;
+  noTracks: string;
+  musicPlayerLabel: string;
+  swipeForControls: string;
+}> = {
+  en: {
+    music: "Music",
+    mute: "Mute",
+    unmute: "Unmute",
+    volume: "Volume",
+    back: "Back",
+    trackList: "Track list",
+    close: "Close",
+    loading: "Loading tracks…",
+    noTrackPlaying: "No current playing track",
+    shuffle: "Shuffle",
+    previousTrack: "Previous track",
+    play: "Play",
+    pause: "Pause",
+    nextTrack: "Next track",
+    repeatOff: "Repeat: off",
+    repeatAll: "Repeat: all",
+    repeatOne: "Repeat: one track",
+    none: "<None>",
+    allTracks: "All tracks",
+    noAlbums: "No albums available.",
+    loadError: "Couldn't load tracks — try again later.",
+    noTracks: "No tracks available.",
+    musicPlayerLabel: "Music player",
+    swipeForControls: "Swipe left for site controls",
+  },
+  vi: {
+    music: "Nhạc",
+    mute: "Tắt tiếng",
+    unmute: "Bật tiếng",
+    volume: "Âm lượng",
+    back: "Quay lại",
+    trackList: "Danh sách bài hát",
+    close: "Đóng",
+    loading: "Đang tải bài hát…",
+    noTrackPlaying: "Chưa phát bài nào",
+    shuffle: "Phát ngẫu nhiên",
+    previousTrack: "Bài trước",
+    play: "Phát",
+    pause: "Tạm dừng",
+    nextTrack: "Bài tiếp theo",
+    repeatOff: "Lặp lại: tắt",
+    repeatAll: "Lặp lại: tất cả",
+    repeatOne: "Lặp lại: một bài",
+    none: "<Không có>",
+    allTracks: "Tất cả bài hát",
+    noAlbums: "Không có album nào.",
+    loadError: "Không tải được bài hát — thử lại sau.",
+    noTracks: "Không có bài hát nào.",
+    musicPlayerLabel: "Trình phát nhạc",
+    swipeForControls: "Vuốt sang trái để mở điều khiển trang",
+  },
+};
 
 interface MusicPlayerProps {
   open: boolean;
@@ -43,6 +124,7 @@ function randomIndex(exclude: number, len: number): number {
 }
 
 export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, setDragProgress, switching }: MusicPlayerProps) {
+  const t = useLocalized(ui);
   const [playlists, setPlaylists] = useState<ScannedPlaylist[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [listOpen, setListOpen] = useState(false);
@@ -137,14 +219,16 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     setNowPlaying({
       title: current?.title ?? null,
       artist: (current?.artist ?? currentPlaylist?.artist) ?? null,
-      albumTitle: currentPlaylist?.title ?? null,
-      cover: currentPlaylist?.cover ?? null,
+      albumTitle: (current?.album ?? currentPlaylist?.title) ?? null,
+      cover: (current?.cover ?? currentPlaylist?.cover) ?? null,
       playing: playing && !!current,
     });
   }, [
     current?.file,
     current?.title,
     current?.artist,
+    current?.album,
+    current?.cover,
     currentPlaylist?.slug,
     currentPlaylist?.title,
     currentPlaylist?.artist,
@@ -284,12 +368,12 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     setRepeat((r) => (r === "off" ? "all" : r === "all" ? "one" : "off"));
 
   const selectionLabel = !playlists || playlists.length === 0
-    ? "<None>"
+    ? t.none
     : queueMode === "all"
-      ? "All tracks"
+      ? t.allTracks
       : typeof queueMode === "number"
-        ? (playlists[queueMode]?.title ?? "<None>")
-        : "<None>";
+        ? (playlists[queueMode]?.title ?? t.none)
+        : t.none;
 
   const onPanelTouchStart = (e: React.TouchEvent) => {
     if (!open || !window.matchMedia(COMPACT_MQ).matches) return;
@@ -375,7 +459,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       } : undefined}
       role="dialog"
       aria-modal="true"
-      aria-label="Music player"
+      aria-label={t.musicPlayerLabel}
       aria-hidden={!open}
       onTouchStart={onPanelTouchStart}
       onTouchMove={onPanelTouchMove}
@@ -384,10 +468,10 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       onWheel={onPanelWheel}
     >
       <div className="player-bg-clip" aria-hidden="true">
-        {currentPlaylist?.cover && (
+        {(current?.cover ?? currentPlaylist?.cover) && (
           <div
             className="player-bg-cover"
-            style={{ backgroundImage: `url(${currentPlaylist.cover})` }}
+            style={{ backgroundImage: `url(${current?.cover ?? currentPlaylist?.cover})` }}
           />
         )}
       </div>
@@ -395,7 +479,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       <div className="panel-head">
         <h2 className="h-with-icon panel-title">
           <Icon name="music" size={18} />
-          Music
+          {t.music}
         </h2>
         <div className="panel-head-actions">
           <div className="player-header-volume">
@@ -404,8 +488,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               className="panel-icon-btn"
               onClick={() => setMuted(!muted)}
               aria-pressed={muted}
-              aria-label={muted || volume === 0 ? "Unmute" : "Mute"}
-              title={muted || volume === 0 ? "Unmute" : "Mute"}
+              aria-label={muted || volume === 0 ? t.unmute : t.mute}
+              title={muted || volume === 0 ? t.unmute : t.mute}
             >
               <Icon name={muted || volume === 0 ? "volumeMute" : "volumeHigh"} size={18} />
             </button>
@@ -421,7 +505,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                 if (muted && v > 0) setMuted(false);
               }}
               onMouseDown={(e) => e.stopPropagation()}
-              aria-label="Volume"
+              aria-label={t.volume}
             />
           </div>
           {listOpen ? (
@@ -429,18 +513,18 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               type="button"
               className="panel-back-btn"
               onClick={() => setListOpen(false)}
-              aria-label="Back"
+              aria-label={t.back}
             >
               <Icon name="arrowLeft" size={14} />
-              Back
+              {t.back}
             </button>
           ) : (
             <button
               type="button"
               className="panel-icon-btn"
               onClick={() => setListOpen(true)}
-              aria-label="Track list"
-              title="Track list"
+              aria-label={t.trackList}
+              title={t.trackList}
             >
               <Icon name="list" size={16} />
             </button>
@@ -449,8 +533,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
             type="button"
             className="panel-icon-btn player-close-btn"
             onClick={onDismiss}
-            aria-label="Close"
-            title="Close"
+            aria-label={t.close}
+            title={t.close}
           >
             <Icon name="close" size={16} />
           </button>
@@ -459,7 +543,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
 
       <div className={`panel-views${sliding ? " panel-views--sliding" : ""}`} ref={viewsRef}>
         {playlists === null ? (
-          <p className="album-empty">Loading tracks…</p>
+          <p className="album-empty">{t.loading}</p>
         ) : (
         <>
         <div
@@ -468,8 +552,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
           aria-hidden={listOpen}
         >
               <div className="player-now-playing">
-                {currentPlaylist?.cover ? (
-                  <img src={currentPlaylist.cover} alt="" className="player-cover" />
+                {(current?.cover ?? currentPlaylist?.cover) ? (
+                  <img src={current?.cover ?? currentPlaylist?.cover} alt="" className="player-cover" />
                 ) : (
                   <span className="player-cover player-cover--placeholder" aria-hidden="true">
                     <Icon name="music" size={28} />
@@ -479,11 +563,11 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   as="p"
                   className={`player-track-title${!current ? " player-track-title--empty" : ""}`}
                 >
-                  {current ? current.title : "No current playing track"}
+                  {current ? current.title : t.noTrackPlaying}
                 </Marquee>
                 {current && (
                   <Marquee as="p" className="player-track-subtext">
-                    {[current.artist ?? currentPlaylist?.artist, currentPlaylist?.title, formatQuality(current)]
+                    {[current.artist ?? currentPlaylist?.artist, current.album ?? currentPlaylist?.title, formatQuality(current)]
                       .filter(Boolean)
                       .join(" • ")}
                   </Marquee>
@@ -518,24 +602,24 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   className={`panel-icon-btn${shuffle ? " panel-icon-btn--active" : ""}`}
                   onClick={() => setShuffle((v) => !v)}
                   aria-pressed={shuffle}
-                  aria-label="Shuffle"
-                  title="Shuffle"
+                  aria-label={t.shuffle}
+                  title={t.shuffle}
                 >
                   <Icon name="shuffle" size={18} />
                 </button>
-                <button type="button" className="panel-icon-btn" onClick={() => goTo(-1)} aria-label="Previous track" title="Previous track">
+                <button type="button" className="panel-icon-btn" onClick={() => goTo(-1)} aria-label={t.previousTrack} title={t.previousTrack}>
                   <Icon name="skipBack" size={18} />
                 </button>
                 <button
                   type="button"
                   className="panel-icon-btn player-play-btn"
                   onClick={togglePlay}
-                  aria-label={playing ? "Pause" : "Play"}
-                  title={playing ? "Pause" : "Play"}
+                  aria-label={playing ? t.pause : t.play}
+                  title={playing ? t.pause : t.play}
                 >
                   <Icon name={playing ? "pause" : "play"} size={22} />
                 </button>
-                <button type="button" className="panel-icon-btn" onClick={() => goTo(1)} aria-label="Next track" title="Next track">
+                <button type="button" className="panel-icon-btn" onClick={() => goTo(1)} aria-label={t.nextTrack} title={t.nextTrack}>
                   <Icon name="skipForward" size={18} />
                 </button>
                 <button
@@ -543,8 +627,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   className={`panel-icon-btn${repeat !== "off" ? " panel-icon-btn--active" : ""}`}
                   onClick={cycleRepeat}
                   aria-pressed={repeat !== "off"}
-                  aria-label={repeat === "one" ? "Repeat: one track" : repeat === "all" ? "Repeat: all" : "Repeat: off"}
-                  title={repeat === "one" ? "Repeat: one track" : repeat === "all" ? "Repeat: all" : "Repeat: off"}
+                  aria-label={repeat === "one" ? t.repeatOne : repeat === "all" ? t.repeatAll : t.repeatOff}
+                  title={repeat === "one" ? t.repeatOne : repeat === "all" ? t.repeatAll : t.repeatOff}
                 >
                   <Icon name={repeat === "one" ? "repeatOne" : "repeat"} size={18} />
                 </button>
@@ -570,7 +654,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
             {albumMenuOpen && (
               <ul className="player-album-menu" role="listbox">
                 {!playlists || playlists.length === 0 ? (
-                  <li className="player-album-menu-empty">No albums available.</li>
+                  <li className="player-album-menu-empty">{t.noAlbums}</li>
                 ) : (
                   <>
                     {totalTracks > 0 && (
@@ -580,7 +664,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                           className={`player-album-option${queueMode === "all" ? " player-album-option--active" : ""}`}
                           onClick={() => selectQueue("all")}
                         >
-                          <Marquee className="player-album-option-text">All tracks</Marquee>
+                          <Marquee className="player-album-option-text">{t.allTracks}</Marquee>
                         </button>
                       </li>
                     )}
@@ -603,21 +687,21 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
 
           {queueItems.length === 0 ? (
             <p className="album-empty">
-              {loadError ? "Couldn't load tracks — try again later." : "No tracks available."}
+              {loadError ? t.loadError : t.noTracks}
             </p>
           ) : (
             <ul className="player-track-list">
-              {queueItems.map((t, i) => (
-                <li key={`${t.playlistIdx}-${t.file}`}>
+              {queueItems.map((track, i) => (
+                <li key={`${track.playlistIdx}-${track.file}`}>
                   <button
                     type="button"
                     className={`player-track${activeTrack === i ? " player-track--active" : ""}`}
                     onClick={() => playTrackAt(i)}
                   >
                     <Icon name={activeTrack === i && playing ? "pause" : "play"} size={13} />
-                    <Marquee className="player-track-name">{t.title}</Marquee>
-                    {Number.isFinite(t.duration) && (
-                      <span className="player-track-duration">{formatTime(t.duration as number)}</span>
+                    <Marquee className="player-track-name">{track.title}</Marquee>
+                    {Number.isFinite(track.duration) && (
+                      <span className="player-track-duration">{formatTime(track.duration as number)}</span>
                     )}
                   </button>
                 </li>
@@ -629,7 +713,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         )}
       </div>
 
-      <p className="panel-swipe-hint">Swipe left for site controls</p>
+      <p className="panel-swipe-hint">{t.swipeForControls}</p>
 
       <audio
         ref={audioRef}

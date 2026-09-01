@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { Localized } from "./i18n";
 
 export interface Fact { label: string; value: string }
 
@@ -78,6 +79,8 @@ export interface TrackMeta {
   file: string;
   title?: string;
   artist?: string;
+  album?: string;
+  cover?: string;
   format?: AudioFormat;
   bitrate?: number;
   bitDepth?: number;
@@ -109,15 +112,15 @@ export type ScannedPlaylist = Omit<Playlist, "tracks" | "cover"> & {
   tracks: Track[];
 };
 
-export interface Spec { label: string; value: string }
+export interface Spec { label: Localized<string>; value: string }
 export interface DeviceItem {
   name: string;
   tag?: string;
   image?: string;
   specs?: Spec[];
-  detail?: string;
+  detail?: Localized<string>;
   icon?: string;
 }
-export interface DeviceSection { categoryName: string; category: string; items: DeviceItem[] }
+export interface DeviceSection { categoryName: Localized<string>; category: string; items: DeviceItem[] }
 
 export interface WithChildren { children?: ReactNode }

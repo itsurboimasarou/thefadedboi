@@ -1,4 +1,5 @@
-import { portfolio } from "@/lib/configs/portfolio.config";
+import { portfolio as portfolioConfig } from "@/lib/configs/portfolio.config";
+import { useLocalized, type Localized } from "@/lib/i18n";
 import LinkBanner from "@/components/content/LinkBanner";
 import Icon from "@/components/ui/Icons";
 import { getChangelog } from "@/lib/assets";
@@ -7,12 +8,19 @@ export async function getStaticProps() {
   return { props: { changelog: await getChangelog() }, revalidate: 300 };
 }
 
+const ui: Localized<{ heading: string; workJourney: string }> = {
+  en: { heading: "Highlights", workJourney: "Work journey" },
+  vi: { heading: "Điểm nhấn", workJourney: "Work journey" },
+};
+
 export default function Portfolio() {
+  const portfolio = useLocalized(portfolioConfig);
+  const t = useLocalized(ui);
   return (
     <div className="stack reveal">
       <header>
         <p className="eyebrow">Portfolio</p>
-        <h1>Highlights</h1>
+        <h1>{t.heading}</h1>
       </header>
 
       <LinkBanner {...portfolio.banner} />
@@ -52,7 +60,7 @@ export default function Portfolio() {
       </section>
 
       <section className="glass">
-        <h2 className="h-with-icon"><Icon name="route" />Work journey</h2>
+        <h2 className="h-with-icon"><Icon name="route" />{t.workJourney}</h2>
         <ol className="timeline">
           {portfolio.journey.map((j) => (
             <li key={j.period}>

@@ -10,7 +10,8 @@ import { usePinned } from "../controls/HuBarPinned";
 import HuBarTrigger from "./HuBarTrigger";
 import useHuBarMeasure from "./functions/useHuBarMeasure";
 import useHuBarAutoHide, { useCompact } from "./functions/useHuBarAutoHide";
-import { home } from "@/lib/configs/home.config";
+import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
+import { useLocalized } from "@/lib/i18n";
 
 interface NavItem { href: string; label: string; icon: string }
 const items: NavItem[] = [
@@ -23,6 +24,7 @@ const items: NavItem[] = [
 ];
 
 export default function HuBar() {
+  const home = useLocalized(homeConfig);
   const { pathname } = useRouter();
   const dock = useDock();
   const pinned = usePinned();
@@ -75,7 +77,7 @@ export default function HuBar() {
         </div>
         <div className="hubar-group hubar-group--end">
           <NowPlaying />
-          <StatusClock config={home.status} />
+          <StatusClock config={{ ...homeStatus, labels: home.statusLabels }} />
           <LangSwitch />
         </div>
       </nav>

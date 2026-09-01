@@ -6,6 +6,33 @@ import AlbumGrid from "@/components/gallery/AlbumGrid";
 import { getManifest, listImages, findAlbum, getChangelog } from "@/lib/assets";
 import YearSelect from "@/components/gallery/YearSelect";
 import type { ScannedSubAlbum } from "@/lib/types";
+import { useLocalized, type Localized } from "@/lib/i18n";
+
+const ui: Localized<{
+  gallery: string;
+  photoCount: (n: number) => string;
+  downloadAlbum: string;
+  download: string;
+  photosToBeAdded: string;
+  photosToBeAddedWithDownload: string;
+}> = {
+  en: {
+    gallery: "Gallery",
+    photoCount: (n) => `${n} photo${n === 1 ? "" : "s"}`,
+    downloadAlbum: "Download album",
+    download: "Download",
+    photosToBeAdded: "Photos to be added.",
+    photosToBeAddedWithDownload: "Photos to be added — the full set is on the Download link above.",
+  },
+  vi: {
+    gallery: "Thư viện",
+    photoCount: (n) => `${n} ảnh`,
+    downloadAlbum: "Tải album",
+    download: "Tải xuống",
+    photosToBeAdded: "Ảnh sẽ được thêm sau.",
+    photosToBeAddedWithDownload: "Ảnh sẽ được thêm sau — bộ ảnh đầy đủ có ở liên kết Tải xuống phía trên.",
+  },
+};
 
 export async function getStaticPaths() {
   const { subjects } = await getManifest();
@@ -55,6 +82,7 @@ export default function AlbumPage({
   subAlbums,
   images,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
+  const t = useLocalized(ui);
   const [active, setActive] = useState<ScannedSubAlbum | null>(
     subAlbums?.[0] ?? null
   );
@@ -78,7 +106,7 @@ export default function AlbumPage({
       <header>
         <p className="eyebrow">
           <Link href="/gallery" className="crumb">
-            Gallery
+            {t.gallery}
           </Link>
           {" / "}
           <Link href={`/gallery#${subjectSlug}`} className="crumb">
@@ -95,15 +123,15 @@ export default function AlbumPage({
               <Icon name="image" />
               {active ? active.title : album.title}
             </h2>
-            <p className="album-count">{(active?.images ?? images).length} photos</p>
+            <p className="album-count">{t.photoCount((active?.images ?? images).length)}</p>
           </div>
           <div className="head-actions">
             {years.length > 0 && <YearSelect years={years} value={year} onChange={setYear} />}
-            {driveUrl && 
+            {driveUrl &&
               <a href={driveUrl} target="_blank" rel="noopener noreferrer"
-                className="btn btn--small btn--download" aria-label="Download album">
+                className="btn btn--small btn--download" aria-label={t.downloadAlbum}>
                 <Icon name="download" size={15} />
-                <span className="btn-label">Download</span>
+                <span className="btn-label">{t.download}</span>
               </a>
             }
           </div>
@@ -133,7 +161,7 @@ export default function AlbumPage({
           subAlbums.map((sa) => (
             <div key={sa.slug} hidden={active?.slug !== sa.slug}>
               {sa.images.length === 0 ? (
-                <p className="album-empty">Photos to be added.</p>
+                <p className="album-empty">{t.photosToBeAdded}</p>
               ) : (
                 <AlbumGrid images={sa.images} title={`${album.title} — ${sa.title}`} />
               )}
@@ -142,8 +170,8 @@ export default function AlbumPage({
         ) : shown.length === 0 ? (
           <p className="album-empty">
             {driveUrl
-              ? "Photos to be added — the full set is on the Download link above."
-              : "Photos to be added."}
+              ? t.photosToBeAddedWithDownload
+              : t.photosToBeAdded}
           </p>
         ) : (
           <AlbumGrid images={shown} title={gridTitle} />

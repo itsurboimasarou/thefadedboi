@@ -15,7 +15,7 @@ export default function StatusClock({
 
   useEffect(() => {
     const fmt = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Europe/Berlin",
+      timeZone: "Asia/Ho_Chi_Minh",
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",

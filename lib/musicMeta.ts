@@ -1,13 +1,20 @@
-import { parseWebStream } from "music-metadata";
+import { parseWebStream, selectCover } from "music-metadata";
 import type { AudioFormat } from "./types";
+
+export interface TrackPicture {
+  data: Uint8Array;
+  format: string;
+}
 
 export interface FileTrackMeta {
   title?: string;
   artist?: string;
+  album?: string;
   bitrate?: number;
   bitDepth?: number;
   sampleRate?: number;
   duration?: number;
+  picture?: TrackPicture;
 }
 
 const EXT_FORMAT: Record<string, AudioFormat> = {
@@ -30,15 +37,18 @@ async function fetchTrackMeta(url: string): Promise<FileTrackMeta> {
     const { common, format } = await parseWebStream(
       res.body,
       { mimeType: res.headers.get("content-type") ?? undefined },
-      { duration: true, skipCovers: true, skipPostHeaders: true }
+      { duration: true, skipPostHeaders: true }
     );
+    const cover = selectCover(common.picture);
     return {
       title: common.title,
       artist: common.artist,
+      album: common.album,
       bitrate: format.bitrate ? Math.round(format.bitrate / 1000) : undefined,
       bitDepth: format.bitsPerSample,
       sampleRate: format.sampleRate ? format.sampleRate / 1000 : undefined,
       duration: format.duration,
+      picture: cover ? { data: cover.data, format: cover.format } : undefined,
     };
   } catch (err) {
     console.warn(`[music] failed reading metadata for ${url}:`, err);
