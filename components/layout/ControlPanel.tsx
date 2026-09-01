@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import ThemeToggle from "../controls/ThemeToggle";
 import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
-import SnowToggle from "../controls/SnowMode";
 import GlassToggle from "../controls/GlassMode";
 import AutoHideToggle from "../controls/HuBarPinned";
 import DockControl from "../controls/HuBarDock";
@@ -16,6 +15,8 @@ import MusicPlayer from "../widgets/MusicPlayer";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { accentSets } from "@/lib/configs/accents.config";
 import { COMPACT_MQ } from "./functions/useHuBarAutoHide";
+import { useInert } from "./functions/useInert";
+import { usePanelSwipe } from "./functions/usePanelSwipe";
 import { useLocalized, type Localized } from "@/lib/i18n";
 
 const ui: Localized<{
@@ -31,9 +32,6 @@ const ui: Localized<{
   liteMode: string;
   aboutLite: string;
   liteTip: string;
-  snow: string;
-  aboutSnow: string;
-  snowTip: string;
   autoHide: string;
   aboutAutoHide: string;
   autoHideTip: string;
@@ -61,9 +59,6 @@ const ui: Localized<{
     liteMode: "Lite mode",
     aboutLite: "About Lite mode",
     liteTip: "Turns off animations and transparency effects — recommended for older devices or weak hardware.",
-    snow: "Snow",
-    aboutSnow: "About snow",
-    snowTip: "Falling snow in the background. Turning it off immediately ends flake generation.",
     autoHide: "Auto-hide",
     aboutAutoHide: "About auto-hide",
     autoHideTip: "HuBar hides itself after a moment and reappears on hover, edge-swipe, or focus. Turn this off to keep it always shown.",
@@ -91,9 +86,6 @@ const ui: Localized<{
     liteMode: "Chế độ Lite",
     aboutLite: "Về chế độ Lite",
     liteTip: "Tắt hiệu ứng chuyển động và độ trong suốt — khuyên dùng cho máy cũ hoặc cấu hình yếu.",
-    snow: "Tuyết rơi",
-    aboutSnow: "Về hiệu ứng tuyết rơi",
-    snowTip: "Tuyết rơi ở nền trang. Tắt đi sẽ lập tức ngừng tạo bông tuyết mới.",
     autoHide: "Tự động ẩn",
     aboutAutoHide: "Về tính năng tự động ẩn",
     autoHideTip: "HuBar sẽ tự động ẩn sau một lúc và hiện lại khi di chuột tới, vuốt cạnh màn hình, hoặc focus vào. Tắt để luôn hiển thị.",
@@ -123,7 +115,7 @@ export function toggleControlPanel() {
 
 function resetAllToDefault() {
   const keys = [
-    "theme", "glass-fx", "lite-mode", "snow", "hubar-pinned", "hubar-dock",
+    "theme", "glass-fx", "lite-mode", "hubar-pinned", "hubar-dock",
     "lang", "logo-custom", "accent-set",
     ...accentSets.map((s) => `accent-element-${s.key}`),
   ];
@@ -167,9 +159,11 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   const mainViewRef = useRef<HTMLDivElement>(null);
   const themeViewRef = useRef<HTMLDivElement>(null);
   const [dragProgress, setDragProgress] = useState<number | null>(null);
-  const dragMetaRef = useRef<{ x: number; y: number; width: number } | null>(null);
-  const dragProgressRef = useRef<number | null>(null);
-  useEffect(() => { dragProgressRef.current = dragProgress; }, [dragProgress]);
+
+  // Closed panel / hidden slide are inert, not aria-hidden — see useInert.
+  useInert(panelRef, !open);
+  useInert(mainViewRef, themeMenuOpen);
+  useInert(themeViewRef, !themeMenuOpen);
 
   useEffect(() => {
     const onToggle = () => {
@@ -260,77 +254,16 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
     };
   }, [visiblePanel, logOpen]);
 
-  const onPanelTouchStart = (e: React.TouchEvent) => {
-    if (themeMenuOpen || playerOpen || !window.matchMedia(COMPACT_MQ).matches) return;
-    const t = e.touches[0];
-    dragMetaRef.current = {
-      x: t.clientX,
-      y: t.clientY,
-      width: panelRef.current?.getBoundingClientRect().width || 1,
-    };
-  };
-  const onPanelTouchMove = (e: React.TouchEvent) => {
-    const meta = dragMetaRef.current;
-    if (!meta) return;
-    const t = e.touches[0];
-    const dx = t.clientX - meta.x;
-    const dy = t.clientY - meta.y;
-    if (dragProgress === null && (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy) * 1.2)) return;
-    setDragProgress(Math.min(1, Math.max(0, dx / meta.width)));
-  };
-  const onPanelTouchEnd = () => {
-    dragMetaRef.current = null;
-    if (dragProgress === null) return;
-    if (dragProgress > 0.35) navigateTo("player");
-    setDragProgress(null);
-  };
-
-  const [mouseDragging, setMouseDragging] = useState(false);
-  const onPanelMouseDown = (e: React.MouseEvent) => {
-    if (themeMenuOpen || playerOpen || !window.matchMedia(COMPACT_MQ).matches) return;
-    dragMetaRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      width: panelRef.current?.getBoundingClientRect().width || 1,
-    };
-    setMouseDragging(true);
-  };
-  useEffect(() => {
-    if (!mouseDragging) return;
-    const onMove = (e: MouseEvent) => {
-      const meta = dragMetaRef.current;
-      if (!meta) return;
-      const dx = e.clientX - meta.x;
-      const dy = e.clientY - meta.y;
-      if (dragProgressRef.current === null && (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy) * 1.2)) return;
-      setDragProgress(Math.min(1, Math.max(0, dx / meta.width)));
-    };
-    const onUp = () => {
-      dragMetaRef.current = null;
-      setMouseDragging(false);
-      if (dragProgressRef.current !== null && dragProgressRef.current > 0.35) navigateTo("player");
-      setDragProgress(null);
-    };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, [mouseDragging]);
-
-  const wheelLockRef = useRef(false);
-  const wheelResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onPanelWheel = (e: React.WheelEvent) => {
-    if (themeMenuOpen) return;
-    if (wheelResetRef.current) clearTimeout(wheelResetRef.current);
-    wheelResetRef.current = setTimeout(() => { wheelLockRef.current = false; }, 400);
-    if (wheelLockRef.current) return;
-    if (e.deltaX < -24 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.2) {
-      wheelLockRef.current = true;
-      navigateTo("player");
-    }
-  };
+  // Swipe right to hand off to the music player.
+  const swipe = usePanelSwipe({
+    panelRef,
+    enabled: !themeMenuOpen && !playerOpen,
+    direction: "right",
+    dragProgress,
+    setDragProgress,
+    onCommit: () => navigateTo("player"),
+    wheelEnabled: !themeMenuOpen,
+  });
 
   return (
     <>
@@ -344,12 +277,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         } : undefined}
         role="dialog"
         aria-label={t.siteControls}
-        aria-hidden={!open}
-        onTouchStart={onPanelTouchStart}
-        onTouchMove={onPanelTouchMove}
-        onTouchEnd={onPanelTouchEnd}
-        onMouseDown={onPanelMouseDown}
-        onWheel={onPanelWheel}
+        {...swipe}
       >
         <div className="panel-head">
           <h2 className="h-with-icon panel-title">
@@ -409,7 +337,6 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         <div
           className={`panel-view-slide panel-view-slide--main${themeMenuOpen ? " panel-view-slide--behind" : ""}`}
           ref={mainViewRef}
-          aria-hidden={themeMenuOpen}
         >
         <dl className="fact-grid glance-grid">
           <div>
@@ -449,22 +376,6 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
                 <Icon name="info" size={17} />
                 <span className="info-tip-bubble" role="tooltip">
                   {t.liteTip}
-                </span>
-              </span>
-            </dd>
-          </div>
-
-          <div className={liteOn ? "row--disabled" : undefined}>
-            <dt>
-              <Icon name="snow" size={15} />
-              {t.snow}
-            </dt>
-            <dd className="dd-row">
-              <SnowToggle />
-              <span className="info-tip" tabIndex={0} aria-label={t.aboutSnow}>
-                <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {t.snowTip}
                 </span>
               </span>
             </dd>
@@ -534,7 +445,6 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         <div
           className={`theme-menu panel-view-slide panel-view-slide--theme${themeMenuOpen ? " panel-view-slide--front" : ""}`}
           ref={themeViewRef}
-          aria-hidden={!themeMenuOpen}
         >
           <div className="theme-menu-section">
             <h3 className="h-with-icon theme-menu-heading">

@@ -13,9 +13,9 @@ const isLocalizedString = (v: any): v is Localized<string> =>
 
 export const CDN = "https://cdn.thefadedboi.me";
 
-export const REPO = "itsurboimasarou/site-assets";
-export const BRANCH = "main";
-export const RAW = `https://gitea.com/${REPO}/raw/branch/${BRANCH}`;
+const REPO = "itsurboimasarou/site-assets";
+const BRANCH = "main";
+const RAW = `https://gitea.com/${REPO}/raw/branch/${BRANCH}`;
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
 const IGNORE_PREFIX = /^_/;
@@ -32,14 +32,14 @@ export const cdnUrl = (folder: string, file: string) =>
 export const trackUrl = (folder: string, file: string) =>
   assetUrl("tracks", folder, file);
 
-export const thumbUrl = (folder: string, file: string) =>
+const thumbUrl = (folder: string, file: string) =>
   `/api/thumb?folder=${encodeURIComponent(folder)}&file=${encodeURIComponent(file)}`;
 
 // ── CDN proxying ────────────────────────────────────────────────────
 // Shared by both proxy routes: /api/thumb (re-encodes to AVIF) and
 // /api/photo (streams the original as a download). They exist because the
 // CDN sends no CORS headers, so the browser can't fetch it directly.
-export const CDN_HOST = new URL(CDN).host;
+const CDN_HOST = new URL(CDN).host;
 
 // Parses a caller-supplied URL, returning null unless it points at our own
 // CDN. Both routes take a URL from the query string, so this check is what

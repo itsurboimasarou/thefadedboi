@@ -3,36 +3,20 @@ import { createPortal } from "react-dom";
 import Icon from "../ui/Icons";
 import YearSelect from "./YearSelect";
 import { useLocalized, type Localized } from "@/lib/i18n";
-
-const EVT = "gallery-bar-pos-change";
-const KEY = "gallery-bar-pos";
+import { createSetting } from "@/lib/setting";
 
 export type BarPos = "top" | "bottom";
 
-export function getBarPos(): BarPos {
-  if (typeof window === "undefined") return "top";
-  try {
-    return localStorage.getItem(KEY) === "bottom" ? "bottom" : "top";
-  } catch {
-    return "top";
-  }
-}
+const barPos = createSetting<BarPos>({
+  key: "gallery-bar-pos",
+  event: "gallery-bar-pos-change",
+  fallback: "top",
+  parse: (raw) => (raw === "bottom" ? "bottom" : "top"),
+});
 
-export function setBarPos(pos: BarPos) {
-  try { localStorage.setItem(KEY, pos); } catch {}
-  window.dispatchEvent(new CustomEvent(EVT, { detail: pos }));
-}
-
-export function useBarPos() {
-  const [pos, setPos] = useState<BarPos>("top");
-  useEffect(() => {
-    setPos(getBarPos());
-    const h = (e: Event) => setPos((e as CustomEvent<BarPos>).detail);
-    window.addEventListener(EVT, h);
-    return () => window.removeEventListener(EVT, h);
-  }, []);
-  return pos;
-}
+export const getBarPos = barPos.get;
+export const setBarPos = barPos.set;
+export const useBarPos = barPos.use;
 
 function useHideOnScrollDown() {
   const [hidden, setHidden] = useState(false);

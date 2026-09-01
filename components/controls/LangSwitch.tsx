@@ -1,32 +1,33 @@
-import { useEffect, useState } from "react";
-
-const EVT = "lang-change";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createSetting } from "@/lib/setting";
 
 export type Lang = "en" | "vi";
 
-export function getLang(): Lang {
-  if (typeof window === "undefined") return "en";
-  try {
-    return localStorage.getItem("lang") === "vi" ? "vi" : "en";
-  } catch {
-    return "en";
-  }
-}
+const langSetting = createSetting<Lang>({
+  key: "lang",
+  event: "lang-change",
+  fallback: "en",
+  parse: (raw) => (raw === "vi" ? "vi" : "en"),
+});
 
-export function setLang(lang: Lang) {
-  try { localStorage.setItem("lang", lang); } catch {}
-  window.dispatchEvent(new CustomEvent(EVT, { detail: lang }));
-}
+export const getLang = langSetting.get;
+export const setLang = langSetting.set;
 
-export function useLang() {
+const LangCtx = createContext<Lang>("en");
+
+export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("en");
+
   useEffect(() => {
     setLangState(getLang());
-    const h = (e: Event) => setLangState((e as CustomEvent<Lang>).detail);
-    window.addEventListener(EVT, h);
-    return () => window.removeEventListener(EVT, h);
+    return langSetting.subscribe(() => setLangState(getLang()));
   }, []);
-  return lang;
+
+  return <LangCtx.Provider value={lang}>{children}</LangCtx.Provider>;
+}
+
+export function useLang(): Lang {
+  return useContext(LangCtx);
 }
 
 export default function LangSwitch() {

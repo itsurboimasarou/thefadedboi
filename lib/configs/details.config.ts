@@ -10,7 +10,7 @@ export interface DetailsContent {
   likes: Like[];
 }
 
-export const detailsAvatar = "/logo/Columbina.png";
+export const detailsAvatar = "/profile.png";
 export const detailsSkills = [
   "React / Next.js", "TypeScript", "Python", "Figma",
   "Video editing", "Affinity", "Node.js",

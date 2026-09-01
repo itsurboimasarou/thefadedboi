@@ -45,6 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (v) res.setHeader(h, v);
   }
   res.setHeader("Accept-Ranges", upstream.headers.get("accept-ranges") ?? "bytes");
+  res.setHeader("Content-Disposition", "inline");
 
   const reader = upstream.body.getReader();
   try {

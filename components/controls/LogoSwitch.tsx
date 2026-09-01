@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocalized, type Localized } from "@/lib/i18n";
+import { createSetting } from "@/lib/setting";
 
 const EVT = "logo-change";
 const KEY = "logo-custom";
@@ -9,36 +10,22 @@ const ui: Localized<{ logo: string; default: string; noLogos: string }> = {
   vi: { logo: "Logo", default: "Mặc định", noLogos: "Chưa có logo nào." },
 };
 
-export function getLogo(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return localStorage.getItem(KEY);
-  } catch {
-    return null;
-  }
-}
+const logoSetting = createSetting<string | null>({
+  key: KEY,
+  event: EVT,
+  fallback: null,
+  parse: (raw) => raw,
+  serialize: (file) => file,
+  apply: (file) => {
+    const s = document.documentElement.style;
+    if (file) s.setProperty("--logo-custom", `url(/logo/${file})`);
+    else s.removeProperty("--logo-custom");
+  },
+});
 
-export function setLogo(file: string | null) {
-  if (!file) {
-    document.documentElement.style.removeProperty("--logo-custom");
-    try { localStorage.removeItem(KEY); } catch {}
-  } else {
-    document.documentElement.style.setProperty("--logo-custom", `url(/logo/${file})`);
-    try { localStorage.setItem(KEY, file); } catch {}
-  }
-  window.dispatchEvent(new CustomEvent(EVT, { detail: file }));
-}
-
-export function useLogo() {
-  const [logo, setLogoState] = useState<string | null>(null);
-  useEffect(() => {
-    setLogoState(getLogo());
-    const h = (e: Event) => setLogoState((e as CustomEvent<string | null>).detail);
-    window.addEventListener(EVT, h);
-    return () => window.removeEventListener(EVT, h);
-  }, []);
-  return logo;
-}
+export const getLogo = logoSetting.get;
+export const setLogo = logoSetting.set;
+export const useLogo = logoSetting.use;
 
 function nameOf(file: string) {
   return file.replace(/\.[^.]+$/, "");

@@ -9,14 +9,6 @@ const p = {
   "aria-hidden": true,
 } as const;
 
-export const snowPaths = (
-  <>
-    <path d="M12 2.5v19M3.8 7.3l16.4 9.5M3.8 16.8 20.2 7.3" />
-    <path d="M10 4.5 12 2.5l2 2M10 19.5l2 2 2-2M6.5 6.5 3.8 7.3l.7 2.7M17.5 6.5l2.7.8-.7 2.7M4.5 14l-.7 2.7 2.7.8M19.5 14l.7 2.8-2.7.7" />
-    <path d="M10.5 5.9 12 7.4l1.5-1.5M10.5 18.1 12 16.6l1.5 1.5M7.5 7.6 8 9.7l-2.1.6M16.5 7.6 16 9.7l2.1.6M7.5 16.4 8 14.3l-2.1-.6M16.5 16.4 16 14.3l2.1-.6" />
-  </>
-);
-
 const icons: Record<string, JSX.Element> = {
   // frickin sections
   phone: <svg {...p}><rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M10.5 18.5h3" /></svg>,
@@ -33,7 +25,6 @@ const icons: Record<string, JSX.Element> = {
   route: <svg {...p}><circle cx="6" cy="18" r="2.4" /><circle cx="18" cy="6" r="2.4" /><path d="M8.4 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.6" /></svg>,
   image: <svg {...p}><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="9" cy="10" r="1.8" /><path d="m5 19 5.2-5.2a1.5 1.5 0 0 1 2.1 0L19 20" /></svg>,
   blog: <svg {...p}><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H16l4 4v10.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5Z" /><path d="M16 4v4h4M8 12h8M8 15.5h5" /></svg>,
-  clock: <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></svg>,
   trophy: <svg {...p}><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" /><path d="M7 6H4.5a2.5 2.5 0 0 0 2.5 4M17 6h2.5a2.5 2.5 0 0 1-2.5 4" /><path d="M12 14v3M8.5 20h7M9.5 20l.6-3h3.8l.6 3" /></svg>,
   download: <svg {...p}><path d="M12 3v12M7.5 10.5 12 15l4.5-4.5" /><path d="M4 17.5v1.5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5" /></svg>,
   // frickin specs
@@ -55,7 +46,6 @@ const icons: Record<string, JSX.Element> = {
   target: <svg {...p}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5.2" /><circle cx="12" cy="12" r="1.6" /></svg>,
   pin: <svg {...p}><path d="M12 21.5s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z" /><circle cx="12" cy="10.5" r="2.6" /></svg>,
   moon: <svg {...p}><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" /></svg>,
-  snow: <svg {...p}>{snowPaths}</svg>,
   dot: <svg {...p}><circle cx="12" cy="12" r="3.5" /></svg>,
   // frickin nav
   home: <svg {...p}><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /><path d="M9.5 21v-6h5v6" /></svg>,
@@ -73,7 +63,6 @@ const icons: Record<string, JSX.Element> = {
   circleArrow: <svg {...p}><path d="M20 12a8 8 0 1 1-2.34-5.66" /><path d="M20 4.5v5h-5" /></svg>,
   close: <svg {...p}><path d="M6 6l12 12M18 6 6 18" /></svg>,
   layers: <svg {...p}><path d="m12 3 9 5-9 5-9-5 9-5Z" /><path d="m3 13 9 5 9-5" /></svg>,
-  check: <svg {...p}><path d="m5 12.5 5 5L19 7" /></svg>,
   globe: <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9Z" /></svg>,
   music: <svg {...p}><path d="M9 18V5.5l10-2v12.5" /><circle cx="6" cy="18" r="2.6" /><circle cx="16" cy="16" r="2.6" /></svg>,
   play: <svg {...p}><path d="M7 4.5v15l13-7.5Z" /></svg>,

@@ -496,11 +496,6 @@ html.lite-mode .lightbox {
 }
 html.lite-mode .theme-switch .knob { transition: none; }
 
-html.lite-mode .lightbox-loader img {
-  animation: none;
-  opacity: 0.35;
-}
-
 html.lite-mode .glass,
 html.lite-mode .gear-card,
 html.lite-mode .spec-item summary,
@@ -516,10 +511,6 @@ html.lite-mode .hubar {
 }
 html.lite-mode .hubar-hotzone { display: none; }
 
-html.lite-mode .version-pill:hover { transform: none; }
-
-html.lite-mode .sky .flake { display: none; }
-
 html.lite-mode .year-menu { animation: none; }
 
 /* Lite + light: solid white surfaces */
@@ -530,13 +521,6 @@ html.lite-mode[data-theme="light"] .contact-icon {
   background: #ffffff;
 }
 
-/* Lite mode: release GPU layers too. Hidden stars still hold compositor
-   memory if `will-change` stays live, so drop the hint alongside them. */
-html.lite-mode .sky {
-  will-change: auto;
-  contain: none;
-  transform: none;
-}
 
 /* Lite mode: a static ring still communicates "working" without animating. */
 html.lite-mode .page-loader-ring {

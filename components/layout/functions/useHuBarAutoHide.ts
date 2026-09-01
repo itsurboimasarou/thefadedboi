@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Dock } from "../../controls/HuBarDock";
 
-export const HIDE_DELAY = 600;
-export const FIRST_HIDE_DELAY = 3000;
+const HIDE_DELAY = 600;
+const FIRST_HIDE_DELAY = 3000;
 export const COMPACT_MQ = "(max-width: 798px), (max-height: 600px)";
 const TOUCH_MQ = "(pointer: coarse)";
 const EDGE = 24;

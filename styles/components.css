@@ -101,7 +101,7 @@
   translate: 34px 0;
 }
 
-/* ── Snowflake shape setting ────────────────────────── */
+/* ── Small square icon toggle (HuBar dock buttons) ──── */
 .shape-toggle {
   display: grid;
   place-items: center;
@@ -680,19 +680,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.version-pill {
-  color: var(--accent);
-  font: inherit;
-  font-family: var(--font-display, system-ui, sans-serif);
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-}
-.version-pill:hover{
-  background: color-mix(in srgb, currentColor 22%, transparent);
-}
-
 .dd-row {
   display: flex;
   align-items: center;
@@ -836,11 +823,6 @@
   opacity: 1;
 }
 
-/* Mobile's own StatusClock (ControlPanel's "At a glance" row, not HuBar's)
-   has no hover to crossfade with — show label and time side by side there,
-   like it always did, instead of stacked. No media query needed: this row
-   is already display: none outside the mobile breakpoint (see
-   .glance-row--mobile-only above), so this simply has no effect there. */
 .glance-row--mobile-only .status-clock-crossfade {
   display: flex;
   flex-direction: row-reverse;

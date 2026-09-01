@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import type { ScannedPlaylist, Track } from "@/lib/types";
 import { COMPACT_MQ } from "../layout/functions/useHuBarAutoHide";
+import { usePanelSwipe } from "../layout/functions/usePanelSwipe";
+import { useInert } from "../layout/functions/useInert";
 import Marquee from "../ui/Marquee";
 import { useMusicPlayback, setNowPlaying, setVolume, setMuted, initMusicPrefs } from "@/lib/musicState";
 import { useLocalized, type Localized } from "@/lib/i18n";
@@ -149,9 +151,13 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   const playerViewRef = useRef<HTMLDivElement>(null);
   const listViewRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
-  const dragMetaRef = useRef<{ x: number; y: number; width: number } | null>(null);
   const durationRef = useRef(0);
   useEffect(() => { durationRef.current = duration; }, [duration]);
+
+  // Closed panel / hidden slide are inert, not aria-hidden — see useInert.
+  useInert(panelRef, !open);
+  useInert(playerViewRef, listOpen);
+  useInert(listViewRef, !listOpen);
 
   useLayoutEffect(() => {
     if (open) setListOpen(false);
@@ -374,78 +380,15 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         ? (playlists[queueMode]?.folder ?? t.none)
         : t.none;
 
-  const onPanelTouchStart = (e: React.TouchEvent) => {
-    if (!open || !window.matchMedia(COMPACT_MQ).matches) return;
-    const t = e.touches[0];
-    dragMetaRef.current = {
-      x: t.clientX,
-      y: t.clientY,
-      width: panelRef.current?.getBoundingClientRect().width || 1,
-    };
-  };
-  const onPanelTouchMove = (e: React.TouchEvent) => {
-    const meta = dragMetaRef.current;
-    if (!meta) return;
-    const t = e.touches[0];
-    const dx = t.clientX - meta.x;
-    const dy = t.clientY - meta.y;
-    if (dragProgress === null && (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy) * 1.2)) return;
-    setDragProgress(Math.min(1, Math.max(0, 1 + dx / meta.width)));
-  };
-  const onPanelTouchEnd = () => {
-    dragMetaRef.current = null;
-    if (dragProgress === null) return;
-    if (dragProgress < 0.65) onClose();
-    setDragProgress(null);
-  };
-
-  const dragProgressRef = useRef<number | null>(null);
-  useEffect(() => { dragProgressRef.current = dragProgress; }, [dragProgress]);
-  const [mouseDragging, setMouseDragging] = useState(false);
-  const onPanelMouseDown = (e: React.MouseEvent) => {
-    if (!open || !window.matchMedia(COMPACT_MQ).matches) return;
-    dragMetaRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      width: panelRef.current?.getBoundingClientRect().width || 1,
-    };
-    setMouseDragging(true);
-  };
-  useEffect(() => {
-    if (!mouseDragging) return;
-    const onMove = (e: MouseEvent) => {
-      const meta = dragMetaRef.current;
-      if (!meta) return;
-      const dx = e.clientX - meta.x;
-      const dy = e.clientY - meta.y;
-      if (dragProgressRef.current === null && (Math.abs(dx) < 10 || Math.abs(dx) <= Math.abs(dy) * 1.2)) return;
-      setDragProgress(Math.min(1, Math.max(0, 1 + dx / meta.width)));
-    };
-    const onUp = () => {
-      dragMetaRef.current = null;
-      setMouseDragging(false);
-      if (dragProgressRef.current !== null && dragProgressRef.current < 0.65) onClose();
-      setDragProgress(null);
-    };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, [mouseDragging]);
-
-  const wheelLockRef = useRef(false);
-  const wheelResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onPanelWheel = (e: React.WheelEvent) => {
-    if (wheelResetRef.current) clearTimeout(wheelResetRef.current);
-    wheelResetRef.current = setTimeout(() => { wheelLockRef.current = false; }, 400);
-    if (wheelLockRef.current) return;
-    if (e.deltaX > 24 && e.deltaX > Math.abs(e.deltaY) * 1.2) {
-      wheelLockRef.current = true;
-      onClose();
-    }
-  };
+  // Swipe left to dismiss back to the control panel.
+  const swipe = usePanelSwipe({
+    panelRef,
+    enabled: open,
+    direction: "left",
+    dragProgress,
+    setDragProgress,
+    onCommit: onClose,
+  });
 
   return (
     <div
@@ -459,12 +402,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       role="dialog"
       aria-modal="true"
       aria-label={t.musicPlayerLabel}
-      aria-hidden={!open}
-      onTouchStart={onPanelTouchStart}
-      onTouchMove={onPanelTouchMove}
-      onTouchEnd={onPanelTouchEnd}
-      onMouseDown={onPanelMouseDown}
-      onWheel={onPanelWheel}
+      {...swipe}
     >
       <div className="player-bg-clip" aria-hidden="true">
         {(current?.cover ?? currentPlaylist?.cover) && (
@@ -547,9 +485,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         <>
         <div
           className={`panel-view-slide panel-view-slide--main${listOpen ? " panel-view-slide--behind" : ""}`}
-          ref={playerViewRef}
-          aria-hidden={listOpen}
-        >
+          ref={playerViewRef}        >
               <div className="player-now-playing">
                 {(current?.cover ?? currentPlaylist?.cover) ? (
                   <img src={current?.cover ?? currentPlaylist?.cover} alt="" className="player-cover" />
@@ -636,9 +572,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
 
         <div
           className={`panel-view-slide panel-view-slide--theme${listOpen ? " panel-view-slide--front" : ""}`}
-          ref={listViewRef}
-          aria-hidden={!listOpen}
-        >
+          ref={listViewRef}        >
           <div className="player-album-select" ref={albumSelectRef}>
             <button
               type="button"

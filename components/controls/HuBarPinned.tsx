@@ -1,35 +1,20 @@
-import { useEffect, useState } from "react";
+import { createSetting } from "@/lib/setting";
 
-const EVT = "hubar-pinned-change";
+const pinned = createSetting<boolean>({
+  key: "hubar-pinned",
+  event: "hubar-pinned-change",
+  fallback: true,
+  parse: (raw) => raw !== "0",
+  serialize: (on) => (on ? "1" : "0"),
+});
 
-export function pinnedOn(): boolean {
-  if (typeof window === "undefined") return true;
-  try {
-    return localStorage.getItem("hubar-pinned") !== "0";
-  } catch {
-    return true;
-  }
-}
-
-export function setPinned(on: boolean) {
-  try { localStorage.setItem("hubar-pinned", on ? "1" : "0"); } catch {}
-  window.dispatchEvent(new CustomEvent(EVT, { detail: on }));
-}
-
-export function usePinned() {
-  const [on, setOn] = useState(true);
-  useEffect(() => {
-    setOn(pinnedOn());
-    const h = (e: Event) => setOn((e as CustomEvent<boolean>).detail);
-    window.addEventListener(EVT, h);
-    return () => window.removeEventListener(EVT, h);
-  }, []);
-  return on;
-}
+export const pinnedOn = pinned.get;
+export const setPinned = pinned.set;
+export const usePinned = pinned.use;
 
 export default function AutoHideToggle() {
-  const pinned = usePinned();
-  const on = !pinned;
+  const isPinned = usePinned();
+  const on = !isPinned;
 
   return (
     <button
@@ -38,7 +23,7 @@ export default function AutoHideToggle() {
       aria-checked={on}
       aria-label="Auto-hide"
       className="theme-switch lite-switch"
-      onClick={() => setPinned(!pinned)}
+      onClick={() => setPinned(!isPinned)}
     >
       <span className="knob" aria-hidden="true" />
     </button>

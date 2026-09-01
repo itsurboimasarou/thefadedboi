@@ -1,38 +1,21 @@
-import { useEffect, useState } from "react";
 import Icon from "../ui/Icons";
 import { useCompact } from "../layout/functions/useHuBarAutoHide";
-
-const EVT = "hubar-dock-change";
+import { createSetting } from "@/lib/setting";
 
 export type Dock = "top" | "bottom" | "left" | "right";
 
 const DOCKS: Dock[] = ["top", "bottom", "left", "right"];
 
-export function getDock(): Dock {
-  if (typeof window === "undefined") return "top";
-  try {
-    const v = localStorage.getItem("hubar-dock");
-    return v === "top" || v === "bottom" || v === "left" || v === "right" ? v : "top";
-  } catch {
-    return "top";
-  }
-}
+const dockSetting = createSetting<Dock>({
+  key: "hubar-dock",
+  event: "hubar-dock-change",
+  fallback: "top",
+  parse: (raw) => (DOCKS.includes(raw as Dock) ? (raw as Dock) : "top"),
+});
 
-export function setDock(d: Dock) {
-  try { localStorage.setItem("hubar-dock", d); } catch {}
-  window.dispatchEvent(new CustomEvent(EVT, { detail: d }));
-}
-
-export function useDock() {
-  const [dock, setDockState] = useState<Dock>("top");
-  useEffect(() => {
-    setDockState(getDock());
-    const h = (e: Event) => setDockState((e as CustomEvent<Dock>).detail);
-    window.addEventListener(EVT, h);
-    return () => window.removeEventListener(EVT, h);
-  }, []);
-  return dock;
-}
+export const getDock = dockSetting.get;
+export const setDock = dockSetting.set;
+export const useDock = dockSetting.use;
 
 const labels: Record<Dock, string> = {
   top: "Top",

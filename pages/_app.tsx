@@ -7,7 +7,6 @@ import "@/styles/components.css";
 import "@/styles/pages.css";
 import "@/styles/modes.css";
 
-// Layout Components
 import Head from "next/head";
 import type { AppProps } from "next/app";
 import { useEffect } from "react";
@@ -17,16 +16,23 @@ import { site as siteConfig, siteName, siteHandle, siteFooter, siteGithub } from
 import { useLocalized } from "@/lib/i18n";
 import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
-import Snowfall from "@/components/layout/Snowfall";
 import ControlPanel from "@/components/layout/ControlPanel";
-import { snowPaths } from "@/components/ui/Icons";
+import { LangProvider } from "@/components/controls/LangSwitch";
 
 const display = Work_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
 const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-body" });
 const script = Momo_Signature({ subsets: ["latin"], weight: "400", display: "swap", variable: "--font-script" });
 const mono = Space_Grotesk({ subsets: ["latin"], weight: ["500", "700"], display: "swap", variable: "--font-lang" });
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App(props: AppProps) {
+  return (
+    <LangProvider>
+      <AppShell {...props} />
+    </LangProvider>
+  );
+}
+
+function AppShell({ Component, pageProps }: AppProps) {
   const site = useLocalized(siteConfig);
   const changelog: string = (pageProps as { changelog?: string }).changelog ?? "";
   const [footerPre, footerPost] = siteFooter.split(siteHandle);
@@ -44,16 +50,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
       </Head>
-      <div id="orb-field" className="orb-field" aria-hidden="true">
-        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
-          <symbol id="flake-glyph" viewBox="0 0 24 24">
-            <g stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" fill="none">
-              {snowPaths}
-            </g>
-          </symbol>
-        </svg>
-        <Snowfall />
-      </div>
+      <div id="orb-field" className="orb-field" aria-hidden="true" />
       <div className="shell">
         <main className="main">
           <Component {...pageProps} />

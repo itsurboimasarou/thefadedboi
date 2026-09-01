@@ -249,11 +249,6 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
                 />
               );
             })}
-          {!loaded && (
-            <span className="lightbox-loader" aria-hidden="true">
-              <img src="/logo.svg" alt="" />
-            </span>
-          )}
         </div>
         <button type="button" className="lightbox-close" onClick={close} aria-label={t.close}>✕</button>
         <button
@@ -308,7 +303,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
       <div className="album-grid">
         {items.map((img, i) =>
           leaving ? (
-            <span key={img.full} className="album-thumb album-thumb--idle" aria-hidden="true" />
+            <span key={img.full} className="album-thumb" aria-hidden="true" />
           ) : (
             <button
               key={img.full}

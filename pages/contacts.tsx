@@ -67,14 +67,14 @@ export default function Contacts() {
       <section>
         <h2 className="h-with-icon"><Icon name="mail" />{t.workProfiles}</h2>
         <div className="grid grid--2">
-          {contacts.direct.map((c) => <LinkCard key={c.label} item={c} />)}
+          {contacts.direct.map((c) => <LinkCard key={c.href ?? c.label} item={c} />)}
         </div>
       </section>
 
       <section>
         <h2 className="h-with-icon"><Icon name="share" />{t.otherSocial}</h2>
         <div className="grid grid--2">
-          {contacts.socials.map((s) => <LinkCard key={s.label} item={s} />)}
+          {contacts.socials.map((s) => <LinkCard key={s.href ?? s.label} item={s} />)}
         </div>
       </section>
 

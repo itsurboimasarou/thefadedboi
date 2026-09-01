@@ -15,21 +15,14 @@
   --bg: #000000;
   --ink: #eaf4fb;
   --ink-dim: #8fa6bf;
-  /* Accent is user-selectable (see AccentSwitch.tsx) via the --accent-custom
-     trio it sets as an inline style on <html> — the same override pattern
-     as --logo-custom below. These literals are just the fallback: Genshin
-     Impact's default set, Anemo — the first color in accents.config.ts. */
   --accent: var(--accent-custom, #6fd6b4);
   --accent-soft: var(--accent-soft-custom, #a8ecd6);
   --accent-contrast: var(--accent-contrast-custom, #06291f);
   --glass: color-mix(in srgb, var(--ink) 6%, var(--bg));
   --glass-strong: color-mix(in srgb, var(--ink) 9%, var(--bg));
-  /* borders carry the separation that background contrast used to */
   --glass-border: rgba(180, 220, 240, 0.18);
   --shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
   --hubar-solid: #0a0a0a;
-  /* HuBar's own footprint — the control panel and .main's padding
-     reservation stack off of this. */
   --hubar-h: 68px;
   --radius: 20px;
   --hubar-w: 84px;
@@ -40,11 +33,6 @@
   --bg: #ffffff;
   --ink: #0d2137;
   --ink-dim: #4f6883;
-  /* Anemo's dark-mode pastel (#6fd6b4) all but disappears as text/icon
-     color against a white page, so the default fallback here is a bolder,
-     more saturated version of the same hue instead — light (not dark)
-     contrast text/icons on it, same as every accent's own light variant
-     (accents.config.ts). */
   --accent: var(--accent-custom, #14966f);
   --accent-soft: var(--accent-soft-custom, #6fd6b4);
   --accent-contrast: var(--accent-contrast-custom, #ffffff);
@@ -72,7 +60,6 @@
   /* ~3× the default glass border */
 }
 
-:root[data-theme="light"] .motion-notice,
 :root[data-theme="light"] .changelog-dialog {
   background: #ffffff;
 }
@@ -128,9 +115,3 @@ html.lite-mode {
   --chrome-blur: none;
   --chrome-bg: var(--hubar-solid);
 }
-
-/* The reduced-motion override for these same two tokens lives in
-   modes.css now, with the rest of the @media rules — it still needs to
-   come after this html.glass-fx rule in overall cascade order (equal
-   specificity, source order decides), which holds since modes.css loads
-   after this file unconditionally. */

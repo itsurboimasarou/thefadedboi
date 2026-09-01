@@ -1,19 +1,6 @@
 /* ═══ pages.css ═══
-   Page-specific: home blog card, details, contacts,
+   Page-specific: details, contacts,
    portfolio, gallery + lightbox, devices. */
-
-/* ── Blog callout ───────────────────────────────────── */
-.blog-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.blog-card .btn {
-  margin-left: auto;
-}
 
 /* ── Details page ───────────────────────────────────── */
 .about-hero {
@@ -91,14 +78,6 @@
 .contact-icon svg {
   width: 22px;
   height: 22px;
-}
-
-.copy-hint {
-  display: inline-block;
-  margin-left: 10px;
-  font-size: 0.8rem;
-  color: var(--accent);
-  font-family: var(--font-display, system-ui, sans-serif);
 }
 
 .btn--pill {
@@ -586,35 +565,6 @@ body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--
   object-fit: contain;
   filter: blur(24px);
   transition: opacity 0.25s;
-}
-
-.lightbox-loader {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-}
-
-.lightbox-loader img {
-  width: 56px;
-  opacity: 0.35;
-  /* the "dim" */
-  animation: loader-pulse 1.2s ease-in-out infinite;
-}
-
-@keyframes loader-pulse {
-
-  0%,
-  100% {
-    opacity: 0.2;
-    transform: scale(0.96);
-  }
-
-  50% {
-    opacity: 0.45;
-    transform: scale(1);
-  }
 }
 
 /* ── Devices page ───────────────────────────────────── */
