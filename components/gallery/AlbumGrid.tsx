@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { GalleryImage } from "@/lib/types";
 import Icon from "../ui/Icons";
 import { useLocalized, type Localized } from "@/lib/i18n";
+import useImageZoom from "@/lib/functions/useImageZoom";
 
 const ui: Localized<{
   photoViewer: (title: string) => string;
@@ -147,6 +148,9 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
     };
   }, [router.events]);
 
+  const frameRef = useRef<HTMLDivElement>(null);
+  const { zoom, zoomed, handlers } = useImageZoom(frameRef, index);
+
   const close = useCallback(() => setIndex(null), []);
   const step = useCallback(
     (dir: number) => setIndex((i) => (i === null ? i : (i + dir + items.length) % items.length)),
@@ -212,26 +216,48 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
         aria-label={t.photoViewer(title)}
         onClick={close}
       >
-        <div className="lightbox-frame" onClick={(e) => e.stopPropagation()}>
-          <img
-            src={withThumbSize(items[index].thumb, "lg")}
-            alt=""
-            aria-hidden="true"
-            className="lightbox-preview"
-            style={{ opacity: loaded ? 0 : 1 }}
-          />
-          <Image
-            key={`${items[index].full}#${thumbs[items[index].full]?.tries ?? 0}`}
-            src={items[index].full}
-            alt={t.fullSizeAlt(title, index + 1)}
-            fill
-            sizes="100vw"
-            quality={80}
-            priority
-            onLoad={() => setLoaded(true)}
-            onError={() => onThumbError(items[index].full)}
-            style={{ objectFit: "contain", opacity: loaded ? 1 : 0, transition: "opacity 0.25s" }}
-          />
+        <div
+          className={`lightbox-frame${zoomed ? " lightbox-frame--zoomed" : ""}`}
+          ref={frameRef}
+          {...handlers}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            className="lightbox-zoom"
+            style={{ transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${zoom.scale})` }}
+          >
+            <img
+              src={withThumbSize(items[index].thumb, "lg")}
+              alt=""
+              aria-hidden="true"
+              className="lightbox-preview"
+              style={{ opacity: loaded ? 0 : 1 }}
+            />
+            <Image
+              key={`${items[index].full}#${thumbs[items[index].full]?.tries ?? 0}`}
+              src={items[index].full}
+              alt={t.fullSizeAlt(title, index + 1)}
+              fill
+              sizes="100vw"
+              quality={80}
+              priority
+              onLoad={() => setLoaded(true)}
+              onError={() => onThumbError(items[index].full)}
+              style={{ objectFit: "contain", opacity: loaded ? 1 : 0, transition: "opacity 0.25s" }}
+            />
+            {/* Zooming past fit swaps in the untouched original. next/image
+                only ever serves a viewport-sized variant, so magnifying that
+                would just enlarge its pixels; this is the real file. */}
+            {zoomed && (
+              <img
+                src={items[index].full}
+                alt=""
+                aria-hidden="true"
+                className="lightbox-full"
+                draggable={false}
+              />
+            )}
+          </div>
           {items.length > 1 &&
             [1, -1].map((dir) => {
               const n = (index + dir + items.length) % items.length;
@@ -350,7 +376,6 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
                   height: "100%",
                   objectFit: "cover",
                   opacity: thumbs[img.thumb]?.ready ? 1 : 0,
-                  transition: "opacity 0.25s",
                 }}
               />
             </button>

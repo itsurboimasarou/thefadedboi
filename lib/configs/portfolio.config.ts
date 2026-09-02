@@ -99,7 +99,7 @@ const vi: PortfolioContent = {
       period: "2025 — 2026",
       role: "Content Writer (for Mr. Bình Bear)",
       org: "GEARVN",
-      note: "Chịu trách nhiệm & hỗ trợ viết kịch bản cho kênh YouTube của GEARVN (các video ngắn), bao gồm đánh gái sản phẩm, thủ thuật & tin tức công nghệ.",
+      note: "Chịu trách nhiệm & hỗ trợ viết kịch bản cho kênh YouTube của GEARVN (các video ngắn), bao gồm đánh giá sản phẩm, thủ thuật & tin tức công nghệ.",
     },
     {
       period: "2024 — 2025 (và hiện tại)",

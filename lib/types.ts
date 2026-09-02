@@ -29,7 +29,8 @@ export interface GalleryAlbum {
 
 export interface Manifest {
   version: number;
-  albums: GalleryAlbum[];
+  photos: GalleryAlbum[];
+  videos: GalleryAlbum[];
 }
 
 export type ScannedGalleryAlbum = GalleryAlbum & {
@@ -38,7 +39,18 @@ export type ScannedGalleryAlbum = GalleryAlbum & {
   images: GalleryImage[];
 };
 
+export type ScannedVideoAlbum = GalleryAlbum & {
+  name: string;
+  year?: number;
+  videos: GalleryVideo[];
+};
+
 export type GalleryImage = string | { full: string; thumb?: string };
+
+export interface GalleryVideo {
+  src: string;
+  name: string;
+}
 
 export type AudioFormat = "MP3" | "FLAC" | "OGG" | "WAV" | "M4A";
 

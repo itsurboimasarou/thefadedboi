@@ -1155,7 +1155,12 @@
   color: var(--ink);
   white-space: nowrap;
   pointer-events: none;
-  z-index: 50;
+  /* Over the HuBar (60/70), notices (200) and the progress bar (500), so a
+     tip near a screen edge is never slid under the chrome. Under the
+     lightbox (1000), which is meant to cover the page it opened from.
+     A tip can only rise within its own stacking context, so a container
+     that clips or layers its contents has to leave room for it. */
+  z-index: 900;
   display: none;
 }
 

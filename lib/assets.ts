@@ -1,6 +1,7 @@
 import type {
   Manifest,
   GalleryAlbum,
+  GalleryVideo,
   DeviceSection,
   MusicManifest,
   Playlist,
@@ -18,6 +19,9 @@ const BRANCH = "main";
 const RAW = `https://gitea.com/${REPO}/raw/branch/${BRANCH}`;
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
+const VIDEO_EXT = /\.(mp4|webm|mov|m4v)$/i;
+
+export const VIDEO_ROOT = "videos";
 const IGNORE_PREFIX = /^_/;
 
 const encPath = (p: string) =>
@@ -35,15 +39,8 @@ export const trackUrl = (folder: string, file: string) =>
 const thumbUrl = (folder: string, file: string) =>
   `/api/thumb?folder=${encodeURIComponent(folder)}&file=${encodeURIComponent(file)}`;
 
-// ── CDN proxying ────────────────────────────────────────────────────
-// Shared by both proxy routes: /api/thumb (re-encodes to AVIF) and
-// /api/photo (streams the original as a download). They exist because the
-// CDN sends no CORS headers, so the browser can't fetch it directly.
 const CDN_HOST = new URL(CDN).host;
 
-// Parses a caller-supplied URL, returning null unless it points at our own
-// CDN. Both routes take a URL from the query string, so this check is what
-// keeps them from being usable as an open proxy for arbitrary hosts.
 export function cdnTarget(src: string): URL | null {
   try {
     const url = new URL(src);
@@ -53,8 +50,6 @@ export function cdnTarget(src: string): URL | null {
   }
 }
 
-// Collapses network errors and non-2xx into a single null failure path, so
-// callers don't each have to re-implement try/catch plus an .ok check.
 export async function cdnFetch(target: URL | string): Promise<Response | null> {
   const res = await fetch(target).catch(() => null);
   return res?.ok ? res : null;
@@ -65,7 +60,7 @@ const indexUrl = (folder: string) =>
 
 async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
   try {
-    const res = await fetch(indexUrl(folder));
+    const res = await fetch(indexUrl(folder), { cache: "no-store" });
 
     const data = await res.json();
     const names: string[] = Array.isArray(data)
@@ -90,7 +85,7 @@ async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
 export const deviceImage = (file: string) =>
   `${RAW}/devices/${encodeURIComponent(file)}`;
 
-export const bgVideoUrl = `${CDN}/bg.mp4`;
+export const bgVideoUrl = `${CDN}/${VIDEO_ROOT}/bg.mp4`;
 
 async function fetchRaw(path: string): Promise<string | null> {
   try {
@@ -129,17 +124,61 @@ export async function listImages(
   }));
 }
 
-function validateAlbums(raw: any): GalleryAlbum[] {
-  if (!raw || !Array.isArray(raw.albums)) return [];
-  return raw.albums
+export const videoOrigin = (file: string) =>
+  `${CDN}/${VIDEO_ROOT}/${encPath(file)}`;
+
+export const videoUrl = (file: string) =>
+  `/api/video?file=${encodeURIComponent(file)}`;
+
+export function isSafeVideoPath(file: string): boolean {
+  if (!file || file.length > 512) return false;
+  if (file.startsWith("/") || file.includes("\\") || file.includes("..")) return false;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(file)) return false;
+  return VIDEO_EXT.test(file);
+}
+
+async function exists(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function listVideos(folder: string): Promise<GalleryVideo[]> {
+  const rel = folder.replace(new RegExp(`^${VIDEO_ROOT}/`), "");
+  const names = await listFiles(folder, VIDEO_EXT);
+
+  const checked = await Promise.all(
+    names.map(async (name) => {
+      const file = `${rel}/${name}`;
+      if (await exists(videoOrigin(file))) {
+        return { src: videoUrl(file), name: name.replace(/\.[^.]+$/, "") };
+      }
+      console.warn(`[assets] ${folder}/${name} is listed but missing from R2 — skipping`);
+      return null;
+    })
+  );
+
+  return checked.filter((v): v is GalleryVideo => v !== null);
+}
+
+function validateAlbums(list: any): GalleryAlbum[] {
+  if (!Array.isArray(list)) return [];
+  return list
     .filter((a: any) => a && typeof a.folder === "string")
     .map((a: any) => ({ folder: a.folder }));
 }
 
 export async function getManifest(): Promise<Manifest> {
   const raw = await fetchJson("gallery.json");
-  if (!raw) return { version: 4, albums: [] };
-  return { version: raw.version ?? 4, albums: validateAlbums(raw) };
+  if (!raw) return { version: 4, photos: [], videos: [] };
+  return {
+    version: raw.version ?? 4,
+    photos: validateAlbums(raw.photos ?? raw.albums),
+    videos: validateAlbums(raw.videos),
+  };
 }
 
 const okTrack = (t: any): t is TrackMeta =>

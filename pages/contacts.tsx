@@ -25,7 +25,7 @@ const ui: Localized<{
     intro: "The fastest way to reach me is email — I usually reply within a day.",
     workProfiles: "Work profiles",
     otherSocial: "Other social media",
-    buyCoffee: "Buy me a coffee",
+    buyCoffee: "Buy me a coffee (Momo)",
   },
   vi: {
     eyebrow: "Liên hệ",

@@ -22,6 +22,13 @@
   overflow-x: clip;
 }
 
+body:has(.gallery-page) .main { max-width: 1560px; }
+
+.app-root:has(.hubar--left.hubar--pinned) .main,
+.app-root:has(.hubar--right.hubar--pinned) .main {
+  padding-inline: calc(16px + var(--hubar-w, 62px) + 16px);
+}
+
 .app-root:has(.hubar--top) .main { padding-top: calc(16px + var(--hubar-h, 68px) + 16px); }
 html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px + var(--hubar-h, 68px) + 32px); }
 
@@ -282,10 +289,6 @@ html.glass-fx .hubar {
   display: none;
 }
 
-/* Placement follows the dock, not the viewport: a tip beside the icon only
-   makes sense on the vertical docks. These used to be gated on desktop, so
-   a narrow window with a mouse got the sideways placement on a horizontal
-   bar and the tip shot out of the bar's side. */
 .hubar--right :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
   left: auto;
   right: calc(100% + 12px);

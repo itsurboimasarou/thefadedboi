@@ -1,81 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import Icon from "../ui/Icons";
 import YearSelect from "./YearSelect";
-import { useLocalized, type Localized } from "@/lib/i18n";
-import { createSetting } from "@/lib/setting";
+import useHideOnScrollDown from "@/lib/functions/useHideOnScrollDown";
+import useHorizontalScroller from "@/lib/functions/useHorizontalScroller";
 
-export type BarPos = "top" | "bottom";
-
-const barPos = createSetting<BarPos>({
-  key: "gallery-bar-pos",
-  event: "gallery-bar-pos-change",
-  fallback: "top",
-  parse: (raw) => (raw === "bottom" ? "bottom" : "top"),
-});
-
-export const getBarPos = barPos.get;
-export const setBarPos = barPos.set;
-export const useBarPos = barPos.use;
-
-function useHideOnScrollDown() {
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
-
-  useEffect(() => {
-    lastY.current = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      const delta = y - lastY.current;
-      if (y < 80) setHidden(false);
-      else if (delta > 8) setHidden(true);
-      else if (delta < -8) setHidden(false);
-      lastY.current = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return hidden;
-}
-
-function useChipOverflow(deps: unknown[]) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [overflow, setOverflow] = useState({ left: false, right: false });
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const update = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      if (max <= 1) {
-        setOverflow({ left: false, right: false });
-        return;
-      }
-      setOverflow({
-        left: el.scrollLeft > 1,
-        right: max - el.scrollLeft > 1,
-      });
-    };
-
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => {
-      el.removeEventListener("scroll", update);
-      ro.disconnect();
-    };
-  }, deps);
-
-  return { ref, overflow };
-}
-
-const ui: Localized<{ togglePosition: string }> = {
-  en: { togglePosition: "Move bar" },
-  vi: { togglePosition: "Chuyển vị trí thanh" },
-};
+/* The bar lives at the bottom now, full stop: the top of the gallery belongs
+   to the Still/Motion switch, so there is nothing left to move it to and the
+   position toggle went with it. The hide-on-scroll behaviour it had is
+   unchanged, and the switch shares it. */
 
 export interface AlbumChip { key: string; label: string; count: number }
 
@@ -96,17 +28,13 @@ export default function AlbumPillBar({
   year,
   onYearChange,
 }: AlbumPillBarProps) {
-  const t = useLocalized(ui);
-  const pos = useBarPos();
   const hidden = useHideOnScrollDown();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const { ref: chipScrollRef, overflow } = useChipOverflow([chips]);
+  const { ref: chipScrollRef, overflow } = useHorizontalScroller([chips]);
 
   const bar = (
-    <div
-      className={`gallery-pillbar gallery-pillbar--${pos}${hidden ? " gallery-pillbar--hidden" : ""}`}
-    >
+    <div className={`gallery-pillbar${hidden ? " gallery-pillbar--hidden" : ""}`}>
       <div
         className="gallery-pillbar-scroll"
         ref={chipScrollRef}
@@ -132,23 +60,12 @@ export default function AlbumPillBar({
           value={year}
           onChange={onYearChange}
           allowAll
-          direction={pos === "bottom" ? "up" : "down"}
+          direction="up"
         />
       )}
-      <button
-        type="button"
-        className="gallery-pillbar-toggle"
-        onClick={() => setBarPos(pos === "top" ? "bottom" : "top")}
-        aria-label={t.togglePosition}
-        data-tip={t.togglePosition}
-        data-tip-pos={pos === "bottom" ? "up" : "down"}
-      >
-        <Icon name={pos === "top" ? "dockBottom" : "dockTop"} size={16} />
-      </button>
     </div>
   );
 
-  if (pos === "top") return bar;
   if (!mounted) return null;
   return createPortal(bar, document.body);
 }

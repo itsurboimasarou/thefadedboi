@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import type { InferGetStaticPropsType } from "next";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
-import AlbumPillBar, { useBarPos } from "@/components/gallery/AlbumPillBar";
-import { getManifest, listImages, getChangelog } from "@/lib/assets";
-import type { ScannedGalleryAlbum } from "@/lib/types";
+import AlbumPillBar from "@/components/gallery/AlbumPillBar";
+import MotionSection from "@/components/gallery/MotionSection";
+import GalleryModeSwitch, { type GalleryMode } from "@/components/gallery/GalleryModeSwitch";
+import { getManifest, listImages, listVideos, getChangelog } from "@/lib/assets";
+import type { ScannedGalleryAlbum, ScannedVideoAlbum } from "@/lib/types";
 import { useLocalized, type Localized } from "@/lib/i18n";
 import { galleryQuotes } from "@/lib/configs/gallery.config";
 
@@ -12,18 +14,21 @@ const ui: Localized<{
   heading: string;
   all: string;
   photosToBeAdded: string;
+  videosToBeAdded: string;
 }> = {
   en: {
     eyebrow: "Gallery",
     heading: "Precious moments",
     all: "All",
     photosToBeAdded: "Photos to be added.",
+    videosToBeAdded: "Videos to be added.",
   },
   vi: {
     eyebrow: "Thư viện",
     heading: "Những khoảnh khắc đẹp nhất",
     all: "Tất cả",
     photosToBeAdded: "Ảnh sẽ được thêm sau.",
+    videosToBeAdded: "Video sẽ được thêm sau.",
   },
 };
 
@@ -54,26 +59,41 @@ function yearFromFolder(folder: string): number | undefined {
 }
 
 export async function getStaticProps() {
-  const { albums } = await getManifest();
+  const { photos, videos } = await getManifest();
+
   const scanned: ScannedGalleryAlbum[] = await Promise.all(
-    albums.map(async (a) => ({
+    photos.map(async (a) => ({
       ...a,
       name: albumName(a.folder),
       year: yearFromFolder(a.folder),
       images: await listImages(a.folder),
     }))
   );
+  const scannedVideos: ScannedVideoAlbum[] = await Promise.all(
+    videos.map(async (a) => ({
+      ...a,
+      name: albumName(a.folder),
+      year: yearFromFolder(a.folder),
+      videos: await listVideos(a.folder),
+    }))
+  );
+
   return {
-    props: { albums: scanned, changelog: await getChangelog() },
-    revalidate: 300,
+    props: {
+      albums: scanned,
+      videoAlbums: scannedVideos,
+      changelog: await getChangelog(),
+    },
+    revalidate: 1,
   };
 }
 
 export default function GalleryIndex({
   albums,
+  videoAlbums,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const t = useLocalized(ui);
-  const barPos = useBarPos();
+  const [mode, setMode] = useState<GalleryMode>("still");
   const [year, setYear] = useState<number | undefined>(undefined);
   const [active, setActive] = useState<string>("all");
   const [quote, setQuote] = useState(0);
@@ -81,35 +101,45 @@ export default function GalleryIndex({
   const picked = galleryQuotes[quote];
   const quoteText = useLocalized(picked?.text ?? NO_TEXT);
   const quoteBy = useLocalized(picked?.by ?? NO_TEXT);
+  const source: (ScannedGalleryAlbum | ScannedVideoAlbum)[] =
+    mode === "motion" ? videoAlbums : albums;
 
   const years = useMemo(
     () =>
-      [...new Set(albums.map((a) => a.year).filter((y): y is number => !!y))].sort(
+      [...new Set(source.map((a) => a.year).filter((y): y is number => !!y))].sort(
         (a, b) => b - a
       ),
-    [albums]
+    [source]
   );
 
   const visible = useMemo(
-    () => (year ? albums.filter((a) => a.year === year) : albums),
-    [albums, year]
+    () => (year ? source.filter((a) => a.year === year) : source),
+    [source, year]
   );
 
   useEffect(() => {
     if (active !== "all" && !visible.some((a) => a.folder === active)) setActive("all");
   }, [visible, active]);
 
+  useEffect(() => {
+    setActive("all");
+    setYear(undefined);
+  }, [mode]);
+
+  const countOf = (a: ScannedGalleryAlbum | ScannedVideoAlbum) =>
+    "videos" in a ? a.videos.length : a.images.length;
+
   const totalCount = useMemo(
-    () => visible.reduce((n, a) => n + a.images.length, 0),
-    [visible]
+    () => visible.reduce((n, a) => n + countOf(a), 0),
+    [visible, mode]
   );
 
   const chips = useMemo(
     () => [
       { key: "all", label: t.all, count: totalCount },
-      ...visible.map((a) => ({ key: a.folder, label: a.name, count: a.images.length })),
+      ...visible.map((a) => ({ key: a.folder, label: a.name, count: countOf(a) })),
     ],
-    [visible, totalCount, t.all]
+    [visible, totalCount, t.all, mode]
   );
 
   const activeAlbum = useMemo(
@@ -118,14 +148,31 @@ export default function GalleryIndex({
   );
 
   const shownImages = useMemo(
-    () => (activeAlbum ? activeAlbum.images : visible.flatMap((a) => a.images)),
+    () =>
+      activeAlbum && "images" in activeAlbum
+        ? activeAlbum.images
+        : visible.flatMap((a) => ("images" in a ? a.images : [])),
     [activeAlbum, visible]
   );
+
+  const shownVideos = useMemo(
+    () =>
+      activeAlbum && "videos" in activeAlbum
+        ? activeAlbum.videos
+        : visible.flatMap((a) => ("videos" in a ? a.videos : [])),
+    [activeAlbum, visible]
+  );
+
+  const shown = mode === "motion" ? shownVideos : shownImages;
 
   const gridTitle = activeAlbum ? activeAlbum.name : t.heading;
 
   return (
-    <div className={`stack reveal gallery-page gallery-page--bar-${barPos}`}>
+    <div
+      className={`stack reveal gallery-page${
+        mode === "motion" ? " gallery-page--motion" : ""
+      }`}
+    >
       <header>
         <p className="eyebrow">{t.eyebrow}</p>
         <h1>{t.heading}</h1>
@@ -137,16 +184,30 @@ export default function GalleryIndex({
         )}
       </header>
 
-      <AlbumPillBar
-        chips={chips}
-        active={active}
-        onSelect={setActive}
-        years={years}
-        year={year}
-        onYearChange={setYear}
-      />
+      <GalleryModeSwitch mode={mode} onChange={setMode} />
 
-      {shownImages.length === 0 ? (
+      {mode === "still" && (
+        <AlbumPillBar
+          chips={chips}
+          active={active}
+          onSelect={setActive}
+          years={years}
+          year={year}
+          onYearChange={setYear}
+        />
+      )}
+
+      {mode === "motion" ? (
+        <MotionSection
+          videos={shownVideos}
+          chips={chips}
+          active={active}
+          onSelect={setActive}
+          years={years}
+          year={year}
+          onYearChange={setYear}
+        />
+      ) : shownImages.length === 0 ? (
         <p className="album-empty">{t.photosToBeAdded}</p>
       ) : (
         <AlbumGrid images={shownImages} title={gridTitle} />

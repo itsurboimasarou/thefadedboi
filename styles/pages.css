@@ -180,7 +180,10 @@
 
 /* ── Gallery ────────────────────────────────────────── */
 
-body:has(.gallery-page) { --gallery-w: 1200px; }
+body:has(.gallery-page) {
+  --gallery-w: 1400px;
+  --motion-w: min(88%, 1180px);
+}
 
 .album-grid {
   display: flex;
@@ -217,7 +220,7 @@ body:has(.gallery-page) { --gallery-w: 1200px; }
   display: block;
   border-radius: 14px;
   border: 1px solid var(--glass-border);
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.25s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .album-thumb:active {
@@ -293,11 +296,483 @@ body:has(.gallery-page) { --gallery-w: 1200px; }
   font-style: italic;
 }
 
-/* Runs on from the quote on the same line; upright and dimmed so the name
-   still reads as attribution rather than part of what was said. */
 .gallery-quote-by {
   font-style: normal;
   color: var(--ink-dim);
+}
+
+/* ── Still / Motion switch ────────────────────────────── */
+.mode-switch {
+  position: sticky;
+  top: 16px;
+  z-index: 29;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  width: fit-content;
+  max-width: 100%;
+  margin: 22px auto 4px;
+  padding: 5px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+
+body:has(.hubar--top) .mode-switch {
+  top: calc(16px + var(--hubar-h, 68px) + 16px);
+}
+
+.mode-switch--hidden {
+  translate: 0 calc(-100% - 28px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mode-switch-knob {
+  position: absolute;
+  inset: 5px auto 5px 5px;
+  width: calc(50% - 5px);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: translate 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.mode-switch-knob[data-side="motion"] {
+  translate: 100% 0;
+}
+
+.mode-switch-side {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ink-dim);
+  font-family: var(--font-lang), var(--font-display, system-ui, sans-serif);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.mode-switch-side:hover { color: var(--ink); }
+.mode-switch-side--on { color: var(--accent); }
+.mode-switch-side:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.mode-switch-label {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+/* ── Motion: player ─────────────────────────────────────
+   Pinned to 16:9 whatever the clip's own shape is, so the page does not
+   jump as you move between them -- a portrait phone clip letterboxes
+   inside the same frame a landscape one fills. */
+.vplayer {
+  max-width: var(--motion-w, 1180px);
+  margin: 18px auto 14px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+}
+
+.vplayer-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 15px;
+  background: #000;
+}
+
+.vplayer-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.vplayer-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: min(70%, 520px);
+  margin: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(8, 10, 14, 0.62);
+  color: #fff;
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.vplayer-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 34px 12px 10px;
+  border-radius: 0 0 15px 15px;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.74) 0%,
+    rgba(0, 0, 0, 0.52) 34%,
+    rgba(0, 0, 0, 0.22) 66%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.vplayer:hover .vplayer-bar,
+.vplayer:focus-within .vplayer-bar,
+.vplayer--paused .vplayer-bar,
+.vplayer:has(.vplayer-volume--open) .vplayer-bar {
+  opacity: 1;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .vplayer-bar { opacity: 1; }
+}
+
+.vplayer-bar > * { pointer-events: auto; }
+
+.vplayer-btn {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.vplayer-btn:hover { color: #fff; border-color: var(--accent); }
+.vplayer-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.vplayer-clock {
+  flex-shrink: 0;
+  min-width: 38px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.86);
+  font-family: var(--font-lang), monospace;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.vplayer-seek-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.vplayer-seek-buffer,
+.vplayer-seek-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.vplayer-seek-buffer { background: rgba(255, 255, 255, 0.46); }
+.vplayer-seek-fill { background: var(--accent); }
+
+/* Taller than the rail it sits on so the bar stays easy to grab. */
+.vplayer-seek {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  translate: 0 -50%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.vplayer-seek::-webkit-slider-runnable-track {
+  height: 20px;
+  background: transparent;
+}
+.vplayer-seek::-moz-range-track {
+  height: 20px;
+  background: transparent;
+}
+
+.vplayer-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  background: var(--accent);
+}
+.vplayer-seek::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  background: var(--accent);
+}
+.vplayer-seek:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+.vplayer-volume {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+}
+
+.vplayer-volume-panel {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 12px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 16, 22, 0.92);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  visibility: hidden;
+  translate: -50% 6px;
+  transition: opacity 0.18s ease, translate 0.18s ease, visibility 0.18s;
+}
+
+.vplayer-volume-panel::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+
+.vplayer-volume:focus-within .vplayer-volume-panel,
+.vplayer-volume--open .vplayer-volume-panel {
+  opacity: 1;
+  visibility: visible;
+  translate: -50% 0;
+}
+
+.vplayer-volume-slider {
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 6px;
+  height: 92px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.vplayer--empty {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  color: var(--ink-dim);
+}
+
+.lightbox.vplayer-overlay {
+  --vp-pad: clamp(4px, 1.2vw, 20px);
+  padding: var(--vp-pad);
+}
+.vplayer--full {
+  --vp-chrome: 2px;
+  width: min(100%, 2400px, calc((100vh - 2 * var(--vp-pad) - var(--vp-chrome)) / 9 * 16));
+  width: min(100%, 2400px, calc((100dvh - 2 * var(--vp-pad) - var(--vp-chrome)) / 9 * 16));
+  max-width: none;
+  margin: 0;
+  background: var(--bg);
+}
+
+/* ── Motion: clips and albums ─────────────────────────── */
+.motion-box {
+  max-width: var(--motion-w, 1180px);
+  margin-inline: auto;
+  border-radius: 18px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  overflow: hidden;
+}
+
+/* Holds the arrows against the strip's edges without joining the scroll. */
+.motion-strip-wrap {
+  position: relative;
+}
+
+.motion-arrow {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.motion-arrow:hover { color: var(--ink); border-color: var(--accent); }
+.motion-arrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.motion-arrow--prev { left: 6px; }
+.motion-arrow--next { right: 6px; }
+
+.motion-strip {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.motion-strip-empty {
+  margin: 0;
+  padding: 24px 4px;
+  color: var(--ink-dim);
+  font-size: 0.85rem;
+}
+
+.motion-tile {
+  position: relative;
+  flex: 0 0 auto;
+  width: 210px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ink) 8%, var(--bg));
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.motion-tile:hover { transform: translateY(-2px); border-color: var(--accent); }
+.motion-tile--on { border-color: var(--accent); }
+.motion-tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.motion-tile video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  background: #000;
+}
+
+.motion-tile-name {
+  display: block;
+  padding: 7px 10px;
+  color: var(--ink-dim);
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 0.72rem;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.motion-tile--on .motion-tile-name { color: var(--ink); }
+
+/* The divider the illustration asks for: one hairline, full bleed. */
+.motion-albums {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.motion-albums-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.motion-albums-scroll::-webkit-scrollbar { display: none; }
+
+/* ── Motion grid ──────────────────────────────────────── */
+.album-grid--motion {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.motion-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ink) 8%, var(--bg));
+}
+
+.motion-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.motion-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  pointer-events: none;
+}
+.motion-play .icn {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(10, 12, 16, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding-left: 3px;
+}
+
+.motion-player {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #000;
 }
 
 /* ── Gallery pill bar ───────────────────────────────── */
@@ -318,20 +793,11 @@ body:has(.gallery-page) { --gallery-w: 1200px; }
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
   z-index: 30;
-  transition: translate 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.34s ease 0.1s;
+  transition: translate 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.34s ease 0.1s,
+    bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.gallery-pillbar--top {
-  position: sticky;
-  top: 16px;
-  margin: 28px auto 0;
-}
-
-body:has(.hubar--top) .gallery-pillbar--top {
-  top: calc(16px + var(--hubar-h, 68px) + 16px);
-}
-
-.gallery-pillbar--bottom {
+.gallery-pillbar {
   position: fixed;
   left: 0;
   right: 0;
@@ -339,35 +805,23 @@ body:has(.hubar--top) .gallery-pillbar--top {
   margin-inline: auto;
 }
 
-body:has(.hubar--bottom) .gallery-pillbar--bottom {
+body:has(.hubar--bottom) .gallery-pillbar {
   bottom: calc(16px + var(--hubar-h, 68px) + 16px);
 }
 
-.gallery-pillbar--top.gallery-pillbar--hidden {
-  translate: 0 calc(-100% - 24px);
-  opacity: 0;
-  pointer-events: none;
+/* The moment the HuBar slides away the space under the bar is free, so take
+   it rather than leaving the pill bar floating where the HuBar used to be. */
+body:has(.hubar--bottom.hubar--hidden) .gallery-pillbar {
+  bottom: 16px;
 }
-.gallery-pillbar--bottom.gallery-pillbar--hidden {
+
+/* Drops straight down out of frame; nothing above it to travel behind, so
+   the fade and the slide can run together. */
+.gallery-pillbar--hidden {
   translate: 0 calc(100% + 24px);
   opacity: 0;
   pointer-events: none;
-}
-
-.gallery-pillbar--hidden {
   transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.26s, opacity 0.3s ease;
-}
-
-body:has(.hubar--top) .gallery-pillbar--top {
-  scale: 1;
-  transition: translate 0.42s cubic-bezier(0.22, 1, 0.36, 1), scale 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.38s ease, visibility 0s;
-}
-
-body:has(.hubar--top) .gallery-pillbar--top.gallery-pillbar--hidden {
-  translate: 0 -14px;
-  scale: 0.97;
-  visibility: hidden;
-  transition: translate 0.42s ease, scale 0.42s ease, opacity 0.4s ease, visibility 0s linear 0.4s;
 }
 
 .gallery-pillbar-scroll {
@@ -431,32 +885,18 @@ body:has(.hubar--top) .gallery-pillbar--top.gallery-pillbar--hidden {
   opacity: 0.75;
 }
 
-.gallery-pillbar-toggle {
-  flex-shrink: 0;
-  align-self: center;
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  box-sizing: border-box;
-  border-radius: 999px;
-  border: 1px solid var(--glass-border);
-  background: transparent;
-  color: var(--ink-dim);
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-.gallery-pillbar-toggle:hover {
-  color: var(--ink);
-  border-color: var(--accent);
-}
+/* Reserve space so the grid never sits under the fixed bottom bar. Only the
+   ≤798px breakpoint reserves space for a bottom HuBar, so this accounts for
+   the full offset itself. Motion floats no bar -- its album chips ride inside
+   the box -- so it reserves nothing and the footer sits up close to the box,
+   leaving only a bottom HuBar to clear. */
+.gallery-page { padding-bottom: 62px; }
+body:has(.hubar--bottom) .gallery-page { padding-bottom: calc(var(--hubar-h, 68px) + 62px); }
 
-/* Reserve space so the grid never sits under the still-fixed bottom bar.
-   "top" needs nothing here any more — it's in normal flow, not fixed. Only
-   the ≤798px breakpoint reserves space for a bottom HuBar, so bar-bottom
-   accounts for the full offset itself. */
-.gallery-page--bar-bottom { padding-bottom: 62px; }
-body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--hubar-h, 68px) + 62px); }
+.gallery-page--motion { padding-bottom: 10px; }
+body:has(.hubar--bottom) .gallery-page--motion {
+  padding-bottom: calc(var(--hubar-h, 68px) + 10px);
+}
 
 .lightbox {
   position: fixed;
@@ -489,6 +929,31 @@ body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--
   width: min(92vw, 1400px);
   height: 88vh;
   height: 88dvh;
+  /* The zoom layer is clipped to the frame, and the browser must not claim
+     the pinch or the drag for its own page zoom. */
+  overflow: hidden;
+  touch-action: none;
+}
+
+.lightbox-frame--zoomed { cursor: grab; }
+.lightbox-frame--zoomed:active { cursor: grabbing; }
+
+.lightbox-zoom {
+  position: absolute;
+  inset: 0;
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* Sits over the optimised copy once it has decoded, so the change is a
+   sharpening rather than a flash of empty space. */
+.lightbox-full {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 16px;
 }
 
 .lightbox-frame img {
@@ -841,11 +1306,6 @@ body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--
   line-height: 1.55;
 }
 
-/* Both calls to action get the width of the wider one, so the pair reads
-   as a unit rather than two differently-sized pills -- the labels differ
-   in length in either language, and more so in Vietnamese. Equal 1fr
-   columns on a shrink-wrapped grid size themselves to the widest button
-   without hardcoding a width that a future label could outgrow. */
 .hero-actions {
   display: grid;
   grid-auto-flow: column;
