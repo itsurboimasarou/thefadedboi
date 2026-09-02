@@ -21,6 +21,13 @@ export const navItems: NavItem[] = [
 
 export const navOrder: string[] = navItems.map((i) => i.href);
 
+export function stackNeighbour(from: string, delta: 1 | -1): string | null {
+  const i = navOrder.indexOf(from);
+  if (i === -1) return null;
+  const j = i + delta;
+  return j >= 0 && j < navOrder.length ? navOrder[j] : null;
+}
+
 export function stackDirection(from: string, to: string): "up" | "down" {
   const a = navOrder.indexOf(from);
   const b = navOrder.indexOf(to);

@@ -91,6 +91,36 @@ html:where(.compact) {
 :where(html.compact) .glance-row--lang { order: 1; }
 :where(html.compact) .glance-row--shape { order: 2; }
 :where(html.compact) .glance-row--dock { order: 3; }
+
+/* Page stack, compact: left/right rather than up/down. The borders move to
+   the sides to match, and an in-progress edge swipe drives the veil from
+   --stack-at instead of a keyframe, so it tracks the finger. */
+:where(html.compact) .stack-veil {
+  border-top: 0;
+  border-bottom: 0;
+  border-left: 1px solid var(--glass-border);
+  border-right: 1px solid var(--glass-border);
+}
+
+:where(html.compact) .stack-veil[data-phase="cover"][data-dir="up"] {
+  animation-name: stack-cover-fwd;
+}
+:where(html.compact) .stack-veil[data-phase="cover"][data-dir="down"] {
+  animation-name: stack-cover-back;
+}
+:where(html.compact) .stack-veil[data-phase="reveal"][data-dir="up"] {
+  animation-name: stack-reveal-fwd;
+}
+:where(html.compact) .stack-veil[data-phase="reveal"][data-dir="down"] {
+  animation-name: stack-reveal-back;
+}
+
+:where(html.compact) .stack-veil[data-phase="drag"] {
+  transform: translateX(var(--stack-at, 100%));
+}
+:where(html.compact) .stack-veil[data-phase="drag"][data-settle] {
+  transition: transform 240ms cubic-bezier(0.32, 0.72, 0, 1);
+}
 /* Status specifically sits beside the "At a glance" title instead of
    its own grid row — an inline flex item there, not a block row. */
 :where(html.compact) .panel-head .glance-row--mobile-only { display: flex; align-items: center; }

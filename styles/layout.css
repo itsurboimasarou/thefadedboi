@@ -88,6 +88,26 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
   to   { transform: translateY(100%); }
 }
 
+@keyframes stack-cover-fwd {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes stack-reveal-fwd {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+@keyframes stack-cover-back {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes stack-reveal-back {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
 /* This breakpoint's .main rules (padding transition, pinned+bottom footer
    clearance) live in modes.css now, alongside the rest of the @media
    rules. */

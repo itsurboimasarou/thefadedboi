@@ -6,7 +6,7 @@ const EXTENSIONS = new Set([".png", ".webp", ".svg", ".jpg", ".jpeg"]);
 const EXCLUDED = new Set(["logo-dark", "logo-light"]);
 
 export default function handler(_req: NextApiRequest, res: NextApiResponse<string[]>) {
-  const dir = path.join(process.cwd(), "public", "logo");
+  const dir = path.join(process.cwd(), "public", "logos");
   let files: string[] = [];
   try {
     files = fs

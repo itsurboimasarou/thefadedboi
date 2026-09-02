@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { cdnTarget, cdnFetch } from "@/lib/assets";
 
+export const config = { api: { responseLimit: false } };
+
 function filenameFrom(pathname: string): string {
   const name = decodeURIComponent(pathname.split("/").pop() || "photo.jpg");
   return name.replace(/["\r\n]/g, "");

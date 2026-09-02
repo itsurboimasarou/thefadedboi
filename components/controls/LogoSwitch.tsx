@@ -18,7 +18,7 @@ const logoSetting = createSetting<string | null>({
   serialize: (file) => file,
   apply: (file) => {
     const s = document.documentElement.style;
-    if (file) s.setProperty("--logo-custom", `url(/logo/${file})`);
+    if (file) s.setProperty("--logo-custom", `url(/logos/${file})`);
     else s.removeProperty("--logo-custom");
   },
 });
@@ -62,7 +62,7 @@ export default function LogoSwitch() {
           aria-pressed={active === f}
           onClick={() => setLogo(f)}
         >
-          <img src={`/logo/${f}`} alt="" className="logo-option-swatch" />
+          <img src={`/logos/${f}`} alt="" className="logo-option-swatch" />
           <span>{nameOf(f)}</span>
         </button>
       ))}
