@@ -10,7 +10,8 @@ import { usePinned } from "../controls/HuBarPinned";
 import { useShape } from "../controls/HuBarShape";
 import HuBarTrigger from "./HuBarTrigger";
 import useHuBarMeasure from "./functions/useHuBarMeasure";
-import useHuBarAutoHide, { useCompact } from "./functions/useHuBarAutoHide";
+import useHuBarAutoHide from "./functions/useHuBarAutoHide";
+import { useCompact, useHuBarFit } from "./functions/useHuBarFit";
 import useHuBarIndicator from "./functions/useHuBarIndicator";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { navItems } from "@/lib/configs/nav.config";
@@ -37,6 +38,7 @@ export default function HuBar() {
   const startRef = useRef<HTMLDivElement>(null);
   const indicator = useHuBarIndicator(startRef, pathname, vertical);
   useHuBarMeasure(railRef);
+  useHuBarFit(railRef);
   const { hidden, touchMode, railHandlers, hotzoneHandlers } = useHuBarAutoHide(railRef, effectiveDock, pinned);
 
   const [panelOpen, setPanelOpen] = useState(false);

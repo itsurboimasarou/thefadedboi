@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import type { ScannedPlaylist, Track } from "@/lib/types";
-import { COMPACT_MQ } from "../layout/functions/useHuBarAutoHide";
 import { usePanelSwipe } from "../layout/functions/usePanelSwipe";
 import { useInert } from "../layout/functions/useInert";
 import Marquee from "../ui/Marquee";
@@ -380,7 +379,6 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         ? (playlists[queueMode]?.folder ?? t.none)
         : t.none;
 
-  // Swipe left to dismiss back to the control panel.
   const swipe = usePanelSwipe({
     panelRef,
     enabled: open,
@@ -426,7 +424,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               onClick={() => setMuted(!muted)}
               aria-pressed={muted}
               aria-label={muted || volume === 0 ? t.unmute : t.mute}
-              title={muted || volume === 0 ? t.unmute : t.mute}
+              data-tip={muted || volume === 0 ? t.unmute : t.mute}
             >
               <Icon name={muted || volume === 0 ? "volumeMute" : "volumeHigh"} size={18} />
             </button>
@@ -452,7 +450,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               onClick={() => setListOpen(false)}
               aria-label={t.back}
             >
-              <Icon name="arrowLeft" size={14} />
+              <Icon name="chevronLeft" size={14} />
               {t.back}
             </button>
           ) : (
@@ -461,7 +459,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               className="panel-icon-btn"
               onClick={() => setListOpen(true)}
               aria-label={t.trackList}
-              title={t.trackList}
+              data-tip={t.trackList}
             >
               <Icon name="list" size={16} />
             </button>
@@ -471,7 +469,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
             className="panel-icon-btn player-close-btn"
             onClick={onDismiss}
             aria-label={t.close}
-            title={t.close}
+            data-tip={t.close}
           >
             <Icon name="close" size={16} />
           </button>
@@ -485,7 +483,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         <>
         <div
           className={`panel-view-slide panel-view-slide--main${listOpen ? " panel-view-slide--behind" : ""}`}
-          ref={playerViewRef}        >
+          ref={playerViewRef}
+        >
               <div className="player-now-playing">
                 {(current?.cover ?? currentPlaylist?.cover) ? (
                   <img src={current?.cover ?? currentPlaylist?.cover} alt="" className="player-cover" />
@@ -538,11 +537,12 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   onClick={() => setShuffle((v) => !v)}
                   aria-pressed={shuffle}
                   aria-label={t.shuffle}
-                  title={t.shuffle}
+                  data-tip={t.shuffle}
+                  data-tip-pos="up"
                 >
                   <Icon name="shuffle" size={18} />
                 </button>
-                <button type="button" className="panel-icon-btn" onClick={() => goTo(-1)} aria-label={t.previousTrack} title={t.previousTrack}>
+                <button type="button" className="panel-icon-btn" onClick={() => goTo(-1)} aria-label={t.previousTrack} data-tip={t.previousTrack} data-tip-pos="up">
                   <Icon name="skipBack" size={18} />
                 </button>
                 <button
@@ -550,11 +550,12 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   className="panel-icon-btn player-play-btn"
                   onClick={togglePlay}
                   aria-label={playing ? t.pause : t.play}
-                  title={playing ? t.pause : t.play}
+                  data-tip={playing ? t.pause : t.play}
+                  data-tip-pos="up"
                 >
                   <Icon name={playing ? "pause" : "play"} size={22} />
                 </button>
-                <button type="button" className="panel-icon-btn" onClick={() => goTo(1)} aria-label={t.nextTrack} title={t.nextTrack}>
+                <button type="button" className="panel-icon-btn" onClick={() => goTo(1)} aria-label={t.nextTrack} data-tip={t.nextTrack} data-tip-pos="up">
                   <Icon name="skipForward" size={18} />
                 </button>
                 <button
@@ -563,7 +564,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                   onClick={cycleRepeat}
                   aria-pressed={repeat !== "off"}
                   aria-label={repeat === "one" ? t.repeatOne : repeat === "all" ? t.repeatAll : t.repeatOff}
-                  title={repeat === "one" ? t.repeatOne : repeat === "all" ? t.repeatAll : t.repeatOff}
+                  data-tip={repeat === "one" ? t.repeatOne : repeat === "all" ? t.repeatAll : t.repeatOff}
+                  data-tip-pos="up"
                 >
                   <Icon name={repeat === "one" ? "repeatOne" : "repeat"} size={18} />
                 </button>
@@ -572,7 +574,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
 
         <div
           className={`panel-view-slide panel-view-slide--theme${listOpen ? " panel-view-slide--front" : ""}`}
-          ref={listViewRef}        >
+          ref={listViewRef}
+        >
           <div className="player-album-select" ref={albumSelectRef}>
             <button
               type="button"

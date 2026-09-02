@@ -3,133 +3,142 @@
    Load LAST — these must win the cascade by order. */
 
 /* ── Mobile ─────────────────────────────────────────── */
-@media (max-width: 798px), (max-height: 600px) {
-  html {
-    font-size: 15px;
-  }
-
-  h1 {
-    font-size: clamp(1.9rem, 8vw, 2.6rem);
-  }
-
-  h2 {
-    font-size: clamp(1.25rem, 5vw, 1.5rem);
-  }
-
-  .hero p:not(.eyebrow) {
-    font-size: 1.05rem;
-  }
-
-  .eyebrow {
-    font-size: 0.72rem;
-  }
-
-  .hubar--top,
-  .hubar--bottom {
-    width: min(385px, calc(100vw - 32px));
-    min-width: 301px;
-    min-height: 51px;
-    max-width: 385px;
-    max-height: 62px;
-    container-type: inline-size;
-  }
-
-  .hubar--top {
-    top: 16px;
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    padding: 8px 10px;
-  }
-  .hubar--top.hubar--hidden {
-    translate: 0 calc(-100% - 7px);
-    opacity: 0.6;
-  }
-  .hubar--bottom {
-    top: auto;
-    bottom: 16px;
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    padding: 8px 10px;
-  }
-  .hubar--bottom.hubar--hidden {
-    translate: 0 calc(100% + 6px);
-    opacity: 0.6;
-  }
-
-  .hubar-item .tip {
-    display: none;
-  }
-
-  .hubar-hotzone { display: none; }
-
-  .hubar-item:active,
-  .hubar-item,
-  .hubar-trigger {
-    width: min(44px, calc((100cqw - 71px) / 7));
-    height: min(44px, calc((100cqw - 71px) / 7));
-  }
-  .hubar-item .icn {
-    width: min(22px, calc((100cqw - 71px) / 14));
-    height: min(22px, calc((100cqw - 71px) / 14));
-  }
-
-  .hubar-group--end { display: none; }
-  .hubar--top,
-  .hubar--bottom {
-    justify-content: center;
-  }
-  .glance-row--mobile-only { display: block; }
-  /* Status specifically sits beside the "At a glance" title instead of
-     its own grid row — an inline flex item there, not a block row. */
-  .panel-head .glance-row--mobile-only { display: flex; align-items: center; }
-
-  .panel-swipe-hint { display: block; }
-
-  .panel-indicator { display: flex; }
-
-  #control-panel.panel-switching {
-    transform: translateX(calc(100% + 16px));
-    opacity: 0;
-    transition:
-      transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.15s ease,
-      visibility 0s linear 0.15s;
-  }
-  #control-panel.panel-switching.control-panel--open {
-    transform: translateX(0);
-    opacity: 1;
-    transition:
-      transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.15s ease,
-      visibility 0s;
-  }
-  #music-player.player-panel.panel-switching {
-    transform: translateX(calc(-100% - 16px));
-    opacity: 0;
-    transition:
-      transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.15s ease,
-      visibility 0s linear 0.15s;
-  }
-  #music-player.player-panel.panel-switching.control-panel--open {
-    transform: translateX(0);
-    opacity: 1;
-    transition:
-      transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.15s ease,
-      visibility 0s;
-  }
-
-  .main {
-    padding-left: clamp(20px, 5vw, 64px);
-    padding-right: clamp(20px, 5vw, 64px);
-  }
-
-  .app-root:has(.hubar--bottom) .main { padding-bottom: 110px; }
-
+/* ── Compact ────────────────────────────────────────────
+   Was @media (max-width: 798px), (max-height: 600px). The width half of
+   that breakpoint is now measured, not guessed: useHuBarFit finds the
+   width at which the HuBar can no longer shrink and puts .narrow /
+   .compact on <html> at that point (see components/layout/functions/
+   useHuBarFit.ts). :where() keeps specificity at zero so these rules win
+   or lose on source order exactly as they did inside @media. */
+html:where(.compact) {
+  font-size: 15px;
 }
+
+:where(html.compact) h1 {
+  font-size: clamp(1.9rem, 8vw, 2.6rem);
+}
+
+:where(html.compact) h2 {
+  font-size: clamp(1.25rem, 5vw, 1.5rem);
+}
+
+:where(html.compact) .hero p:not(.eyebrow) {
+  font-size: 1.05rem;
+}
+
+:where(html.compact) .eyebrow {
+  font-size: 0.72rem;
+}
+
+:where(html.compact) .hubar--top,
+:where(html.compact) .hubar--bottom {
+  width: min(385px, calc(100vw - 32px));
+  min-width: 301px;
+  min-height: 51px;
+  max-width: 385px;
+  max-height: 62px;
+  container-type: inline-size;
+}
+
+:where(html.compact) .hubar--top {
+  top: 16px;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  padding: 8px 10px;
+}
+:where(html.compact) .hubar--top.hubar--hidden {
+  translate: 0 calc(-100% - 7px);
+  opacity: 0.6;
+}
+:where(html.compact) .hubar--bottom {
+  top: auto;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  padding: 8px 10px;
+}
+:where(html.compact) .hubar--bottom.hubar--hidden {
+  translate: 0 calc(100% + 6px);
+  opacity: 0.6;
+}
+
+:where(html.compact) .hubar-hotzone { display: none; }
+
+:where(html.compact) .hubar-item:active,
+:where(html.compact) .hubar-item,
+:where(html.compact) .hubar-trigger {
+  width: min(44px, calc((100cqw - 71px) / 7));
+  height: min(44px, calc((100cqw - 71px) / 7));
+}
+:where(html.compact) .hubar-item .icn {
+  width: min(22px, calc((100cqw - 71px) / 14));
+  height: min(22px, calc((100cqw - 71px) / 14));
+}
+
+:where(html.compact) .hubar-group--end { display: none; }
+:where(html.compact) .hubar--top,
+:where(html.compact) .hubar--bottom {
+  justify-content: center;
+}
+:where(html.compact) .glance-row--mobile-only { display: block; }
+
+/* Language moves up beside Lite mode and the two HuBar rows pair off on the
+   line below. Grid order rather than a DOM swap, because on desktop the
+   language row is not rendered at all and reordering there would shuffle
+   the HuBar rows for no reason. Everything else stays at the default 0. */
+:where(html.compact) .glance-row--lang { order: 1; }
+:where(html.compact) .glance-row--shape { order: 2; }
+:where(html.compact) .glance-row--dock { order: 3; }
+/* Status specifically sits beside the "At a glance" title instead of
+   its own grid row — an inline flex item there, not a block row. */
+:where(html.compact) .panel-head .glance-row--mobile-only { display: flex; align-items: center; }
+
+:where(html.compact) .panel-swipe-hint { display: block; }
+
+:where(html.compact) .panel-indicator { display: flex; }
+
+:where(html.compact) #control-panel.panel-switching {
+  transform: translateX(calc(100% + 16px));
+  opacity: 0;
+  transition:
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.15s ease,
+    visibility 0s linear 0.15s;
+}
+:where(html.compact) #control-panel.panel-switching.control-panel--open {
+  transform: translateX(0);
+  opacity: 1;
+  transition:
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.15s ease,
+    visibility 0s;
+}
+:where(html.compact) #music-player.player-panel.panel-switching {
+  transform: translateX(calc(-100% - 16px));
+  opacity: 0;
+  transition:
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.15s ease,
+    visibility 0s linear 0.15s;
+}
+:where(html.compact) #music-player.player-panel.panel-switching.control-panel--open {
+  transform: translateX(0);
+  opacity: 1;
+  transition:
+    transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.15s ease,
+    visibility 0s;
+}
+
+:where(html.compact) .main {
+  padding-left: clamp(20px, 5vw, 64px);
+  padding-right: clamp(20px, 5vw, 64px);
+}
+
+:where(html.compact) .app-root:has(.hubar--bottom) .main { padding-bottom: 110px; }
+
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -147,7 +156,9 @@
   }
 
   .panel-views,
-  .panel-view-slide {
+  .panel-view-slide,
+  .gallery-pillbar,
+  .gallery-pillbar--hidden {
     transition: none;
   }
 }
@@ -156,57 +167,57 @@
   .album-grid { --row-h: 230px; }
 }
 
-@media (max-width: 798px) {
-  /* HuBar never actually auto-hides on mobile regardless of this setting
-     — useHuBarAutoHide's schedule() bails out early whenever compact is
-     true — so the toggle has nothing to control here. */
-  .glance-row--autohide { display: none; }
+/* ── Narrow only, height irrelevant (was max-width: 798px) ─────── */
+/* HuBar never actually auto-hides on mobile regardless of this setting
+   — useHuBarAutoHide's schedule() bails out early whenever compact is
+   true — so the toggle has nothing to control here. */
+:where(html.narrow) .glance-row--autohide { display: none; }
 
-  .app-root:has(.hubar--bottom) .control-panel.control-panel {
-    bottom: calc(16px + var(--hubar-h, 68px) + 52px);
-  }
-  .app-root:has(.hubar--top) .control-panel.control-panel {
-    top: calc(16px + var(--hubar-h, 68px) + 52px);
-    bottom: auto;
-    transform: translateY(-24px) scale(0.98);
-    transform-origin: top center;
-  }
-  .app-root:has(.hubar--top) .control-panel--open.control-panel--open {
-    transform: translateY(0) scale(1);
-  }
-
-  .panel-head-actions { display: none; }
-  .player-panel .panel-head-actions { display: flex; }
-  .player-close-btn { display: none; }
-
-  .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
-
-  .lang-switch .track-icon--left { top: 2px; left: 3px }
-  .lang-switch .track-icon--right { top: 2px; left: 37px }
-
-  .glance-grid .info-tip-bubble {
-    right: 0;
-    left: 0;
-    width: auto;
-    max-width: none;
-  }
-
-  /* Mobile: plain uniform squares, ignoring each photo's real ratio —
-     height comes from aspect-ratio: 1 against the flex-basis width, so no
-     separate img override is needed (compare desktop's fixed height). */
-  .album-thumb {
-    height: auto;
-    aspect-ratio: 1;
-    flex: 0 0 calc((100% - 24px) / 3);
-  }
+:where(html.narrow) .app-root:has(.hubar--bottom) .control-panel.control-panel {
+  bottom: calc(16px + var(--hubar-h, 68px) + 52px);
 }
+:where(html.narrow) .app-root:has(.hubar--top) .control-panel.control-panel {
+  top: calc(16px + var(--hubar-h, 68px) + 52px);
+  bottom: auto;
+  transform: translateY(-24px) scale(0.98);
+  transform-origin: top center;
+}
+:where(html.narrow) .app-root:has(.hubar--top) .control-panel--open.control-panel--open {
+  transform: translateY(0) scale(1);
+}
+
+:where(html.narrow) .panel-head-actions { display: none; }
+:where(html.narrow) .player-panel .panel-head-actions { display: flex; }
+:where(html.narrow) .player-close-btn { display: none; }
+
+:where(html.narrow) .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
+
+:where(html.narrow) .lang-switch .track-icon--left { top: 2px; left: 3px }
+:where(html.narrow) .lang-switch .track-icon--right { top: 2px; left: 37px }
+
+:where(html.narrow) .glance-grid .info-tip-bubble {
+  right: 0;
+  left: 0;
+  width: auto;
+  max-width: none;
+}
+
+/* Mobile: plain uniform squares, ignoring each photo's real ratio —
+   height comes from aspect-ratio: 1 against the flex-basis width, so no
+   separate img override is needed (compare desktop's fixed height). */
+:where(html.narrow) .album-thumb {
+  height: auto;
+  aspect-ratio: 1;
+  flex: 0 0 calc((100% - 24px) / 3);
+}
+
 
 @media (max-width: 600px) {
   .album-thumb { flex-basis: calc((100% - 12px) / 2); }
 }
 
 @media (hover: none), (pointer: coarse) {
-  .hubar-item .tip { display: none !important; }
+  :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip { display: none !important; }
 }
 
 /* ── Desktop ────────────────────────────────────────── */
@@ -222,244 +233,220 @@
   html.lite-mode .main { transition: none; }
 }
 
-@media (min-width: 799px) and (min-height: 601px) {
-  .hubar--top,
-  .hubar--bottom {
-    gap: clamp(32px, 7vw, 140px);
-  }
-
-  .hubar--top {
-    top: 16px;
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-  }
-  .hubar--top.hubar--hidden {
-    translate: 0 calc(-100% - 7px);
-    opacity: 0.6;
-  }
-
-  .hubar--bottom {
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    bottom: 16px;
-  }
-  .hubar--bottom.hubar--hidden {
-    translate: 0 calc(100% + 6px);
-    opacity: 0.6;
-  }
-
-  .hubar--left {
-    left: 16px;
-    top: 50%;
-    translate: 0 -50%;
-  }
-  .hubar--left.hubar--hidden {
-    translate: calc(-100% - 7px) -50%;
-    opacity: 0.6;
-  }
-
-  .hubar--right {
-    right: 16px;
-    top: 50%;
-    translate: 0 -50%;
-  }
-  .hubar--right.hubar--hidden {
-    translate: calc(100% + 7px) -50%;
-    opacity: 0.6;
-  }
-
-  .hubar--right .hubar-item .tip {
-    left: auto;
-    right: calc(100% + 12px);
-    translate: 0 -50%;
-  }
-
-  .hubar--top .hubar-item .tip,
-  .hubar--bottom .hubar-item .tip {
-    left: 50%;
-    top: auto;
-    translate: -50% 4px;
-  }
-  .hubar--top .hubar-item .tip {
-    top: calc(100% + 12px);
-  }
-  .hubar--bottom .hubar-item .tip {
-    bottom: calc(100% + 12px);
-  }
-  .hubar--top .hubar-item:hover .tip,
-  .hubar--bottom .hubar-item:hover .tip {
-    display: block;
-    translate: -50% 0;
-  }
-
-  .hubar-hotzone {
-    position: fixed;
-    z-index: 49;
-  }
-  .hubar-hotzone--top {
-    top: 0; left: 0; right: 0;
-    height: 14px;
-  }
-  .hubar-hotzone--bottom {
-    left: 0; right: 0; bottom: 0;
-    height: 14px;
-  }
-  .hubar-hotzone--left {
-    left: 0; top: 0; bottom: 0;
-    width: 14px;
-  }
-  .hubar-hotzone--right {
-    right: 0; top: 0; bottom: 0;
-    width: 14px;
-  }
-
-  .hubar--left .status-clock,
-  .hubar--right .status-clock {
-    flex-direction: column;
-    gap: 6px;
-    padding: 4px 2px;
-    width: 100%;
-  }
-
-  .hubar--left .status-clock-label,
-  .hubar--right .status-clock-label {
-    display: none;
-  }
-  .hubar--left .status-clock:hover .status-clock-time,
-  .hubar--left .status-clock:focus-visible .status-clock-time,
-  .hubar--right .status-clock:hover .status-clock-time,
-  .hubar--right .status-clock:focus-visible .status-clock-time {
-    opacity: 1;
-  }
-  .hubar--left .status-clock-time,
-  .hubar--right .status-clock-time {
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-    width: 100%;
-    min-width: 0;
-  }
-  .hubar--left .status-clock-sep,
-  .hubar--right .status-clock-sep {
-    display: none;
-  }
-  .hubar--left .status-clock-hh,
-  .hubar--left .status-clock-mm,
-  .hubar--left .status-clock-ss,
-  .hubar--right .status-clock-hh,
-  .hubar--right .status-clock-mm,
-  .hubar--right .status-clock-ss {
-    font-size: 0.82rem;
-    font-weight: 700;
-    line-height: 1.25;
-  }
-  .hubar--left .status-clock-ss,
-  .hubar--right .status-clock-ss {
-    color: var(--ink-dim);
-    font-weight: 600;
-  }
-
-  .hubar--left .lang-switch,
-  .hubar--right .lang-switch {
-    width: 34px;
-    height: 78px;
-  }
-  .hubar--left .lang-switch .track-icon,
-  .hubar--right .lang-switch .track-icon {
-    width: 26px;
-    height: 36px;
-    left: 3px;
-  }
-  .hubar--left .lang-switch .track-icon--left,
-  .hubar--right .lang-switch .track-icon--left {
-    top: 3px;
-  }
-  .hubar--left .lang-switch .track-icon--right,
-  .hubar--right .lang-switch .track-icon--right {
-    top: 38px;
-  }
-  .hubar--left .lang-switch .knob,
-  .hubar--right .lang-switch .knob {
-    top: 3px;
-    left: 3px;
-    width: 26px;
-    height: 36px;
-  }
-  .hubar--left .lang-switch[aria-checked="true"] .knob,
-  .hubar--right .lang-switch[aria-checked="true"] .knob {
-    translate: 0 34px;
-  }
-
-  /* Left/Right: the 62px vertical capsule has no room for a marquee title
-     row, so now-playing collapses to an icon-only circle (matching the
-     other 44px hubar-item cells) and the volume slider turns vertical. */
-  .hubar--left .hubar-nowplaying-group,
-  .hubar--right .hubar-nowplaying-group {
-    flex-direction: column;
-    gap: 4px;
-  }
-  .hubar--left .hubar-nowplaying,
-  .hubar--right .hubar-nowplaying {
-    width: 44px;
-    height: 44px;
-    max-width: none;
-    padding: 0;
-    justify-content: center;
-    border-radius: 50%;
-  }
-  .hubar--left .hubar-nowplaying-text,
-  .hubar--right .hubar-nowplaying-text {
-    display: none;
-  }
+/* ── Not compact (was min-width: 799px and min-height: 601px) ──── */
+:where(html:not(.compact)) .hubar--top,
+:where(html:not(.compact)) .hubar--bottom {
+  gap: clamp(32px, 7vw, 140px);
 }
 
-@media (min-width: 799px) {
-  .theme-menu-back-mobile { display: none; }
-
-  .theme-menu-heading {
-    font-size: 0.85rem;
-  }
-
-  .control-panel {
-    width: min(500px, calc(100vw - 32px));
-    padding: 18px 20px;
-  }
-  .panel-title {
-    font-size: 1.15rem;
-  }
-  .control-panel .glance-grid {
-    gap: 12px 22px;
-  }
-  .control-panel .glance-grid dt {
-    font-size: 0.74rem;
-  }
-
-  .app-root:has(.hubar--left) .control-panel {
-    left: calc(16px + var(--hubar-w) + 16px);
-    right: auto;
-    margin-inline: 0;
-    bottom: auto;
-    top: 50%;
-    transform: translate(-16px, -50%);
-  }
-  .app-root:has(.hubar--left) .control-panel--open {
-    transform: translate(0, -50%);
-  }
-
-  .app-root:has(.hubar--right) .control-panel {
-    right: calc(16px + var(--hubar-w) + 16px);
-    left: auto;
-    margin-inline: 0;
-    bottom: auto;
-    top: 50%;
-    transform: translate(16px, -50%);
-  }
-  .app-root:has(.hubar--right) .control-panel--open {
-    transform: translate(0, -50%);
-  }
+:where(html:not(.compact)) .hubar--top {
+  top: 16px;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
 }
+:where(html:not(.compact)) .hubar--top.hubar--hidden {
+  translate: 0 calc(-100% - 7px);
+  opacity: 0.6;
+}
+
+:where(html:not(.compact)) .hubar--bottom {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  bottom: 16px;
+}
+:where(html:not(.compact)) .hubar--bottom.hubar--hidden {
+  translate: 0 calc(100% + 6px);
+  opacity: 0.6;
+}
+
+:where(html:not(.compact)) .hubar--left {
+  left: 16px;
+  top: 50%;
+  translate: 0 -50%;
+}
+:where(html:not(.compact)) .hubar--left.hubar--hidden {
+  translate: calc(-100% - 7px) -50%;
+  opacity: 0.6;
+}
+
+:where(html:not(.compact)) .hubar--right {
+  right: 16px;
+  top: 50%;
+  translate: 0 -50%;
+}
+:where(html:not(.compact)) .hubar--right.hubar--hidden {
+  translate: calc(100% + 7px) -50%;
+  opacity: 0.6;
+}
+
+:where(html:not(.compact)) .hubar-hotzone {
+  position: fixed;
+  z-index: 49;
+}
+:where(html:not(.compact)) .hubar-hotzone--top {
+  top: 0; left: 0; right: 0;
+  height: 14px;
+}
+:where(html:not(.compact)) .hubar-hotzone--bottom {
+  left: 0; right: 0; bottom: 0;
+  height: 14px;
+}
+:where(html:not(.compact)) .hubar-hotzone--left {
+  left: 0; top: 0; bottom: 0;
+  width: 14px;
+}
+:where(html:not(.compact)) .hubar-hotzone--right {
+  right: 0; top: 0; bottom: 0;
+  width: 14px;
+}
+
+:where(html:not(.compact)) .hubar--left .status-clock,
+:where(html:not(.compact)) .hubar--right .status-clock {
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 2px;
+  width: 100%;
+}
+
+:where(html:not(.compact)) .hubar--left .status-clock-label,
+:where(html:not(.compact)) .hubar--right .status-clock-label {
+  display: none;
+}
+:where(html:not(.compact)) .hubar--left .status-clock:hover .status-clock-time,
+:where(html:not(.compact)) .hubar--left .status-clock:focus-visible .status-clock-time,
+:where(html:not(.compact)) .hubar--right .status-clock:hover .status-clock-time,
+:where(html:not(.compact)) .hubar--right .status-clock:focus-visible .status-clock-time {
+  opacity: 1;
+}
+:where(html:not(.compact)) .hubar--left .status-clock-time,
+:where(html:not(.compact)) .hubar--right .status-clock-time {
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+:where(html:not(.compact)) .hubar--left .status-clock-sep,
+:where(html:not(.compact)) .hubar--right .status-clock-sep {
+  display: none;
+}
+:where(html:not(.compact)) .hubar--left .status-clock-hh,
+:where(html:not(.compact)) .hubar--left .status-clock-mm,
+:where(html:not(.compact)) .hubar--left .status-clock-ss,
+:where(html:not(.compact)) .hubar--right .status-clock-hh,
+:where(html:not(.compact)) .hubar--right .status-clock-mm,
+:where(html:not(.compact)) .hubar--right .status-clock-ss {
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+:where(html:not(.compact)) .hubar--left .status-clock-ss,
+:where(html:not(.compact)) .hubar--right .status-clock-ss {
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+:where(html:not(.compact)) .hubar--left .lang-switch,
+:where(html:not(.compact)) .hubar--right .lang-switch {
+  width: 34px;
+  height: 78px;
+}
+:where(html:not(.compact)) .hubar--left .lang-switch .track-icon,
+:where(html:not(.compact)) .hubar--right .lang-switch .track-icon {
+  width: 26px;
+  height: 36px;
+  left: 3px;
+}
+:where(html:not(.compact)) .hubar--left .lang-switch .track-icon--left,
+:where(html:not(.compact)) .hubar--right .lang-switch .track-icon--left {
+  top: 3px;
+}
+:where(html:not(.compact)) .hubar--left .lang-switch .track-icon--right,
+:where(html:not(.compact)) .hubar--right .lang-switch .track-icon--right {
+  top: 38px;
+}
+:where(html:not(.compact)) .hubar--left .lang-switch .knob,
+:where(html:not(.compact)) .hubar--right .lang-switch .knob {
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 36px;
+}
+:where(html:not(.compact)) .hubar--left .lang-switch[aria-checked="true"] .knob,
+:where(html:not(.compact)) .hubar--right .lang-switch[aria-checked="true"] .knob {
+  translate: 0 34px;
+}
+
+/* Left/Right: the 62px vertical capsule has no room for a marquee title
+   row, so now-playing collapses to an icon-only circle (matching the
+   other 44px hubar-item cells) and the volume slider turns vertical. */
+:where(html:not(.compact)) .hubar--left .hubar-nowplaying-group,
+:where(html:not(.compact)) .hubar--right .hubar-nowplaying-group {
+  flex-direction: column;
+  gap: 4px;
+}
+:where(html:not(.compact)) .hubar--left .hubar-nowplaying,
+:where(html:not(.compact)) .hubar--right .hubar-nowplaying {
+  width: 44px;
+  height: 44px;
+  max-width: none;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+}
+:where(html:not(.compact)) .hubar--left .hubar-nowplaying-text,
+:where(html:not(.compact)) .hubar--right .hubar-nowplaying-text {
+  display: none;
+}
+
+
+/* ── Not narrow (was min-width: 799px) ─────────────────────────── */
+:where(html:not(.narrow)) .theme-menu-back-mobile { display: none; }
+
+:where(html:not(.narrow)) .theme-menu-heading {
+  font-size: 0.85rem;
+}
+
+:where(html:not(.narrow)) .control-panel {
+  width: min(500px, calc(100vw - 32px));
+  padding: 18px 20px;
+}
+:where(html:not(.narrow)) .panel-title {
+  font-size: 1.15rem;
+}
+:where(html:not(.narrow)) .control-panel .glance-grid {
+  gap: 12px 22px;
+}
+:where(html:not(.narrow)) .control-panel .glance-grid dt {
+  font-size: 0.74rem;
+}
+
+:where(html:not(.narrow)) .app-root:has(.hubar--left) .control-panel {
+  left: calc(16px + var(--hubar-w) + 16px);
+  right: auto;
+  margin-inline: 0;
+  bottom: auto;
+  top: 50%;
+  transform: translate(-16px, -50%);
+}
+:where(html:not(.narrow)) .app-root:has(.hubar--left) .control-panel--open {
+  transform: translate(0, -50%);
+}
+
+:where(html:not(.narrow)) .app-root:has(.hubar--right) .control-panel {
+  right: calc(16px + var(--hubar-w) + 16px);
+  left: auto;
+  margin-inline: 0;
+  bottom: auto;
+  top: 50%;
+  transform: translate(16px, -50%);
+}
+:where(html:not(.narrow)) .app-root:has(.hubar--right) .control-panel--open {
+  transform: translate(0, -50%);
+}
+
 
 /* Lite mode: no animation */
 
@@ -525,3 +512,5 @@ html.lite-mode .thumb-loader::after { animation: none; }
 html.lite-mode .status-dot::after { animation: none; opacity: 0; }
 
 html.lite-mode .control-panel { transition: none; }
+html.lite-mode .gallery-pillbar,
+html.lite-mode .gallery-pillbar--hidden { transition: none; }

@@ -140,7 +140,8 @@ export default function AlbumPillBar({
         className="gallery-pillbar-toggle"
         onClick={() => setBarPos(pos === "top" ? "bottom" : "top")}
         aria-label={t.togglePosition}
-        title={t.togglePosition}
+        data-tip={t.togglePosition}
+        data-tip-pos={pos === "bottom" ? "up" : "down"}
       >
         <Icon name={pos === "top" ? "dockBottom" : "dockTop"} size={16} />
       </button>

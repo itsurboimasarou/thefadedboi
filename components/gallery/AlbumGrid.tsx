@@ -250,7 +250,9 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               );
             })}
         </div>
-        <button type="button" className="lightbox-close" onClick={close} aria-label={t.close}>✕</button>
+        <button type="button" className="lightbox-close" onClick={close} aria-label={t.close} data-tip={t.close}>
+          <Icon name="close" size={18} />
+        </button>
         <button
           type="button"
           className="lightbox-download"
@@ -260,7 +262,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
             setDownloadBlocked(!ok);
           }}
           aria-label={t.download}
-          title={t.download}
+          data-tip={t.download}
         >
           <Icon name="download" size={18} />
         </button>
@@ -272,9 +274,10 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               className="lightbox-toast-dismiss"
               onClick={() => setDownloadBlocked(false)}
               aria-label={t.dismiss}
-              title={t.dismiss}
+              data-tip={t.dismiss}
+              data-tip-pos="up"
             >
-              ✕
+              <Icon name="close" size={12} />
             </button>
           </div>
         )}
@@ -285,13 +288,21 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               className="lightbox-nav lightbox-nav--prev"
               onClick={(e) => { e.stopPropagation(); step(-1); }}
               aria-label={t.previousPhoto}
-            >‹</button>
+              data-tip={t.previousPhoto}
+              data-tip-pos="right"
+            >
+              <Icon name="chevronLeft" size={22} />
+            </button>
             <button
               type="button"
               className="lightbox-nav lightbox-nav--next"
               onClick={(e) => { e.stopPropagation(); step(1); }}
               aria-label={t.nextPhoto}
-            >›</button>
+              data-tip={t.nextPhoto}
+              data-tip-pos="left"
+            >
+              <Icon name="chevronRight" size={22} />
+            </button>
           </>
         )}
         <span className="lightbox-count">{index + 1} / {items.length}</span>

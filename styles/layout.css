@@ -130,8 +130,8 @@ html.glass-fx .hubar {
   box-shadow: none;
 }
 
-.hubar:has(.hubar-item:hover),
-.hubar:has(.hubar-item:focus-visible) {
+.hubar:has(:is(.hubar-item, .hubar-trigger, .hubar-nowplaying):hover),
+.hubar:has(:is(.hubar-item, .hubar-trigger, .hubar-nowplaying):focus-visible) {
   z-index: 70;
 }
 
@@ -239,7 +239,7 @@ html.glass-fx .hubar {
   height: 22px;
 }
 
-.hubar-item .tip {
+:is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
   position: absolute;
   left: calc(100% + 12px);
   top: 50%;
@@ -248,17 +248,52 @@ html.glass-fx .hubar {
   background: var(--bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
+  font-family: var(--font-body, system-ui, sans-serif);
   font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-transform: none;
   color: var(--ink);
   white-space: nowrap;
   pointer-events: none;
+  z-index: 5;
   translate: 0 -50%;
   display: none;
 }
 
-.hubar-item:hover .tip,
-.hubar-item:focus-visible .tip {
+/* Placement follows the dock, not the viewport: a tip beside the icon only
+   makes sense on the vertical docks. These used to be gated on desktop, so
+   a narrow window with a mouse got the sideways placement on a horizontal
+   bar and the tip shot out of the bar's side. */
+.hubar--right :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
+  left: auto;
+  right: calc(100% + 12px);
+  translate: 0 -50%;
+}
+
+.hubar--top :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip,
+.hubar--bottom :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
+  left: 50%;
+  top: auto;
+  translate: calc(-50% + var(--tip-shift, 0px)) 4px;
+}
+.hubar--top :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
+  top: calc(100% + 12px);
+}
+.hubar--bottom :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
+  bottom: calc(100% + 12px);
+}
+
+:is(.hubar-item, .hubar-trigger, .hubar-nowplaying):hover .tip,
+:is(.hubar-item, .hubar-trigger, .hubar-nowplaying):focus-visible .tip {
   display: block;
+}
+.hubar--top :is(.hubar-item, .hubar-trigger, .hubar-nowplaying):hover .tip,
+.hubar--top :is(.hubar-item, .hubar-trigger, .hubar-nowplaying):focus-visible .tip,
+.hubar--bottom :is(.hubar-item, .hubar-trigger, .hubar-nowplaying):hover .tip,
+.hubar--bottom :is(.hubar-item, .hubar-trigger, .hubar-nowplaying):focus-visible .tip {
+  translate: calc(-50% + var(--tip-shift, 0px)) 0;
 }
 
 .hubar-item:focus-visible {
@@ -314,6 +349,7 @@ html.glass-fx .hubar {
   gap: 6px;
 }
 .hubar-nowplaying {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;

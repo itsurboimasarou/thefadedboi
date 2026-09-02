@@ -2,8 +2,15 @@ import Icon from "../ui/Icons";
 import Marquee from "../ui/Marquee";
 import { useMusicPlayback } from "@/lib/musicState";
 import { toggleMusicPlayer } from "../layout/ControlPanel";
+import { useLocalized, type Localized } from "@/lib/i18n";
+
+const ui: Localized<{ openPlayer: string }> = {
+  en: { openPlayer: "Open music player" },
+  vi: { openPlayer: "Mở trình phát nhạc" },
+};
 
 export default function NowPlaying() {
+  const t = useLocalized(ui);
   const { nowPlaying } = useMusicPlayback();
   const hasTrack = !!nowPlaying.title;
   const subtitle = nowPlaying.artist || nowPlaying.albumTitle || "";
@@ -14,7 +21,6 @@ export default function NowPlaying() {
         type="button"
         className={`hubar-nowplaying${hasTrack ? "" : " hubar-nowplaying--idle"}`}
         onClick={toggleMusicPlayer}
-        title="Open music player"
         aria-label={
           hasTrack
             ? `${nowPlaying.playing ? "Playing" : "Paused"}: ${nowPlaying.title}${subtitle ? ` by ${subtitle}` : ""} — open music player`
@@ -30,6 +36,7 @@ export default function NowPlaying() {
             {subtitle && <Marquee className="hubar-nowplaying-subtitle">{subtitle}</Marquee>}
           </span>
         )}
+        <span className="tip">{t.openPlayer}</span>
       </button>
     </div>
   );

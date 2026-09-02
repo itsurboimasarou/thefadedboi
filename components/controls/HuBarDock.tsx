@@ -1,5 +1,5 @@
 import Icon from "../ui/Icons";
-import { useCompact } from "../layout/functions/useHuBarAutoHide";
+import { useCompact } from "../layout/functions/useHuBarFit";
 import { createSetting } from "@/lib/setting";
 
 export type Dock = "top" | "bottom" | "left" | "right";
@@ -45,7 +45,7 @@ export default function DockControl() {
             role="radio"
             aria-checked={dock === d}
             aria-label={labels[d]}
-            title={labels[d]}
+            data-tip={labels[d]}
             className={`shape-toggle${dock === d ? " shape-toggle--on" : ""}`}
             onClick={() => setDock(d)}
           >

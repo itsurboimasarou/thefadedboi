@@ -4,7 +4,7 @@ import ThemeToggle from "../controls/ThemeToggle";
 import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
 import GlassToggle from "../controls/GlassMode";
 import AutoHideToggle from "../controls/HuBarPinned";
-import DockControl from "../controls/HuBarDock";
+import DockControl, { useDock } from "../controls/HuBarDock";
 import ShapeControl from "../controls/HuBarShape";
 import LangSwitch from "../controls/LangSwitch";
 import AccentSwitch from "../controls/AccentSwitch";
@@ -15,7 +15,7 @@ import ChangelogDialog from "../content/ChangelogDialog";
 import MusicPlayer from "../widgets/MusicPlayer";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { accentSets } from "@/lib/configs/accents.config";
-import { COMPACT_MQ } from "./functions/useHuBarAutoHide";
+import { isCompact } from "./functions/useHuBarFit";
 import { useInert } from "./functions/useInert";
 import { usePanelSwipe } from "./functions/usePanelSwipe";
 import { useLocalized, type Localized } from "@/lib/i18n";
@@ -134,6 +134,9 @@ type PanelView = "none" | "controls" | "player";
 export default function ControlPanel({ changelog }: { changelog: string }) {
   const home = useLocalized(homeConfig);
   const t = useLocalized(ui);
+  // The indicator is compact-only, where the bar is always top or bottom.
+  // Point its tips at the panel rather than across the HuBar.
+  const tipPos = useDock() === "bottom" ? "up" : "down";
   const [visiblePanel, setVisiblePanel] = useState<PanelView>("none");
   const open = visiblePanel === "controls";
   const playerOpen = visiblePanel === "player";
@@ -171,7 +174,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
 
   useEffect(() => {
     const onToggle = () => {
-      const mobile = window.matchMedia(COMPACT_MQ).matches;
+      const mobile = isCompact();
       const current = visiblePanelRef.current;
       const next = mobile
         ? (current === "none" ? lastPanelRef.current : "none")
@@ -303,7 +306,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
                 onClick={() => setThemeMenuOpen(false)}
                 aria-label={t.back}
               >
-                <Icon name="arrowLeft" size={14} />
+                <Icon name="chevronLeft" size={14} />
                 {t.back}
               </button>
             ) : (
@@ -322,7 +325,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               className="panel-icon-btn"
               onClick={resetAllToDefault}
               aria-label={t.resetAll}
-              title={t.resetAll}
+              data-tip={t.resetAll}
             >
               <Icon name="circleArrow" size={16} />
             </button>
@@ -331,7 +334,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               className="panel-icon-btn"
               onClick={() => navigateTo("none")}
               aria-label={t.close}
-              title={t.close}
+              data-tip={t.close}
             >
               <Icon name="close" size={16} />
             </button>
@@ -402,7 +405,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dd>
           </div>
 
-          <div>
+          <div className="glance-row--dock">
             <dt>
               <Icon name="target" size={15} />
               {t.huBarPosition}
@@ -412,7 +415,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dd>
           </div>
 
-          <div>
+          <div className="glance-row--shape">
             <dt>
               <Icon name="star4" size={15} />
               {t.huBarShape}
@@ -422,7 +425,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dd>
           </div>
 
-          <div className="glance-row--mobile-only">
+          <div className="glance-row--mobile-only glance-row--lang">
             <dt>
               <Icon name="globe" size={15} />
               {t.language}
@@ -490,7 +493,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             className="text-btn text-btn--center theme-menu-back-mobile"
             onClick={() => setThemeMenuOpen(false)}
           >
-            <Icon name="arrowLeft" size={14} />
+            <Icon name="chevronLeft" size={14} />
             {t.back}
           </button>
         </div>
@@ -520,28 +523,30 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         role="tablist"
         aria-label={t.activePanel}
       >
-        <button
-          type="button"
-          role="tab"
-          className={`panel-indicator-btn${playerOpen ? " panel-indicator-btn--active" : ""}`}
-          onClick={() => navigateTo("player")}
-          aria-selected={playerOpen}
-          aria-label={t.musicPlayer}
-          title={t.musicPlayer}
-        >
-          <Icon name="music" size={15} />
-        </button>
-        <button
-          type="button"
-          role="tab"
-          className={`panel-indicator-btn${open ? " panel-indicator-btn--active" : ""}`}
-          onClick={() => navigateTo("controls")}
-          aria-selected={open}
-          aria-label={t.siteControls}
-          title={t.siteControls}
-        >
-          <Icon name="spark" size={15} />
-        </button>
+        <span className="panel-indicator-slot" data-tip={t.musicPlayer} data-tip-pos={tipPos}>
+          <button
+            type="button"
+            role="tab"
+            className={`panel-indicator-btn${playerOpen ? " panel-indicator-btn--active" : ""}`}
+            onClick={() => navigateTo("player")}
+            aria-selected={playerOpen}
+            aria-label={t.musicPlayer}
+          >
+            <Icon name="music" size={15} />
+          </button>
+        </span>
+        <span className="panel-indicator-slot" data-tip={t.siteControls} data-tip-pos={tipPos}>
+          <button
+            type="button"
+            role="tab"
+            className={`panel-indicator-btn${open ? " panel-indicator-btn--active" : ""}`}
+            onClick={() => navigateTo("controls")}
+            aria-selected={open}
+            aria-label={t.siteControls}
+          >
+            <Icon name="spark" size={15} />
+          </button>
+        </span>
       </div>
     </>
   );

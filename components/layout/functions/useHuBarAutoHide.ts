@@ -1,24 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Dock } from "../../controls/HuBarDock";
+import { useCompact } from "./useHuBarFit";
 
 const HIDE_DELAY = 600;
 const FIRST_HIDE_DELAY = 3000;
-export const COMPACT_MQ = "(max-width: 798px), (max-height: 600px)";
 const TOUCH_MQ = "(pointer: coarse)";
 const EDGE = 24;
 const SWIPE = 30;
-
-export function useCompact() {
-  const [compact, setCompact] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia(COMPACT_MQ);
-    const sync = () => setCompact(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-  return compact;
-}
 
 function nearEdge(dock: Dock, x: number, y: number) {
   switch (dock) {

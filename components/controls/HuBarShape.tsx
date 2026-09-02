@@ -41,7 +41,7 @@ export default function ShapeControl() {
           role="radio"
           aria-checked={shape === s}
           aria-label={labels[s]}
-          title={labels[s]}
+          data-tip={labels[s]}
           className={`shape-toggle${shape === s ? " shape-toggle--on" : ""}`}
           onClick={() => setShape(s)}
         >

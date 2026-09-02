@@ -288,6 +288,10 @@ body:has(.gallery-page) { --gallery-w: 1200px; }
 .year-option--on { background: var(--accent); color: var(--accent-contrast); }
 
 /* ── Gallery pill bar ───────────────────────────────── */
+.reveal > .gallery-pillbar {
+  animation-fill-mode: backwards;
+}
+
 .gallery-pillbar {
   display: flex;
   align-items: stretch;
@@ -301,7 +305,7 @@ body:has(.gallery-page) { --gallery-w: 1200px; }
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
   z-index: 30;
-  transition: translate 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+  transition: translate 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.34s ease 0.1s;
 }
 
 .gallery-pillbar--top {
@@ -335,6 +339,22 @@ body:has(.hubar--bottom) .gallery-pillbar--bottom {
   translate: 0 calc(100% + 24px);
   opacity: 0;
   pointer-events: none;
+}
+
+.gallery-pillbar--hidden {
+  transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1) 0.26s, opacity 0.3s ease;
+}
+
+body:has(.hubar--top) .gallery-pillbar--top {
+  scale: 1;
+  transition: translate 0.42s cubic-bezier(0.22, 1, 0.36, 1), scale 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.38s ease, visibility 0s;
+}
+
+body:has(.hubar--top) .gallery-pillbar--top.gallery-pillbar--hidden {
+  translate: 0 -14px;
+  scale: 0.97;
+  visibility: hidden;
+  transition: translate 0.42s ease, scale 0.42s ease, opacity 0.4s ease, visibility 0s linear 0.4s;
 }
 
 .gallery-pillbar-scroll {
@@ -474,7 +494,6 @@ body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  font-size: 20px;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -498,8 +517,6 @@ body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--
 .lightbox-nav {
   top: 50%;
   translate: 0 -50%;
-  font-size: 30px;
-  line-height: 0;
 }
 
 .lightbox-nav--prev {
@@ -551,7 +568,6 @@ body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--
   border: none;
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
-  font-size: 12px;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -942,6 +958,28 @@ body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--
 .app-root:has(.hubar--top) .panel-indicator {
   bottom: auto;
   top: calc(16px + var(--hubar-h, 68px) + 11px);
+}
+
+/* The indicator deliberately sits under the control panel, but a tip on one
+   of its buttons reaches into the panel and was being painted underneath it.
+   Bring the whole indicator forward while a tip is up — past the panel (65)
+   and past a hovered HuBar (70) — the same move the HuBar makes for its own
+   tips, since a tip inside a stacking context can never escape it. */
+.panel-indicator:has(.panel-indicator-slot:hover),
+.panel-indicator:has(.panel-indicator-btn:focus-visible) {
+  z-index: 71;
+}
+
+/* The buttons scale — 0.95 at rest, 1.25 when their panel is open — and a
+   tip on the button itself rode that transform, so it changed size with the
+   button it labels. The tip hangs off this wrapper instead: same box, never
+   transformed, so it stays one size and one distance away. The button is
+   what takes focus, so the slot has to relay that to its tip. */
+.panel-indicator-slot {
+  display: inline-flex;
+}
+.panel-indicator-slot:has(:focus-visible)::after {
+  display: block;
 }
 
 .panel-indicator-btn {

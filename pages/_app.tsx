@@ -16,6 +16,7 @@ import { site as siteConfig, siteName, siteHandle, siteFooter, siteGithub } from
 import { useLocalized } from "@/lib/i18n";
 import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
+import useTipFit from "@/components/ui/useTipFit";
 import ControlPanel from "@/components/layout/ControlPanel";
 import { LangProvider } from "@/components/controls/LangSwitch";
 import PageStackTransition from "@/components/layout/PageStackTransition";
@@ -36,6 +37,7 @@ export default function App(props: AppProps) {
 }
 
 function AppShell({ Component, pageProps }: AppProps) {
+  useTipFit();
   const site = useLocalized(siteConfig);
   const changelog: string = (pageProps as { changelog?: string }).changelog ?? "";
   const [footerPre, footerPost] = siteFooter.split(siteHandle);
@@ -51,7 +53,7 @@ function AppShell({ Component, pageProps }: AppProps) {
         <title>{`${siteName}`}</title>
         <meta name="description" content={site.tagline} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+        <link rel="icon" type="image/svg+xml" href="/avatar.ico" />
       </Head>
       <div id="orb-field" className="orb-field" aria-hidden="true" />
       <div className="shell">

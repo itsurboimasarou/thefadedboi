@@ -214,10 +214,8 @@
 }
 
 .fact-grid dd .theme-switch {
-  display: block;
   /* obeys the dd's padding-left cleanly */
-  margin-top: 4px;
-  /* optical nudge so its center matches the text line */
+  display: block;
 }
 
 .fact-grid dt .icn {
@@ -684,6 +682,7 @@
 .dd-row {
   display: flex;
   align-items: center;
+  min-height: 34px;
   gap: 8px;
 }
 
@@ -1127,21 +1126,73 @@
   outline-offset: 2px;
 }
 
+/* ── Hover tip ──────────────────────────────────────────
+   Same look as the HuBar's <span class="tip">, but driven by an attribute
+   so an icon-only button needs no extra element: add data-tip="Label" and
+   data-tip-pos to steer it away from a screen edge. Use it instead of
+   `title`, never alongside — the native tooltip would double up. */
+[data-tip] {
+  position: relative;
+}
+
+[data-tip]::after,
 .tip--up {
   position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  translate: -50% 0;
   padding: 5px 10px;
   border-radius: 8px;
   background: var(--bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
+  font-family: var(--font-body, system-ui, sans-serif);
   font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-transform: none;
   color: var(--ink);
   white-space: nowrap;
   pointer-events: none;
+  z-index: 50;
   display: none;
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  top: calc(100% + 10px);
+  left: 50%;
+  translate: calc(-50% + var(--tip-shift, 0px)) 0;
+}
+[data-tip][data-tip-pos="up"]::after {
+  top: auto;
+  bottom: calc(100% + 10px);
+}
+[data-tip][data-tip-pos="left"]::after {
+  top: 50%;
+  left: auto;
+  right: calc(100% + 10px);
+  translate: 0 -50%;
+}
+[data-tip][data-tip-pos="right"]::after {
+  top: 50%;
+  left: calc(100% + 10px);
+  translate: 0 -50%;
+}
+
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  display: block;
+}
+
+/* No hover to leave on a touch screen, so the tip would just linger after a
+   tap — same call the HuBar tips already make. */
+@media (hover: none), (pointer: coarse) {
+  [data-tip]::after { display: none !important; }
+}
+
+.tip--up {
+  bottom: calc(100% + 10px);
+  left: 50%;
+  translate: calc(-50% + var(--tip-shift, 0px)) 0;
 }
 .accent-swatch:hover .tip--up,
 .accent-swatch:focus-visible .tip--up {

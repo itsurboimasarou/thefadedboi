@@ -136,10 +136,10 @@ export default function AccentSwitch() {
         className="accent-swatch accent-swatch--reset"
         disabled={active === set.defaultKey}
         aria-label="Reset to default"
-        title="Reset to default"
         onClick={() => setAccent(set.defaultKey)}
       >
         <Icon name="circleArrow" size={16} />
+        <span className="tip--up" aria-hidden="true">Reset to default</span>
       </button>
     </div>
   );

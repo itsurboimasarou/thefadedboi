@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { COMPACT_MQ } from "./useHuBarAutoHide";
+import { isCompact } from "./useHuBarFit";
 
 interface PanelSwipeOptions {
   panelRef: RefObject<HTMLElement | null>;
@@ -28,7 +28,7 @@ export function usePanelSwipe(o: PanelSwipeOptions) {
   const passedThreshold = (p: number) => (toRight ? p > 0.35 : p < 0.65);
 
   const begin = (x: number, y: number) => {
-    if (!enabled || !window.matchMedia(COMPACT_MQ).matches) return false;
+    if (!enabled || !isCompact()) return false;
     metaRef.current = { x, y, width: panelRef.current?.getBoundingClientRect().width || 1 };
     return true;
   };
