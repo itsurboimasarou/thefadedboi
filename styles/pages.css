@@ -585,8 +585,6 @@ body:has(.hubar--top) .mode-switch {
 }
 
 .vplayer-volume-slider {
-  -webkit-appearance: slider-vertical;
-  appearance: slider-vertical;
   writing-mode: vertical-lr;
   direction: rtl;
   width: 6px;
