@@ -1,8 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import type { ScannedPlaylist, Track } from "@/lib/types";
-import { usePanelSwipe } from "../layout/functions/usePanelSwipe";
-import { useInert } from "../layout/functions/useInert";
+import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
+import { useInert } from "@/lib/functions/useInert";
 import Marquee from "../ui/Marquee";
 import { useMusicPlayback, setNowPlaying, setVolume, setMuted, initMusicPrefs } from "@/lib/musicState";
 import { useLocalized, type Localized } from "@/lib/i18n";

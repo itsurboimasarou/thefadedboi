@@ -58,9 +58,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.end();
   }
 }
-
-export const config = {
-  api: {
-    responseLimit: false,
-  },
-};

@@ -15,9 +15,9 @@ import ChangelogDialog from "../content/ChangelogDialog";
 import MusicPlayer from "../widgets/MusicPlayer";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { accentSets } from "@/lib/configs/accents.config";
-import { isCompact } from "./functions/useHuBarFit";
-import { useInert } from "./functions/useInert";
-import { usePanelSwipe } from "./functions/usePanelSwipe";
+import { isCompact } from "@/lib/functions/useHuBarFit";
+import { useInert } from "@/lib/functions/useInert";
+import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
 import { useLocalized, type Localized } from "@/lib/i18n";
 
 const ui: Localized<{

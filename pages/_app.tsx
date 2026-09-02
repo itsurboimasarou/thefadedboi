@@ -16,7 +16,7 @@ import { site as siteConfig, siteName, siteHandle, siteFooter, siteGithub } from
 import { useLocalized } from "@/lib/i18n";
 import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
-import useTipFit from "@/components/ui/useTipFit";
+import useTipFit from "@/lib/functions/useTipFit";
 import ControlPanel from "@/components/layout/ControlPanel";
 import { LangProvider } from "@/components/controls/LangSwitch";
 import PageStackTransition from "@/components/layout/PageStackTransition";

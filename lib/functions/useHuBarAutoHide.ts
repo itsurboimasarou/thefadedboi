@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Dock } from "../../controls/HuBarDock";
+import type { Dock } from "@/components/controls/HuBarDock";
 import { useCompact } from "./useHuBarFit";
 
 const HIDE_DELAY = 600;

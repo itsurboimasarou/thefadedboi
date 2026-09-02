@@ -1,5 +1,5 @@
 import Icon from "../ui/Icons";
-import { useCompact } from "../layout/functions/useHuBarFit";
+import { useCompact } from "@/lib/functions/useHuBarFit";
 import { createSetting } from "@/lib/setting";
 
 export type Dock = "top" | "bottom" | "left" | "right";

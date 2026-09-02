@@ -7,8 +7,8 @@
    Was @media (max-width: 798px), (max-height: 600px). The width half of
    that breakpoint is now measured, not guessed: useHuBarFit finds the
    width at which the HuBar can no longer shrink and puts .narrow /
-   .compact on <html> at that point (see components/layout/functions/
-   useHuBarFit.ts). :where() keeps specificity at zero so these rules win
+   .compact on <html> at that point (see lib/functions/useHuBarFit.ts).
+   :where() keeps specificity at zero so these rules win
    or lose on source order exactly as they did inside @media. */
 html:where(.compact) {
   font-size: 15px;
