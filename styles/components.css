@@ -242,7 +242,8 @@
   display: none;
 }
 
-.dock-control {
+.dock-control,
+.shape-control {
   display: flex;
   gap: 6px;
 }

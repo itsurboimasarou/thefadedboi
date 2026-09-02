@@ -117,7 +117,13 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
   box-shadow: var(--shadow);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, border-radius 0.28s ease, translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+}
+
+/* Shape is a user setting (HuBarShape). 999px reads as a pill against
+   both the 68px horizontal bar and the 62px vertical one. */
+.hubar--pill {
+  border-radius: 999px;
 }
 
 html.glass-fx .hubar {
@@ -184,9 +190,49 @@ html.glass-fx .hubar {
 
 .hubar-item[aria-current="page"] {
   color: var(--accent);
-  background: var(--glass-strong);
-  box-shadow: inset 0 0 0 1px var(--glass-border);
 }
+
+/* ── Active-page dash ─────────────────────────────────── */
+.hubar-group--start {
+  position: relative;
+}
+
+.hubar-indicator {
+  --dash: calc(var(--ind-size) * 0.4);
+  position: absolute;
+  border-radius: 999px;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: translate 0.34s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+}
+
+.hubar-indicator--on {
+  opacity: 1;
+}
+
+.hubar-indicator--instant {
+  transition: opacity 0.22s ease;
+}
+
+.hubar--top .hubar-indicator,
+.hubar--bottom .hubar-indicator {
+  left: 0;
+  bottom: calc(var(--ind-size) * 0.11);
+  width: var(--dash);
+  height: 2px;
+  translate: calc(var(--ind-center) - var(--dash) / 2) 0;
+}
+
+.hubar--left .hubar-indicator,
+.hubar--right .hubar-indicator {
+  top: 0;
+  width: 2px;
+  height: var(--dash);
+  translate: 0 calc(var(--ind-center) - var(--dash) / 2);
+}
+.hubar--left .hubar-indicator { right: -3px; }
+.hubar--right .hubar-indicator { left: -3px; }
 
 .hubar-item .icn {
   width: 22px;

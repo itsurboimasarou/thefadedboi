@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Icon from "../ui/Icons";
 import StatusClock from "../widgets/StatusClock";
 import NowPlaying from "../widgets/NowPlaying";
 import LangSwitch from "../controls/LangSwitch";
 import { useDock } from "../controls/HuBarDock";
 import { usePinned } from "../controls/HuBarPinned";
+import { useShape } from "../controls/HuBarShape";
 import HuBarTrigger from "./HuBarTrigger";
 import useHuBarMeasure from "./functions/useHuBarMeasure";
 import useHuBarAutoHide, { useCompact } from "./functions/useHuBarAutoHide";
+import useHuBarIndicator from "./functions/useHuBarIndicator";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { navItems } from "@/lib/configs/nav.config";
 import { useStackNavigate } from "./PageStackTransition";
@@ -24,11 +26,16 @@ export default function HuBar() {
   const { pathname } = useRouter();
   const dock = useDock();
   const pinned = usePinned();
+  const shape = useShape();
   const compact = useCompact();
   const stackNavigate = useStackNavigate();
   const effectiveDock = compact ? (dock === "bottom" ? "bottom" : "top") : dock;
 
+  const vertical = effectiveDock === "left" || effectiveDock === "right";
+
   const railRef = useRef<HTMLElement>(null);
+  const startRef = useRef<HTMLDivElement>(null);
+  const indicator = useHuBarIndicator(startRef, pathname, vertical);
   useHuBarMeasure(railRef);
   const { hidden, touchMode, railHandlers, hotzoneHandlers } = useHuBarAutoHide(railRef, effectiveDock, pinned);
 
@@ -42,6 +49,7 @@ export default function HuBar() {
   const className = [
     "hubar",
     `hubar--${effectiveDock}`,
+    `hubar--${shape}`,
     hidden && "hubar--hidden",
     pinned && "hubar--pinned",
   ].filter(Boolean).join(" ");
@@ -56,7 +64,7 @@ export default function HuBar() {
         />
       )}
       <nav ref={railRef} className={className} aria-label="Primary" {...railHandlers}>
-        <div className="hubar-group hubar-group--start">
+        <div className="hubar-group hubar-group--start" ref={startRef}>
           <HuBarTrigger open={panelOpen} />
           <span className="hubar-divider" aria-hidden="true" />
           {items.map((item) => (
@@ -76,6 +84,18 @@ export default function HuBar() {
               <span className="tip">{item.label[lang]}</span>
             </Link>
           ))}
+          <span
+            className={[
+              "hubar-indicator",
+              indicator && "hubar-indicator--on",
+              indicator?.jump && "hubar-indicator--instant",
+            ].filter(Boolean).join(" ")}
+            aria-hidden="true"
+            style={indicator ? ({
+              "--ind-center": `${indicator.center}px`,
+              "--ind-size": `${indicator.size}px`,
+            } as CSSProperties) : undefined}
+          />
         </div>
         <div className="hubar-group hubar-group--end">
           <NowPlaying />

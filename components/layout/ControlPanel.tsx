@@ -5,6 +5,7 @@ import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
 import GlassToggle from "../controls/GlassMode";
 import AutoHideToggle from "../controls/HuBarPinned";
 import DockControl from "../controls/HuBarDock";
+import ShapeControl from "../controls/HuBarShape";
 import LangSwitch from "../controls/LangSwitch";
 import AccentSwitch from "../controls/AccentSwitch";
 import AccentSetSwitch from "../controls/AccentSetSwitch";
@@ -36,6 +37,7 @@ const ui: Localized<{
   aboutAutoHide: string;
   autoHideTip: string;
   huBarPosition: string;
+  huBarShape: string;
   language: string;
   customizeTheme: string;
   colorSets: string;
@@ -63,6 +65,7 @@ const ui: Localized<{
     aboutAutoHide: "About auto-hide",
     autoHideTip: "HuBar hides itself after a moment and reappears on hover, edge-swipe, or focus. Turn this off to keep it always shown.",
     huBarPosition: "HuBar position",
+    huBarShape: "HuBar shape",
     language: "Language",
     customizeTheme: "Customize theme",
     colorSets: "Theme",
@@ -90,6 +93,7 @@ const ui: Localized<{
     aboutAutoHide: "Về tính năng tự động ẩn",
     autoHideTip: "HuBar sẽ tự động ẩn sau một lúc và hiện lại khi di chuột tới, vuốt cạnh màn hình, hoặc focus vào. Tắt để luôn hiển thị.",
     huBarPosition: "Vị trí HuBar",
+    huBarShape: "Kiểu HuBar",
     language: "Ngôn ngữ",
     customizeTheme: "Tùy chỉnh giao diện",
     colorSets: "Chủ đề",
@@ -116,7 +120,7 @@ export function toggleControlPanel() {
 function resetAllToDefault() {
   const keys = [
     "theme", "glass-fx", "lite-mode", "hubar-pinned", "hubar-dock",
-    "lang", "logo-custom", "accent-set",
+    "lang", "logo-custom", "accent-set", "hubar-shape",
     ...accentSets.map((s) => `accent-element-${s.key}`),
   ];
   try {
@@ -232,6 +236,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
       !(t as Element).closest?.(".control-panel") &&
       !(t as Element).closest?.(".hubar-trigger") &&
       !(t as Element).closest?.(".status-clock") &&
+      !(t as Element).closest?.(".lang-switch") &&
       !(t as Element).closest?.(".hubar-nowplaying-group") &&
       !(t as Element).closest?.(".panel-indicator") &&
       !(t as Element).closest?.(".notice-backdrop");
@@ -404,6 +409,16 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dt>
             <dd className="dd-row">
               <DockControl />
+            </dd>
+          </div>
+
+          <div>
+            <dt>
+              <Icon name="star4" size={15} />
+              {t.huBarShape}
+            </dt>
+            <dd className="dd-row">
+              <ShapeControl />
             </dd>
           </div>
 

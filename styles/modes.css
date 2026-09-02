@@ -327,6 +327,12 @@
   .hubar--right .status-clock-label {
     display: none;
   }
+  .hubar--left .status-clock:hover .status-clock-time,
+  .hubar--left .status-clock:focus-visible .status-clock-time,
+  .hubar--right .status-clock:hover .status-clock-time,
+  .hubar--right .status-clock:focus-visible .status-clock-time {
+    opacity: 1;
+  }
   .hubar--left .status-clock-time,
   .hubar--right .status-clock-time {
     flex-direction: column;
