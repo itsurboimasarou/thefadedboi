@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
-import ThemeToggle from "../controls/ThemeToggle";
+import ThemeToggle, { AutoThemeToggle } from "../controls/ThemeToggle";
 import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
 import GlassToggle from "../controls/GlassMode";
 import AutoHideToggle from "../controls/HuBarPinned";
@@ -27,6 +27,8 @@ const ui: Localized<{
   resetAll: string;
   close: string;
   appearance: string;
+  aboutAppearance: string;
+  appearanceTip: string;
   glassBlur: string;
   aboutGlass: string;
   glassTip: string;
@@ -55,6 +57,8 @@ const ui: Localized<{
     resetAll: "Reset all to default",
     close: "Close",
     appearance: "Appearance",
+    aboutAppearance: "About appearance",
+    appearanceTip: "Switch between dark and light. The auto button follows your browser's theme setting instead, and changes along with it. Use the dark/light switch will turn auto theme off.",
     glassBlur: "Glass blur",
     aboutGlass: "About glass effect",
     glassTip: "Frosted blur behind HuBar. Costs GPU when anything animates behind it.",
@@ -83,6 +87,8 @@ const ui: Localized<{
     resetAll: "Đặt lại về mặc định",
     close: "Đóng",
     appearance: "Giao diện",
+    aboutAppearance: "Về giao diện",
+    appearanceTip: "Chuyển giữa giao diện tối và sáng. Nút tự động sẽ theo cài đặt giao diện của trình duyệt và tự đổi theo, dùng công tắc sáng/tối sẽ tắt tự động chuyển giao diện theo trình duyệt",
     glassBlur: "Hiệu ứng kính mờ",
     aboutGlass: "Về hiệu ứng kính mờ",
     glassTip: "Hiệu ứng mờ sương phía sau HuBar. Tiêu tốn GPU khi có chuyển động phía sau.",
@@ -354,6 +360,13 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dt>
             <dd className="dd-row">
               <ThemeToggle />
+              <AutoThemeToggle />
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutAppearance}>
+                <Icon name="info" size={17} />
+                <span className="info-tip-bubble" role="tooltip">
+                  {t.appearanceTip}
+                </span>
+              </span>
             </dd>
           </div>
 
