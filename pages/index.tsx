@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import StackLink from "@/components/layout/StackLink";
 import { site as siteConfig, siteName } from "@/lib/configs/site.config";
 import { homeEyebrow } from "@/lib/configs/home.config";
 import { useLocalized, type Localized } from "@/lib/i18n";
@@ -53,14 +53,14 @@ export default function Home() {
           {site.tagline}
         </p>
         <div className="hero-actions">
-          <Link href="/gallery" className="btn">
+          <StackLink href="/gallery" className="btn">
             <Icon name="image" size={18} />
             {t.viewGallery}
-          </Link>
-          <Link href="/about" className="btn btn--ghost">
+          </StackLink>
+          <StackLink href="/about" className="btn btn--ghost">
             <Icon name="user" size={18} />
             {t.aboutMe}
-          </Link>
+          </StackLink>
         </div>
       </section>
     </>

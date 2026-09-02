@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Icon from "../ui/Icons";
@@ -15,7 +14,7 @@ import { useCompact, useHuBarFit } from "@/lib/functions/useHuBarFit";
 import useHuBarIndicator from "@/lib/functions/useHuBarIndicator";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { navItems } from "@/lib/configs/nav.config";
-import { useStackNavigate } from "./PageStackTransition";
+import StackLink from "./StackLink";
 import { useLocalized } from "@/lib/i18n";
 import { useLang } from "../controls/LangSwitch";
 
@@ -29,7 +28,6 @@ export default function HuBar() {
   const pinned = usePinned();
   const shape = useShape();
   const compact = useCompact();
-  const stackNavigate = useStackNavigate();
   const effectiveDock = compact ? (dock === "bottom" ? "bottom" : "top") : dock;
 
   const vertical = effectiveDock === "left" || effectiveDock === "right";
@@ -70,21 +68,16 @@ export default function HuBar() {
           <HuBarTrigger open={panelOpen} />
           <span className="hubar-divider" aria-hidden="true" />
           {items.map((item) => (
-            <Link
+            <StackLink
               key={item.href}
               href={item.href}
               className="hubar-item"
               aria-current={pathname === item.href ? "page" : undefined}
               aria-label={item.label[lang]}
-              onClick={(e) => {
-                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-                e.preventDefault();
-                stackNavigate(item.href);
-              }}
             >
               <Icon name={item.icon} size={22} />
               <span className="tip">{item.label[lang]}</span>
-            </Link>
+            </StackLink>
           ))}
           <span
             className={[
