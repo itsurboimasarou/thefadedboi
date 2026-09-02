@@ -14,11 +14,13 @@ import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { navItems } from "@/lib/configs/nav.config";
 import { useStackNavigate } from "./PageStackTransition";
 import { useLocalized } from "@/lib/i18n";
+import { useLang } from "../controls/LangSwitch";
 
 const items = navItems;
 
 export default function HuBar() {
   const home = useLocalized(homeConfig);
+  const lang = useLang();
   const { pathname } = useRouter();
   const dock = useDock();
   const pinned = usePinned();
@@ -63,7 +65,7 @@ export default function HuBar() {
               href={item.href}
               className="hubar-item"
               aria-current={pathname === item.href ? "page" : undefined}
-              aria-label={item.label}
+              aria-label={item.label[lang]}
               onClick={(e) => {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
                 e.preventDefault();
@@ -71,7 +73,7 @@ export default function HuBar() {
               }}
             >
               <Icon name={item.icon} size={22} />
-              <span className="tip">{item.label}</span>
+              <span className="tip">{item.label[lang]}</span>
             </Link>
           ))}
         </div>
