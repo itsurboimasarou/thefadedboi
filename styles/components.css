@@ -774,7 +774,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 2px 4px;
+  padding: 2px 15px;
   line-height: 1;
   border: 0;
   background: none;
@@ -782,7 +782,6 @@
   font-weight: 600;
   font-size: 0.9rem;
   color: currentColor;
-  cursor: pointer;
   border-radius: 8px;
 }
 
@@ -805,10 +804,11 @@
 
 .status-clock-label {
   position: absolute;
-  left: 0;
+  left: 50%;
   top: 50%;
-  translate: 0 -50%;
+  translate: -50% -50%;
   width: max-content;
+  text-align: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.18s ease;
@@ -890,8 +890,10 @@
   flex-shrink: 0;
 }
 
+/* The only volume control now — it used to be hidden until ≤904px, with the
+   HuBar carrying one above that. */
 .player-header-volume {
-  display: none;
+  display: flex;
   align-items: center;
   gap: 4px;
 }

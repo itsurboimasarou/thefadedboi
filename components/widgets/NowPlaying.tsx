@@ -1,13 +1,12 @@
 import Icon from "../ui/Icons";
 import Marquee from "../ui/Marquee";
-import { useMusicPlayback, setVolume, setMuted } from "@/lib/musicState";
+import { useMusicPlayback } from "@/lib/musicState";
 import { toggleMusicPlayer } from "../layout/ControlPanel";
 
 export default function NowPlaying() {
-  const { nowPlaying, volume, muted } = useMusicPlayback();
+  const { nowPlaying } = useMusicPlayback();
   const hasTrack = !!nowPlaying.title;
   const subtitle = nowPlaying.artist || nowPlaying.albumTitle || "";
-  const isMuted = muted || volume === 0;
 
   return (
     <div className="hubar-nowplaying-group">
@@ -32,32 +31,6 @@ export default function NowPlaying() {
           </span>
         )}
       </button>
-
-      <div className="hubar-volume">
-        <button
-          type="button"
-          className="hubar-volume-btn"
-          onClick={() => setMuted(!muted)}
-          aria-pressed={muted}
-          aria-label={muted ? "Unmute" : "Mute"}
-          title={muted ? "Unmute" : "Mute"}
-        >
-          <Icon name={isMuted ? "volumeMute" : "volumeHigh"} size={18} />
-        </button>
-        <input
-          type="range"
-          className="hubar-volume-slider"
-          min={0}
-          max={100}
-          value={Math.round((isMuted ? 0 : volume) * 100)}
-          onChange={(e) => {
-            const v = Number(e.target.value) / 100;
-            setVolume(v);
-            if (muted && v > 0) setMuted(false);
-          }}
-          aria-label="Volume"
-        />
-      </div>
     </div>
   );
 }

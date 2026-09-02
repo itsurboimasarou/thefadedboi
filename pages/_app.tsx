@@ -18,6 +18,7 @@ import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
 import ControlPanel from "@/components/layout/ControlPanel";
 import { LangProvider } from "@/components/controls/LangSwitch";
+import PageStackTransition from "@/components/layout/PageStackTransition";
 
 const display = Work_Sans({ subsets: ["latin"], weight: ["500", "600", "700"], display: "swap", variable: "--font-display" });
 const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], display: "swap", variable: "--font-body" });
@@ -27,7 +28,9 @@ const mono = Space_Grotesk({ subsets: ["latin"], weight: ["500", "700"], display
 export default function App(props: AppProps) {
   return (
     <LangProvider>
-      <AppShell {...props} />
+      <PageStackTransition>
+        <AppShell {...props} />
+      </PageStackTransition>
     </LangProvider>
   );
 }

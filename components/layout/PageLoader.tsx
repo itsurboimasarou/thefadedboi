@@ -33,8 +33,9 @@ export default function PageLoader() {
   if (!loading) return null;
 
   return (
-    <div className="page-loader" role="status" aria-live="polite">
-      <span className="page-loader-ring" aria-hidden="true" />
+    <div className="page-progress" role="status" aria-live="polite">
+      <span className="page-progress-bar page-progress-bar--primary" aria-hidden="true" />
+      <span className="page-progress-bar page-progress-bar--secondary" aria-hidden="true" />
       <span className="sr-only">Loading page…</span>
     </div>
   );

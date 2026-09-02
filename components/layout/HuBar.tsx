@@ -11,17 +11,11 @@ import HuBarTrigger from "./HuBarTrigger";
 import useHuBarMeasure from "./functions/useHuBarMeasure";
 import useHuBarAutoHide, { useCompact } from "./functions/useHuBarAutoHide";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
+import { navItems } from "@/lib/configs/nav.config";
+import { useStackNavigate } from "./PageStackTransition";
 import { useLocalized } from "@/lib/i18n";
 
-interface NavItem { href: string; label: string; icon: string }
-const items: NavItem[] = [
-  { href: "/", label: "Home", icon: "home" },
-  { href: "/about", label: "Details", icon: "user" },
-  { href: "/contacts", label: "Contacts", icon: "contacts" },
-  { href: "/portfolio", label: "Portfolio", icon: "portfolio" },
-  { href: "/gallery", label: "Gallery", icon: "image" },
-  { href: "/devices", label: "Devices & Equipment", icon: "devices" },
-];
+const items = navItems;
 
 export default function HuBar() {
   const home = useLocalized(homeConfig);
@@ -29,6 +23,7 @@ export default function HuBar() {
   const dock = useDock();
   const pinned = usePinned();
   const compact = useCompact();
+  const stackNavigate = useStackNavigate();
   const effectiveDock = compact ? (dock === "bottom" ? "bottom" : "top") : dock;
 
   const railRef = useRef<HTMLElement>(null);
@@ -69,6 +64,11 @@ export default function HuBar() {
               className="hubar-item"
               aria-current={pathname === item.href ? "page" : undefined}
               aria-label={item.label}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                e.preventDefault();
+                stackNavigate(item.href);
+              }}
             >
               <Icon name={item.icon} size={22} />
               <span className="tip">{item.label}</span>

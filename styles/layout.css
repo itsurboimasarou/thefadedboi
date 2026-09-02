@@ -37,6 +37,57 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
   }
 }
 
+/* ── Page transition veil (Canva-style stack) ───────── */
+.stack-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: var(--bg);
+  border-top: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+  will-change: transform;
+}
+
+/* Covering: comes from below when moving down the nav order, from above when
+   moving back up it. */
+.stack-veil[data-phase="cover"][data-dir="up"] {
+  animation: stack-cover-up 300ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.stack-veil[data-phase="cover"][data-dir="down"] {
+  animation: stack-cover-down 300ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Revealing: continues past the viewport the same way it entered. */
+.stack-veil[data-phase="reveal"][data-dir="up"] {
+  animation: stack-reveal-up 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.stack-veil[data-phase="reveal"][data-dir="down"] {
+  animation: stack-reveal-down 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes stack-cover-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes stack-reveal-up {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-100%); }
+}
+
+@keyframes stack-cover-down {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes stack-reveal-down {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+
 /* This breakpoint's .main rules (padding transition, pinned+bottom footer
    clearance) live in modes.css now, alongside the rest of the @media
    rules. */
@@ -240,8 +291,7 @@ html.glass-fx .hubar {
   outline-offset: 2px;
 }
 /* No track loaded yet — a bare icon circle so it still reads as "music
-   lives here", matching .hubar-volume-btn's shape instead of the
-   text-carrying pill. */
+   lives here", instead of the text-carrying pill. */
 .hubar-nowplaying--idle {
   width: 32px;
   height: 32px;
@@ -278,43 +328,6 @@ html.glass-fx .hubar {
 .hubar-nowplaying-subtitle {
   font-size: 0.68rem;
   color: var(--ink-dim);
-}
-
-.hubar-volume {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.hubar-volume-btn {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  color: var(--ink-dim);
-  cursor: pointer;
-  transition: color 0.2s, background 0.2s;
-}
-.hubar-volume-btn:hover,
-.hubar-volume-btn:focus-visible {
-  color: var(--ink);
-  background: var(--glass);
-}
-.hubar-volume-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-.hubar-volume-btn .icn {
-  position: relative;
-  top: -1px;
-}
-.hubar-volume-slider {
-  width: 64px;
-  height: 4px;
-  accent-color: var(--accent);
-  cursor: pointer;
 }
 
 /* Desktop dock positioning/tooltips, hotzones, and the Left/Right vertical

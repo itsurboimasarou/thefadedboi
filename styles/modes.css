@@ -178,9 +178,6 @@
   .panel-head-actions { display: none; }
   .player-panel .panel-head-actions { display: flex; }
   .player-close-btn { display: none; }
-  .player-header-volume { display: flex; }
-
-  .page-loader { top: auto; bottom: 96px; left: 50%; right: auto; }
 
   .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
 
@@ -226,6 +223,10 @@
 }
 
 @media (min-width: 799px) and (min-height: 601px) {
+  .hubar--top,
+  .hubar--bottom {
+    gap: clamp(32px, 7vw, 140px);
+  }
 
   .hubar--top {
     top: 16px;
@@ -406,24 +407,6 @@
   .hubar--right .hubar-nowplaying-text {
     display: none;
   }
-  .hubar--left .hubar-volume,
-  .hubar--right .hubar-volume {
-    flex-direction: column;
-    gap: 4px;
-  }
-  .hubar--left .hubar-volume-slider,
-  .hubar--right .hubar-volume-slider {
-    width: 4px;
-    height: 64px;
-    writing-mode: vertical-lr;
-    direction: rtl;
-    -moz-orient: vertical;
-  }
-}
-
-@media (max-width: 904px) {
-  .hubar-volume { display: none; }
-  .player-header-volume { display: flex; }
 }
 
 @media (min-width: 799px) {
@@ -521,12 +504,14 @@ html.lite-mode[data-theme="light"] .contact-icon {
   background: #ffffff;
 }
 
-
-/* Lite mode: a static ring still communicates "working" without animating. */
-html.lite-mode .page-loader-ring {
+/* Lite mode: hold the bar as a static fill rather than sweeping it. */
+html.lite-mode .page-progress-bar--primary {
   animation: none;
-  border-top-color: var(--accent);
+  left: 0;
+  right: 0;
 }
+
+html.lite-mode .page-progress-bar--secondary { display: none; }
 
 html.lite-mode .thumb-loader::after { animation: none; }
 
