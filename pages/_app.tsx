@@ -12,8 +12,7 @@ import type { AppProps } from "next/app";
 import { useEffect } from "react";
 import { Work_Sans, IBM_Plex_Sans, Momo_Signature, Space_Grotesk } from "next/font/google";
 import HuBar from "@/components/layout/HuBar";
-import { site as siteConfig, siteName, siteHandle, siteFooter, siteGithub } from "@/lib/configs/site.config";
-import { useLocalized } from "@/lib/i18n";
+import { siteName, siteHandle, siteFooter, siteGithub, siteUrl, siteBanner, siteDescription } from "@/lib/configs/site.config";
 import LiteNotice from "@/components/controls/LiteNotice";
 import PageLoader from "@/components/layout/PageLoader";
 import useTipFit from "@/lib/functions/useTipFit";
@@ -38,7 +37,6 @@ export default function App(props: AppProps) {
 
 function AppShell({ Component, pageProps }: AppProps) {
   useTipFit();
-  const site = useLocalized(siteConfig);
   const changelog: string = (pageProps as { changelog?: string }).changelog ?? "";
   const [footerPre, footerPost] = siteFooter.split(siteHandle);
 
@@ -51,9 +49,23 @@ function AppShell({ Component, pageProps }: AppProps) {
     <div className={`app-root ${display.variable} ${body.variable} ${script.variable} ${mono.variable}`}>
       <Head>
         <title>{`${siteName}`}</title>
-        <meta name="description" content={site.tagline} />
+        <meta name="description" content={siteDescription} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/svg+xml" href="/avatar.ico" />
+
+        <meta key="og:type" property="og:type" content="website" />
+        <meta key="og:site_name" property="og:site_name" content={siteName} />
+        <meta key="og:title" property="og:title" content={siteName} />
+        <meta key="og:description" property="og:description" content={siteDescription} />
+        <meta key="og:url" property="og:url" content={siteUrl} />
+        <meta key="og:locale" property="og:locale" content="en_US" />
+        <meta key="og:image" property="og:image" content={siteBanner.url} />
+        <meta key="og:image:width" property="og:image:width" content={String(siteBanner.width)} />
+        <meta key="og:image:height" property="og:image:height" content={String(siteBanner.height)} />
+        <meta key="og:image:alt" property="og:image:alt" content={siteName} />
+        <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+
+        <meta name="theme-color" content="#6fd6b4" />
       </Head>
       <div id="orb-field" className="orb-field" aria-hidden="true" />
       <div className="shell">
