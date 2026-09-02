@@ -92,6 +92,18 @@ html:where(.compact) {
 :where(html.compact) .glance-row--shape { order: 2; }
 :where(html.compact) .glance-row--dock { order: 3; }
 
+/* Shorter panel on mobile, so the logo list gives up a row before it
+   starts scrolling. */
+:where(html.compact) .logo-grid { --logo-rows: 3; }
+
+/* Short screens cannot afford three rows: at 360x640 the panel ran
+   106px past the bottom of the viewport and the logo list was cut off,
+   so scrolling it fought the page behind. Two rows brings the whole
+   panel back on screen. */
+@media (max-height: 700px) {
+  .logo-grid { --logo-rows: 2; }
+}
+
 /* Page stack, compact: left/right rather than up/down. The borders move to
    the sides to match, and an in-progress edge swipe drives the veil from
    --stack-at instead of a keyframe, so it tracks the finger. */
@@ -476,7 +488,6 @@ html:where(.compact) {
 :where(html:not(.narrow)) .app-root:has(.hubar--right) .control-panel--open {
   transform: translate(0, -50%);
 }
-
 
 /* Lite mode: no animation */
 

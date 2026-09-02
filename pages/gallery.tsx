@@ -5,29 +5,39 @@ import AlbumPillBar, { useBarPos } from "@/components/gallery/AlbumPillBar";
 import { getManifest, listImages, getChangelog } from "@/lib/assets";
 import type { ScannedGalleryAlbum } from "@/lib/types";
 import { useLocalized, type Localized } from "@/lib/i18n";
+import { galleryQuotes } from "@/lib/configs/gallery.config";
 
 const ui: Localized<{
   eyebrow: string;
   heading: string;
-  description: string;
   all: string;
   photosToBeAdded: string;
 }> = {
   en: {
     eyebrow: "Gallery",
     heading: "Precious moments",
-    description: "Every photo I've taken, all in one place — filter by album or just scroll through everything.",
     all: "All",
     photosToBeAdded: "Photos to be added.",
   },
   vi: {
     eyebrow: "Thư viện",
     heading: "Những khoảnh khắc đẹp nhất",
-    description: "Toàn bộ ảnh mình chụp, gom lại một chỗ — lọc theo album hoặc lướt xem tất cả.",
     all: "Tất cả",
     photosToBeAdded: "Ảnh sẽ được thêm sau.",
   },
 };
+
+const NO_TEXT: Localized<string> = { en: "", vi: "" };
+
+let lastQuote = -1;
+
+function pickQuote(): number {
+  if (galleryQuotes.length < 2) return 0;
+  let i = lastQuote;
+  while (i === lastQuote) i = Math.floor(Math.random() * galleryQuotes.length);
+  lastQuote = i;
+  return i;
+}
 
 function albumName(folder: string): string {
   const seg = folder.split("/").pop() ?? folder;
@@ -66,6 +76,11 @@ export default function GalleryIndex({
   const barPos = useBarPos();
   const [year, setYear] = useState<number | undefined>(undefined);
   const [active, setActive] = useState<string>("all");
+  const [quote, setQuote] = useState(0);
+  useEffect(() => setQuote(pickQuote()), []);
+  const picked = galleryQuotes[quote];
+  const quoteText = useLocalized(picked?.text ?? NO_TEXT);
+  const quoteBy = useLocalized(picked?.by ?? NO_TEXT);
 
   const years = useMemo(
     () =>
@@ -114,7 +129,12 @@ export default function GalleryIndex({
       <header>
         <p className="eyebrow">{t.eyebrow}</p>
         <h1>{t.heading}</h1>
-        <p style={{ marginTop: 12, maxWidth: "100ch" }}>{t.description}</p>
+        {quoteText && (
+          <p className="gallery-quote">
+            &quot;{quoteText}&quot;
+            {quoteBy && <cite className="gallery-quote-by"> - {quoteBy}</cite>}
+          </p>
+        )}
       </header>
 
       <AlbumPillBar

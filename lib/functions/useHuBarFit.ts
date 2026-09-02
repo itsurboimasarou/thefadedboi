@@ -8,6 +8,21 @@ let narrow = false;
 let compact = false;
 const listeners = new Set<() => void>();
 
+function takeScroll(): [Element, number, number][] {
+  const out: [Element, number, number][] = [];
+  for (const el of document.querySelectorAll("*")) {
+    if (el.scrollTop || el.scrollLeft) out.push([el, el.scrollTop, el.scrollLeft]);
+  }
+  return out;
+}
+
+function putScroll(saved: [Element, number, number][]) {
+  for (const [el, top, left] of saved) {
+    if (el.scrollTop !== top) el.scrollTop = top;
+    if (el.scrollLeft !== left) el.scrollLeft = left;
+  }
+}
+
 function desktopOverflows(rail: HTMLElement): boolean {
   const root = document.documentElement.classList;
   const hadCompact = root.contains("compact");
@@ -16,6 +31,7 @@ function desktopOverflows(rail: HTMLElement): boolean {
   const hadTop = rail.classList.contains("hubar--top");
   const prevMax = rail.style.maxWidth;
   const prevWidth = rail.style.width;
+  const scroll = takeScroll();
 
   root.remove("compact", "narrow");
   rail.classList.remove(...docked);
@@ -32,8 +48,15 @@ function desktopOverflows(rail: HTMLElement): boolean {
   rail.classList.add(...docked);
   if (hadCompact) root.add("compact");
   if (hadNarrow) root.add("narrow");
+  putScroll(scroll);
 
   return Number.isFinite(allowed) && wanted > allowed - 0.5;
+}
+
+function isCosmetic(r: MutationRecord): boolean {
+  const node = r.target;
+  const el = node.nodeType === 1 ? (node as Element) : node.parentElement;
+  return !!el?.closest(".status-clock, .hubar-nowplaying-text");
 }
 
 function apply() {
@@ -80,8 +103,11 @@ export function useHuBarFit(railRef: React.RefObject<HTMLElement>) {
     document.fonts?.ready.then(schedule).catch(() => {});
 
     const short = window.matchMedia(SHORT_MQ);
-    const mo = new MutationObserver(schedule);
-    mo.observe(rail, { childList: true, subtree: true, characterData: true });
+    const mo = new MutationObserver((records) => {
+      if (records.every(isCosmetic)) return;
+      schedule();
+    });
+    mo.observe(rail, { childList: true, subtree: true });
     window.addEventListener("resize", schedule);
     short.addEventListener("change", schedule);
     return () => {

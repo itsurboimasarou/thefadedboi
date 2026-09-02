@@ -287,6 +287,19 @@ body:has(.gallery-page) { --gallery-w: 1200px; }
 .year-option:hover { background: var(--glass-strong); color: var(--ink); }
 .year-option--on { background: var(--accent); color: var(--accent-contrast); }
 
+.gallery-quote {
+  margin-top: 12px;
+  max-width: 100ch;
+  font-style: italic;
+}
+
+/* Runs on from the quote on the same line; upright and dimmed so the name
+   still reads as attribution rather than part of what was said. */
+.gallery-quote-by {
+  font-style: normal;
+  color: var(--ink-dim);
+}
+
 /* ── Gallery pill bar ───────────────────────────────── */
 .reveal > .gallery-pillbar {
   animation-fill-mode: backwards;
@@ -828,12 +841,27 @@ body:has(.hubar--bottom) .gallery-page--bar-bottom { padding-bottom: calc(var(--
   line-height: 1.55;
 }
 
+/* Both calls to action get the width of the wider one, so the pair reads
+   as a unit rather than two differently-sized pills -- the labels differ
+   in length in either language, and more so in Vietnamese. Equal 1fr
+   columns on a shrink-wrapped grid size themselves to the widest button
+   without hardcoding a width that a future label could outgrow. */
 .hero-actions {
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  width: fit-content;
+  margin-inline: auto;
   gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
   margin-top: 26px;
+}
+
+/* Too narrow for two across: stack them, still matched at full width. */
+@media (max-width: 420px) {
+  .hero-actions {
+    grid-auto-flow: row;
+    width: 100%;
+  }
 }
 
 /* ── Control panel ─────────────────────────────────── */

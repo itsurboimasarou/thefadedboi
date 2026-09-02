@@ -8,6 +8,43 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ── Scrollbars ───────────────────────────────────────── */
+html {
+  --sb-size: 10px;
+  --sb-pad: 2px;
+  --sb-thumb: color-mix(in srgb, var(--ink) 26%, transparent);
+  --sb-thumb-hover: color-mix(in srgb, var(--accent) 70%, var(--ink));
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: var(--sb-size);
+  height: var(--sb-size);
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb);
+  background-clip: padding-box;
+  border: var(--sb-pad) solid transparent;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--sb-thumb-hover);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
 /* ── Type ───────────────────────────────────────────── */
 h1,
 h2,
@@ -17,9 +54,6 @@ h3 {
   line-height: 1.15;
 }
 
-/* Page-name headers: script face, but sized so descenders clear the line
-   below — the first cut was so large that "Say hello" and "Highlights" ran
-   into their subtitles. Home's hero overrides this to go big. */
 h1 {
   font-family: var(--font-script), var(--font-display, system-ui, sans-serif);
   font-size: clamp(2.4rem, 5vw, 3.6rem);
@@ -112,8 +146,6 @@ a {
 
 [hidden] { display: none !important; }
 
-/* Home page: exactly one viewport, no scroll. Set on <html> AND body so iOS
-   cannot rubber-band the document behind a merely-clipped child. */
 html.no-scroll,
 html.no-scroll body {
   height: 100%;
