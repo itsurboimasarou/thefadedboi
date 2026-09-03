@@ -64,11 +64,6 @@ export default function useImageZoom(frameRef: React.RefObject<HTMLElement | nul
     if (zoom.scale === MIN) scaleAbout(2.5, point);
   }, [zoom.scale, scaleAbout]);
 
-  const onWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    scaleAbout(zoom.scale * (e.deltaY < 0 ? STEP : 1 / STEP), { x: e.clientX, y: e.clientY });
-  }, [zoom.scale, scaleAbout]);
-
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     moved.current = false;
@@ -117,11 +112,18 @@ export default function useImageZoom(frameRef: React.RefObject<HTMLElement | nul
       pinch.current = null;
     };
 
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      scaleAbout(zoom.scale * (e.deltaY < 0 ? STEP : 1 / STEP), { x: e.clientX, y: e.clientY });
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
     el.addEventListener("touchstart", onStart, { passive: true });
     el.addEventListener("touchmove", onMove, { passive: false });
     el.addEventListener("touchend", onEnd);
     el.addEventListener("touchcancel", onEnd);
     return () => {
+      el.removeEventListener("wheel", onWheel);
       el.removeEventListener("touchstart", onStart);
       el.removeEventListener("touchmove", onMove);
       el.removeEventListener("touchend", onEnd);
@@ -158,7 +160,6 @@ export default function useImageZoom(frameRef: React.RefObject<HTMLElement | nul
     zoomIn: useCallback(() => scaleAbout(zoom.scale * 1.6), [zoom.scale, scaleAbout]),
     zoomOut: useCallback(() => scaleAbout(zoom.scale / 1.6), [zoom.scale, scaleAbout]),
     handlers: {
-      onWheel,
       onPointerDown,
       onPointerMove,
       onPointerUp: endDrag,

@@ -47,6 +47,9 @@ const ui: Localized<{
   },
 };
 
+const FIT_SIZES = "(min-width: 1522px) 1400px, 92vw";
+const ZOOM_SIZES = "3840px";
+
 function withThumbSize(url: string, size: "lg"): string {
   return `${url}${url.includes("?") ? "&" : "?"}size=${size}`;
 }
@@ -238,23 +241,25 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               src={items[index].full}
               alt={t.fullSizeAlt(title, index + 1)}
               fill
-              sizes="100vw"
+              sizes={FIT_SIZES}
               quality={80}
               priority
               onLoad={() => setLoaded(true)}
               onError={() => onThumbError(items[index].full)}
               style={{ objectFit: "contain", opacity: loaded ? 1 : 0, transition: "opacity 0.25s" }}
             />
-            {/* Zooming past fit swaps in the untouched original. next/image
-                only ever serves a viewport-sized variant, so magnifying that
-                would just enlarge its pixels; this is the real file. */}
             {zoomed && (
-              <img
+              <Image
+                key={`full-${items[index].full}`}
                 src={items[index].full}
                 alt=""
                 aria-hidden="true"
+                fill
+                sizes={ZOOM_SIZES}
+                quality={80}
                 className="lightbox-full"
                 draggable={false}
+                style={{ objectFit: "contain" }}
               />
             )}
           </div>
@@ -268,7 +273,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
                   alt=""
                   aria-hidden="true"
                   fill
-                  sizes="100vw"
+                  sizes={FIT_SIZES}
                   quality={80}
                   loading="eager"
                   style={{ opacity: 0, pointerEvents: "none" }}

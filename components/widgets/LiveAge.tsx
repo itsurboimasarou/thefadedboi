@@ -28,7 +28,7 @@ export default function LiveAge({ birthday }: { birthday: string }) {
     if (!birthday || Number.isNaN(new Date(birthday).getTime())) return;
     const tick = () => setAge(wholeYears(birthday));
     tick();
-    const id = setInterval(tick, 60_000); // re-check each minute; flips on the birthday
+    const id = setInterval(tick, 60_000);
     return () => clearInterval(id);
   }, [birthday]);
 

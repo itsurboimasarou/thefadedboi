@@ -940,11 +940,8 @@ body:has(.hubar--bottom) .gallery-page--motion {
   position: absolute;
   inset: 0;
   transform-origin: center;
-  will-change: transform;
 }
 
-/* Sits over the optimised copy once it has decoded, so the change is a
-   sharpening rather than a flash of empty space. */
 .lightbox-full {
   position: absolute;
   inset: 0;
