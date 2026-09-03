@@ -17,7 +17,7 @@ export default function GalleryModeSwitch({
   onChange: (mode: GalleryMode) => void;
 }) {
   const t = useLocalized(ui);
-  const hidden = useHideOnScrollDown() && mode === "still";
+  const hidden = useHideOnScrollDown();
   const sides: { key: GalleryMode; icon: string; label: string }[] = [
     { key: "still", icon: "image", label: t.still },
     { key: "motion", icon: "film", label: t.motion },

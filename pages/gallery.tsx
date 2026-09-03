@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { InferGetStaticPropsType } from "next";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
 import AlbumPillBar from "@/components/gallery/AlbumPillBar";
@@ -94,6 +94,7 @@ export default function GalleryIndex({
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const t = useLocalized(ui);
   const [mode, setMode] = useState<GalleryMode>("still");
+  const view = useDeferredValue(mode);
   const [year, setYear] = useState<number | undefined>(undefined);
   const [active, setActive] = useState<string>("all");
   const [quote, setQuote] = useState(0);
@@ -102,7 +103,7 @@ export default function GalleryIndex({
   const quoteText = useLocalized(picked?.text ?? NO_TEXT);
   const quoteBy = useLocalized(picked?.by ?? NO_TEXT);
   const source: (ScannedGalleryAlbum | ScannedVideoAlbum)[] =
-    mode === "motion" ? videoAlbums : albums;
+    view === "motion" ? videoAlbums : albums;
 
   const years = useMemo(
     () =>
@@ -124,14 +125,14 @@ export default function GalleryIndex({
   useEffect(() => {
     setActive("all");
     setYear(undefined);
-  }, [mode]);
+  }, [view]);
 
   const countOf = (a: ScannedGalleryAlbum | ScannedVideoAlbum) =>
     "videos" in a ? a.videos.length : a.images.length;
 
   const totalCount = useMemo(
     () => visible.reduce((n, a) => n + countOf(a), 0),
-    [visible, mode]
+    [visible, view]
   );
 
   const chips = useMemo(
@@ -139,7 +140,7 @@ export default function GalleryIndex({
       { key: "all", label: t.all, count: totalCount },
       ...visible.map((a) => ({ key: a.folder, label: a.name, count: countOf(a) })),
     ],
-    [visible, totalCount, t.all, mode]
+    [visible, totalCount, t.all, view]
   );
 
   const activeAlbum = useMemo(
@@ -163,14 +164,14 @@ export default function GalleryIndex({
     [activeAlbum, visible]
   );
 
-  const shown = mode === "motion" ? shownVideos : shownImages;
+  const shown = view === "motion" ? shownVideos : shownImages;
 
   const gridTitle = activeAlbum ? activeAlbum.name : t.heading;
 
   return (
     <div
       className={`stack reveal gallery-page${
-        mode === "motion" ? " gallery-page--motion" : ""
+        view === "motion" ? " gallery-page--motion" : ""
       }`}
     >
       <header>
@@ -186,7 +187,7 @@ export default function GalleryIndex({
 
       <GalleryModeSwitch mode={mode} onChange={setMode} />
 
-      {mode === "still" && (
+      {view === "still" && (
         <AlbumPillBar
           chips={chips}
           active={active}
@@ -197,7 +198,7 @@ export default function GalleryIndex({
         />
       )}
 
-      {mode === "motion" ? (
+      {view === "motion" ? (
         <MotionSection
           videos={shownVideos}
           chips={chips}

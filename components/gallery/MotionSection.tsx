@@ -55,11 +55,17 @@ export default function MotionSection({
   const [current, setCurrent] = useState(0);
   const [fullView, setFullView] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [settled, setSettled] = useState(false);
   const strip = useHorizontalScroller([videos]);
   const albumRow = useHorizontalScroller([chips]);
 
   useEffect(() => setMounted(true), []);
   useEffect(() => { setCurrent(0); }, [videos]);
+  
+  useEffect(() => {
+    const t = setTimeout(() => setSettled(true), 380);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     if (!fullView) return;
@@ -112,7 +118,13 @@ export default function MotionSection({
               onClick={() => setCurrent(i)}
               aria-label={t.pick(v.name)}
             >
-              <video src={`${v.src}#t=0.1`} preload="metadata" muted playsInline tabIndex={-1} />
+              <video
+                src={settled ? `${v.src}#t=0.1` : undefined}
+                preload="metadata"
+                muted
+                playsInline
+                tabIndex={-1}
+              />
               <span className="motion-tile-name">{v.name}</span>
             </button>
           ))}
