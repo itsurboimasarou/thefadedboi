@@ -50,7 +50,7 @@ const en: DetailsContent = {
 
 const vi: DetailsContent = {
   aboutMe: [
-    "Mình là Lê Nhật Lâm (nickname thường được biết là masarou). Mình đang là 1 photophone tự do, cũng như là developer & (một chút) designer. Sống ở Việt Nam & đang trên cong đường chuẩn bị du học.",
+    "Mình là Lê Nhật Lâm (nickname thường được biết là masarou). Mình đang là 1 photophone tự do, cũng như là developer & (một chút) designer. Sống ở Việt Nam & đang trên con đường chuẩn bị du học.",
     "Bản thân mình không phải là người thật sự hướng ngoại & thường để bản thân mờ nhạt một chút giữa đám đông. Nhưng mình lại khá thích chia sẻ những cảm nghĩ và ý tưởng của mình, đặc biệt là qua những bức ảnh mình chụp và cosplay. Hành trình của mình bắt đầu với một cái tình yêu với cảm xúc nghệ thuật toàn thời gian - đúng rồi đó, nhiếp ảnh, một cái động lực lớn kéo mình theo con đường phát triển web lẫn design.",
     "Mình làm nhiều thứ, theo hứng, nhưng với tiêu chí - giữ cho mọi thứ được đơn giản, nhưng vẫn phải có cái hồn của nó. Mình tin rằng một chi tiết nhỏ cũng có thể làm nên một thay đổi lớn, và cũng như cố gắng một trải nghiệm không chỉ dừng lại ở việc nó chạy mà nó cũng phải nhìn có sự thú vị.",
     "Đây là nơi bạn có thể tìm thấy tất tần tật mọi thứ về mình - những bức ảnh mình chụp, cosplays & những dự ánh đang phát triển của mình. Mình hy vọng bạn sẽ tận hưởng khám phá chúng.",

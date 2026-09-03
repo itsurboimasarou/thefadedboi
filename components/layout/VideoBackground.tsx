@@ -5,6 +5,16 @@ import { glassOn, setGlass } from "@/components/controls/GlassMode";
 
 const SRC = process.env.NEXT_PUBLIC_BG_VIDEO || bgVideoUrl;
 
+const HOME = "/";
+
+export function primeBgVideo(href: string) {
+  if (href === HOME) return;
+  const root = document.documentElement;
+  if (!root.classList.contains("has-bg-video")) return;
+  root.classList.remove("has-bg-video");
+  setGlass(glassOn());
+}
+
 export default function VideoBackground() {
   const ref = useRef<HTMLVideoElement>(null);
   const [ok, setOk] = useState(true);

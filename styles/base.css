@@ -142,7 +142,7 @@ a {
 }
 
 .reveal>* {
-  animation: page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .reveal>*:nth-child(2) {

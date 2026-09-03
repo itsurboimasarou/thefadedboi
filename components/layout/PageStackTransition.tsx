@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/router";
 import { stackDirection, stackNeighbour } from "@/lib/configs/nav.config";
 import useEdgeSwipeNav, { type StackDir } from "@/lib/functions/useEdgeSwipeNav";
+import { primeBgVideo } from "./VideoBackground";
 
 type Phase = "idle" | "cover" | "reveal";
 
@@ -51,6 +52,7 @@ export default function PageStackTransition({ children }: { children: ReactNode 
   const navigate = useCallback(
     (href: string) => {
       if (href === router.pathname || awaitingLoad.current) return;
+      primeBgVideo(href);
       if (motionDisabled()) {
         router.push(href);
         return;
@@ -88,6 +90,7 @@ export default function PageStackTransition({ children }: { children: ReactNode 
         timers.current.push(setTimeout(() => setDrag(null), SETTLE_MS));
         return;
       }
+      primeBgVideo(href);
       if (motionDisabled()) {
         router.push(href);
         return;
