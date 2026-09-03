@@ -49,6 +49,7 @@ const ui: Localized<{
 
 const FIT_SIZES = "(min-width: 1522px) 1400px, 92vw";
 const ZOOM_SIZES = "3840px";
+const EAGER_TILES = 4;
 
 function withThumbSize(url: string, size: "lg"): string {
   return `${url}${url.includes("?") ? "&" : "?"}size=${size}`;
@@ -373,7 +374,8 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
                 height={400}
                 sizes="(max-width: 600px) 50vw, (max-width: 900px) 33vw, 420px"
                 quality={75}
-                fetchPriority="low"
+                loading={i < EAGER_TILES ? "eager" : "lazy"}
+                fetchPriority={i < EAGER_TILES ? "high" : "low"}
                 onLoad={(e) => onThumbLoad(img.thumb, e)}
                 onError={() => onThumbError(img.thumb)}
                 style={{

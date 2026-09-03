@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import type { ScannedPlaylist, Track } from "@/lib/types";
 import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
 import { useInert } from "@/lib/functions/useInert";
+import { useIsoLayoutEffect } from "@/lib/functions/useIsoLayoutEffect";
 import Marquee from "../ui/Marquee";
 import { useMusicPlayback, setNowPlaying, setVolume, setMuted, initMusicPrefs } from "@/lib/musicState";
 import { useLocalized, type Localized } from "@/lib/i18n";
@@ -158,7 +159,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   useInert(playerViewRef, listOpen);
   useInert(listViewRef, !listOpen);
 
-  useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     if (open) setListOpen(false);
   }, [open]);
 
@@ -240,13 +241,13 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     playing,
   ]);
 
-  useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     setSliding(true);
     const t = setTimeout(() => setSliding(false), 340);
     return () => clearTimeout(t);
   }, [listOpen]);
 
-  useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     const wrap = viewsRef.current;
     const a = playerViewRef.current;
     const b = listViewRef.current;

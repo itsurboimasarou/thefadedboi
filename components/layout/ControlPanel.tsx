@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import ThemeToggle, { AutoThemeToggle } from "../controls/ThemeToggle";
 import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
@@ -17,6 +17,7 @@ import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { accentSets } from "@/lib/configs/accents.config";
 import { isCompact } from "@/lib/functions/useHuBarFit";
 import { useInert } from "@/lib/functions/useInert";
+import { useIsoLayoutEffect } from "@/lib/functions/useIsoLayoutEffect";
 import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
 import { useLocalized, type Localized } from "@/lib/i18n";
 
@@ -202,13 +203,13 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
     if (!open) setThemeMenuOpen(false);
   }, [open]);
 
-  useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     setSliding(true);
     const t = setTimeout(() => setSliding(false), 340);
     return () => clearTimeout(t);
   }, [themeMenuOpen]);
 
-  useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     const wrap = viewsRef.current;
     const main = mainViewRef.current;
     const theme = themeViewRef.current;
