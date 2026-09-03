@@ -76,6 +76,6 @@ html.has-bg-video.lite-mode .hubar {
   background: #0a0a0a;
 }
 
-html.has-bg-video .hubar-item .tip {
+html.has-bg-video :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
   background: var(--glass-strong);
 }

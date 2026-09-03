@@ -790,10 +790,12 @@
 }
 
 .status-clock-crossfade {
-  position: relative;
-  display: inline-flex;
+  display: inline-grid;
+  justify-items: center;
+  align-items: center;
 }
 .status-clock-crossfade > * {
+  grid-area: 1 / 1;
   white-space: nowrap;
 }
 
@@ -807,12 +809,6 @@
 }
 
 .status-clock-label {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  translate: -50% -50%;
-  width: max-content;
-  text-align: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.18s ease;
@@ -834,9 +830,6 @@
   gap: 6px;
 }
 .glance-row--mobile-only .status-clock-label {
-  position: static;
-  translate: none;
-  width: auto;
   opacity: 1;
 }
 
