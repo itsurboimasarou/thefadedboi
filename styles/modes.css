@@ -3,13 +3,7 @@
    Load LAST — these must win the cascade by order. */
 
 /* ── Mobile ─────────────────────────────────────────── */
-/* ── Compact ────────────────────────────────────────────
-   Was @media (max-width: 798px), (max-height: 600px). The width half of
-   that breakpoint is now measured, not guessed: useHuBarFit finds the
-   width at which the HuBar can no longer shrink and puts .narrow /
-   .compact on <html> at that point (see lib/functions/useHuBarFit.ts).
-   :where() keeps specificity at zero so these rules win
-   or lose on source order exactly as they did inside @media. */
+/* ── Compact ────────────────────────────────────────────*/
 html:where(.compact) {
   font-size: 15px;
 }
@@ -347,6 +341,7 @@ html:where(.compact) {
 :where(html:not(.compact)) .hubar--left .status-clock,
 :where(html:not(.compact)) .hubar--right .status-clock {
   flex-direction: column;
+  align-items: center;
   gap: 6px;
   padding: 4px 2px;
   width: 100%;
@@ -383,6 +378,7 @@ html:where(.compact) {
   font-size: 0.82rem;
   font-weight: 700;
   line-height: 1.25;
+  text-box-trim: none;
 }
 :where(html:not(.compact)) .hubar--left .status-clock-ss,
 :where(html:not(.compact)) .hubar--right .status-clock-ss {

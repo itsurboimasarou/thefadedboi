@@ -776,7 +776,7 @@
 /* ── Status clock (top bar) ────────────────────────── */
 .status-clock {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 7px;
   padding: 2px 15px;
   line-height: 1;
@@ -792,11 +792,23 @@
 .status-clock-crossfade {
   display: inline-grid;
   justify-items: center;
-  align-items: center;
+  align-items: baseline;
 }
 .status-clock-crossfade > * {
   grid-area: 1 / 1;
   white-space: nowrap;
+}
+
+.status-clock-time > *,
+.status-clock-label {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+
+@supports (-moz-appearance: none) and (not (text-box-trim: trim-both)) {
+  :is(.hubar--top, .hubar--bottom, .glance-row--mobile-only) .status-clock > * {
+    translate: 0 -0.14em;
+  }
 }
 
 .status-clock-time {
