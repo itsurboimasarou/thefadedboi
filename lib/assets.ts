@@ -86,6 +86,7 @@ export const deviceImage = (file: string) =>
   `${RAW}/devices/${encodeURIComponent(file)}`;
 
 export const bgVideoUrl = `${CDN}/${VIDEO_ROOT}/bg.mp4`;
+export const bgImageUrl = `${CDN}/photos/bg.jpg`;
 
 async function fetchRaw(path: string): Promise<string | null> {
   try {

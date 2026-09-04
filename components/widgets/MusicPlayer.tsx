@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Icon from "../ui/Icons";
 import type { ScannedPlaylist, Track } from "@/lib/types";
 import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
@@ -429,20 +429,29 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
             >
               <Icon name={muted || volume === 0 ? "volumeMute" : "volumeHigh"} size={18} />
             </button>
-            <input
-              type="range"
-              className="player-header-volume-slider"
-              min={0}
-              max={100}
-              value={Math.round((muted ? 0 : volume) * 100)}
-              onChange={(e) => {
-                const v = Number(e.target.value) / 100;
-                setVolume(v);
-                if (muted && v > 0) setMuted(false);
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              aria-label={t.volume}
-            />
+            <div
+              className="player-volume-track"
+              style={{ "--vol": Math.round((muted ? 0 : volume) * 100) } as CSSProperties}
+            >
+              <span className="player-volume-value" aria-hidden="true">
+                {Math.round((muted ? 0 : volume) * 100)}%
+              </span>
+              <input
+                type="range"
+                className="player-header-volume-slider"
+                min={0}
+                max={100}
+                value={Math.round((muted ? 0 : volume) * 100)}
+                onChange={(e) => {
+                  const v = Number(e.target.value) / 100;
+                  setVolume(v);
+                  if (muted && v > 0) setMuted(false);
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                aria-label={t.volume}
+                aria-valuetext={`${Math.round((muted ? 0 : volume) * 100)}%`}
+              />
+            </div>
           </div>
           {listOpen ? (
             <button

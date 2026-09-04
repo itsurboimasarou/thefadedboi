@@ -912,6 +912,41 @@
   accent-color: var(--accent);
   cursor: pointer;
 }
+
+.player-volume-track {
+  position: relative;
+  display: grid;
+  place-items: center;
+  --thumb: 14px;
+}
+
+.player-volume-value {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: calc(var(--thumb) / 2 + (var(--vol) / 100) * (100% - var(--thumb)));
+  translate: -50% 0;
+  padding: 3px 7px;
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.player-volume-track:hover .player-volume-value,
+.player-volume-track:focus-within .player-volume-value,
+.player-volume-track:active .player-volume-value {
+  opacity: 1;
+}
 .player-header-volume .panel-icon-btn .icn {
   position: relative;
   top: -1px;
@@ -1042,6 +1077,42 @@
   letter-spacing: 0.1em;
   margin-bottom: 8px;
 }
+
+.theme-menu-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.theme-menu-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.theme-menu-option:first-child { align-items: flex-start; }
+.theme-menu-option:last-child  { align-items: flex-end; }
+
+.theme-menu-option-name {
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.theme-menu-option-value {
+  font-size: 0.74rem;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.theme-menu-heading .info-tip {
+  letter-spacing: normal;
+  text-transform: none;
+}
 .theme-menu-heading .icn { color: var(--accent); opacity: 0.9; }
 
 .set-select-wrap {
@@ -1134,11 +1205,7 @@
   outline-offset: 2px;
 }
 
-/* ── Hover tip ──────────────────────────────────────────
-   Same look as the HuBar's <span class="tip">, but driven by an attribute
-   so an icon-only button needs no extra element: add data-tip="Label" and
-   data-tip-pos to steer it away from a screen edge. Use it instead of
-   `title`, never alongside — the native tooltip would double up. */
+/* ── Hover tip ────────────────────────────────────────── */
 [data-tip] {
   position: relative;
 }
@@ -1160,11 +1227,6 @@
   color: var(--ink);
   white-space: nowrap;
   pointer-events: none;
-  /* Over the HuBar (60/70), notices (200) and the progress bar (500), so a
-     tip near a screen edge is never slid under the chrome. Under the
-     lightbox (1000), which is meant to cover the page it opened from.
-     A tip can only rise within its own stacking context, so a container
-     that clips or layers its contents has to leave room for it. */
   z-index: 900;
   display: none;
 }
@@ -1299,9 +1361,16 @@
   aspect-ratio: 1;
   object-fit: contain;
 }
+
 .logo-option-swatch--default {
   border-radius: 50%;
-  border: 1px dashed var(--glass-border);
+  background-image: url("../public/logo-light.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+html[data-theme="light"] .logo-option-swatch--default {
+  background-image: url("../public/logo-dark.png");
 }
 
 .logo-grid-empty {

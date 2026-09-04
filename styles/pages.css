@@ -584,6 +584,32 @@ body:has(.hubar--top) .mode-switch {
   translate: -50% 0;
 }
 
+.vplayer-volume-track {
+  position: relative;
+  display: grid;
+  place-items: center;
+  --thumb: 14px;
+}
+
+.vplayer-volume-value {
+  position: absolute;
+  right: calc(100% + 12px);
+  bottom: calc(var(--thumb) / 2 + (var(--vol) / 100) * (100% - var(--thumb)));
+  translate: 0 50%;
+  padding: 3px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 16, 22, 0.92);
+  color: #fff;
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .vplayer-volume-slider {
   writing-mode: vertical-lr;
   direction: rtl;

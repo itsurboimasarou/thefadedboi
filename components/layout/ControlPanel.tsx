@@ -6,6 +6,8 @@ import GlassToggle from "../controls/GlassMode";
 import AutoHideToggle from "../controls/HuBarPinned";
 import DockControl, { useDock } from "../controls/HuBarDock";
 import ShapeControl from "../controls/HuBarShape";
+import { useBackdropAvailability, useBackdropKind, setBackdropKind, type BackdropKind } from "@/lib/backdrop";
+import { AccentBgToggle, AccentBgMixControl, AccentBgMotionToggle, useAccentBg, accentBgUi } from "../controls/AccentBackground";
 import LangSwitch from "../controls/LangSwitch";
 import AccentSwitch from "../controls/AccentSwitch";
 import AccentSetSwitch from "../controls/AccentSetSwitch";
@@ -41,6 +43,10 @@ const ui: Localized<{
   autoHideTip: string;
   huBarPosition: string;
   huBarShape: string;
+  gradientBg: string;
+  backdrop: string;
+  backdropVideo: string;
+  backdropImage: string;
   language: string;
   customizeTheme: string;
   colorSets: string;
@@ -71,9 +77,13 @@ const ui: Localized<{
     autoHideTip: "HuBar hides itself after a moment and reappears on hover, edge-swipe, or focus. Turn this off to keep it always shown.",
     huBarPosition: "HuBar position",
     huBarShape: "HuBar shape",
+    gradientBg: "Gradient background",
+    backdrop: "Home backdrop",
+    backdropVideo: "Video",
+    backdropImage: "Image",
     language: "Language",
     customizeTheme: "Customize theme",
-    colorSets: "Theme",
+    colorSets: "Color sets",
     accentColor: "Accent color",
     logo: "Logo",
     swipeForMusic: "Swipe right for music player",
@@ -101,9 +111,13 @@ const ui: Localized<{
     autoHideTip: "HuBar sẽ tự động ẩn sau một lúc và hiện lại khi di chuột tới, vuốt cạnh màn hình, hoặc focus vào. Tắt để luôn hiển thị.",
     huBarPosition: "Vị trí HuBar",
     huBarShape: "Kiểu HuBar",
+    gradientBg: "Nền chuyển sắc",
+    backdrop: "Nền trang chủ",
+    backdropVideo: "Video",
+    backdropImage: "Ảnh",
     language: "Ngôn ngữ",
     customizeTheme: "Tùy chỉnh giao diện",
-    colorSets: "Chủ đề",
+    colorSets: "Bộ màu",
     accentColor: "Màu sắc",
     logo: "Biểu tượng",
     swipeForMusic: "Vuốt sang phải để mở trình phát nhạc",
@@ -128,6 +142,7 @@ function resetAllToDefault() {
   const keys = [
     "theme", "glass-fx", "lite-mode", "hubar-pinned", "hubar-dock",
     "lang", "logo-custom", "accent-set", "hubar-shape",
+    "accent-bg", "accent-bg-mix", "accent-bg-motion", "bg-backdrop",
     ...accentSets.map((s) => `accent-element-${s.key}`),
   ];
   try {
@@ -167,6 +182,11 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   const [logOpen, setLogOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const liteOn = useLiteMode();
+  const accentBgOn = useAccentBg();
+  const backdropAvail = useBackdropAvailability();
+  const backdropKind = useBackdropKind();
+  const backdropChoice = backdropAvail.video === true && backdropAvail.image === true;
+  const bgT = useLocalized(accentBgUi);
   const [sliding, setSliding] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const viewsRef = useRef<HTMLDivElement>(null);
@@ -356,7 +376,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         <dl className="fact-grid glance-grid">
           <div>
             <dt>
-              <Icon name="moon" size={15} />
+              <Icon name="shirt" size={15} />
               {t.appearance}
             </dt>
             <dd className="dd-row">
@@ -370,6 +390,36 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               </span>
             </dd>
           </div>
+
+          {backdropChoice && (
+            <div>
+              <dt>
+                <Icon name="image" size={15} />
+                {t.backdrop}
+              </dt>
+              <dd className="dd-row">
+                <div className="shape-control" role="radiogroup" aria-label={t.backdrop}>
+                  {(["video", "image"] as BackdropKind[]).map((k) => {
+                    const label = k === "video" ? t.backdropVideo : t.backdropImage;
+                    return (
+                      <button
+                        key={k}
+                        type="button"
+                        role="radio"
+                        aria-checked={backdropKind === k}
+                        aria-label={label}
+                        data-tip={label}
+                        className={`shape-toggle${backdropKind === k ? " shape-toggle--on" : ""}`}
+                        onClick={() => setBackdropKind(k)}
+                      >
+                        <Icon name={k === "video" ? "film" : "image"} size={16} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </dd>
+            </div>
+          )}
 
           <div className={liteOn ? "row--disabled" : undefined}>
             <dt>
@@ -492,6 +542,33 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               {t.accentColor}
             </h3>
             <AccentSwitch />
+          </div>
+
+          <div className="theme-menu-section">
+            <h3 className="h-with-icon theme-menu-heading">
+              <Icon name="spark" size={15} />
+              {t.gradientBg}
+              <span className="info-tip" tabIndex={0} aria-label={bgT.aboutBackground}>
+                <Icon name="info" size={17} />
+                <span className="info-tip-bubble" role="tooltip">
+                  {bgT.backgroundTip} {bgT.motionTip}
+                </span>
+              </span>
+            </h3>
+            <div className="theme-menu-options">
+              <div className="theme-menu-option">
+                <span className="theme-menu-option-name">{bgT.onOff}</span>
+                <AccentBgToggle />
+              </div>
+              <div className="theme-menu-option">
+                <span className="theme-menu-option-name">{bgT.tone}</span>
+                <AccentBgMixControl disabled={!accentBgOn} />
+              </div>
+              <div className="theme-menu-option">
+                <span className="theme-menu-option-name">{bgT.drifting}</span>
+                <AccentBgMotionToggle disabled={!accentBgOn} />
+              </div>
+            </div>
           </div>
 
           <div className="theme-menu-section theme-menu-section--logo">

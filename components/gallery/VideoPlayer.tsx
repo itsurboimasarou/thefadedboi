@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Icon from "../ui/Icons";
 import type { GalleryVideo } from "@/lib/types";
 import { useLocalized, type Localized } from "@/lib/i18n";
@@ -175,6 +175,7 @@ export default function VideoPlayer({
   };
 
   const off = muted || volume === 0;
+  const level = Math.round((muted ? 0 : volume) * 100);
   const pct = (v: number) => (length > 0 ? Math.min(100, (v / length) * 100) : 0);
 
   if (!video) {
@@ -264,19 +265,23 @@ export default function VideoPlayer({
               <Icon name={off ? "volumeMute" : "volumeHigh"} size={18} />
             </button>
             <div className="vplayer-volume-panel">
-              <input
-                type="range"
-                className="vplayer-volume-slider"
-                min={0}
-                max={100}
-                value={Math.round((muted ? 0 : volume) * 100)}
-                aria-label={t.volume}
-                onPointerDown={() => { sliding.current = true; }}
-                onPointerUp={() => { sliding.current = false; }}
-                onPointerCancel={() => { sliding.current = false; }}
-                onLostPointerCapture={() => { sliding.current = false; }}
-                onChange={(e) => levelTo(Number(e.target.value) / 100)}
-              />
+              <div className="vplayer-volume-track" style={{ "--vol": level } as CSSProperties}>
+                <span className="vplayer-volume-value" aria-hidden="true">{level}%</span>
+                <input
+                  type="range"
+                  className="vplayer-volume-slider"
+                  min={0}
+                  max={100}
+                  value={level}
+                  aria-label={t.volume}
+                  aria-valuetext={`${level}%`}
+                  onPointerDown={() => { sliding.current = true; }}
+                  onPointerUp={() => { sliding.current = false; }}
+                  onPointerCancel={() => { sliding.current = false; }}
+                  onLostPointerCapture={() => { sliding.current = false; }}
+                  onChange={(e) => levelTo(Number(e.target.value) / 100)}
+                />
+              </div>
             </div>
         </div>
 

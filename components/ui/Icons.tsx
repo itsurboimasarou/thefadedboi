@@ -45,7 +45,8 @@ const icons: Record<string, JSX.Element> = {
   cake: <svg {...p}><path d="M4 13a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7H4v-7Z" /><path d="M4 16c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0" /><path d="M12 11V8.5" /><path d="M12 6.5c-.9 0-1.5-.7-1.5-1.5S12 2.5 12 2.5s1.5 1.7 1.5 2.5-.6 1.5-1.5 1.5Z" /></svg>,
   target: <svg {...p}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5.2" /><circle cx="12" cy="12" r="1.6" /></svg>,
   pin: <svg {...p}><path d="M12 21.5s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11Z" /><circle cx="12" cy="10.5" r="2.6" /></svg>,
-  moon: <svg {...p}><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" /></svg>,
+  sun: <svg {...p} strokeWidth={2.4}><circle cx="12" cy="12" r="4.6" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19" /></svg>,
+  moon: <svg {...p} strokeWidth={2.4}><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" /></svg>,
   dot: <svg {...p}><circle cx="12" cy="12" r="3.5" /></svg>,
   // frickin nav
   home: <svg {...p}><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /><path d="M9.5 21v-6h5v6" /></svg>,
@@ -82,6 +83,7 @@ const icons: Record<string, JSX.Element> = {
   repeatOne: <svg {...p}><path d="m17 1 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 23-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /><text x="12" y="16.5" fontSize="12" fontWeight="700" fill="currentColor" stroke="none" textAnchor="middle">1</text></svg>,
   volumeHigh: <svg {...p}><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12" /></svg>,
   volumeMute: <svg {...p}><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="m16 9 5 6M21 9l-5 6" /></svg>,
+  shirt: <svg {...p}><path d="m8 4.5-4.4 2.1L2 10.5l3.4 1.2V20h13.2v-8.3l3.4-1.2-1.6-3.9L16 4.5a4 4 0 0 1-8 0Z" /></svg>,
 };
 
 const specMap: ReadonlyArray<readonly [string, string]> = [
