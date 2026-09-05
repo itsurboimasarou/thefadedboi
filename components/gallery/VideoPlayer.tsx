@@ -66,6 +66,19 @@ function keepVolume(v: number) {
   } catch {}
 }
 
+let handoff: { src: string; time: number; playing: boolean } | null = null;
+
+function resumeAt(el: HTMLVideoElement, time: number, play: boolean) {
+  const apply = () => {
+    try {
+      el.currentTime = time;
+    } catch {}
+    if (play) el.play().catch(() => {});
+  };
+  if (el.readyState >= 1) apply();
+  else el.addEventListener("loadedmetadata", apply, { once: true });
+}
+
 function keepMuted(m: boolean) {
   lastMuted = m;
   try {
@@ -89,10 +102,12 @@ export default function VideoPlayer({
   video,
   onFullView,
   full = false,
+  active = true,
 }: {
   video: GalleryVideo | undefined;
   onFullView?: () => void;
   full?: boolean;
+  active?: boolean;
 }) {
   const t = useLocalized(ui);
   const ref = useRef<HTMLVideoElement>(null);
@@ -114,6 +129,27 @@ export default function VideoPlayer({
     setBuffered(0);
     setPlaying(false);
   }, [video?.src]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !video) return;
+
+    if (!active) {
+      el.pause();
+      return;
+    }
+
+    const carry = handoff;
+    if (carry && carry.src === video.src) {
+      resumeAt(el, carry.time, carry.playing);
+      setAt(carry.time);
+    }
+
+    return () => {
+      if (el.ended) return;
+      handoff = { src: video.src, time: el.currentTime, playing: !el.paused };
+    };
+  }, [active, video?.src]);
 
   useEffect(() => {
     loadLevel();
@@ -209,7 +245,10 @@ export default function VideoPlayer({
             if (!scrubbing.current) setAt(e.currentTarget.currentTime);
             setBuffered(bufferedTo(e.currentTarget));
           }}
-          onEnded={() => setPlaying(false)}
+          onEnded={() => {
+            setPlaying(false);
+            handoff = null;
+          }}
         />
         <span className="vplayer-title" title={video.name}>{video.name}</span>
 

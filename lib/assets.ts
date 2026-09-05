@@ -8,6 +8,8 @@ import type {
   TrackMeta,
 } from "./types";
 import type { Localized } from "./i18n";
+import { readCamera } from "./photoMeta";
+import { deviceFrom, validateCameras, type CameraTable } from "./cameras";
 
 const isLocalizedString = (v: any): v is Localized<string> =>
   !!v && typeof v.en === "string" && typeof v.vi === "string";
@@ -120,14 +122,35 @@ async function fetchJson<T = any>(path: string): Promise<T | null> {
   }
 }
 
-export async function listImages(
-  folder: string
-): Promise<{ full: string; thumb: string }[]> {
-  const names = await listFiles(folder, IMAGE_EXT);
-  return names.map((name) => ({
-    full: cdnUrl(folder, name),
-    thumb: thumbUrl(folder, name),
-  }));
+export interface ScannedImage {
+  full: string;
+  thumb: string;
+  name: string;
+  device?: string;
+}
+
+export async function getCameras(): Promise<CameraTable> {
+  return validateCameras(await fetchJson("cameras.json"));
+}
+
+export async function listImages(folder: string): Promise<ScannedImage[]> {
+  const [names, cameras] = await Promise.all([
+    listFiles(folder, IMAGE_EXT),
+    getCameras(),
+  ]);
+  return Promise.all(
+    names.map(async (name) => {
+      const full = cdnUrl(folder, name);
+      const tags = await readCamera(full);
+      const device = deviceFrom(tags.make, tags.model, cameras);
+      return {
+        full,
+        thumb: thumbUrl(folder, name),
+        name: name.replace(/\.[^.]+$/, ""),
+        ...(device ? { device } : {}),
+      };
+    })
+  );
 }
 
 export const videoOrigin = (file: string) =>

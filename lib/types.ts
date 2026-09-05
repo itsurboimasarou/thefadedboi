@@ -45,7 +45,9 @@ export type ScannedVideoAlbum = GalleryAlbum & {
   videos: GalleryVideo[];
 };
 
-export type GalleryImage = string | { full: string; thumb?: string };
+export type GalleryImage =
+  | string
+  | { full: string; thumb?: string; name?: string; device?: string };
 
 export interface GalleryVideo {
   src: string;

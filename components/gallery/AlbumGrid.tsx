@@ -6,6 +6,7 @@ import type { GalleryImage } from "@/lib/types";
 import Icon from "../ui/Icons";
 import { useLocalized, type Localized } from "@/lib/i18n";
 import useImageZoom from "@/lib/functions/useImageZoom";
+import usePhotoSwipe from "@/lib/functions/usePhotoSwipe";
 
 const ui: Localized<{
   photoViewer: (title: string) => string;
@@ -112,8 +113,13 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
     () =>
       images.map((it) =>
         typeof it === "string"
-          ? { full: it, thumb: it }
-          : { thumb: it.thumb ?? it.full, full: it.full }
+          ? { full: it, thumb: it, name: undefined, device: undefined as string | undefined }
+          : {
+              thumb: it.thumb ?? it.full,
+              full: it.full,
+              name: it.name,
+              device: it.device,
+            }
       ),
     [images]
   );
@@ -154,12 +160,13 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
 
   const frameRef = useRef<HTMLDivElement>(null);
   const { zoom, zoomed, handlers } = useImageZoom(frameRef, index);
-
   const close = useCallback(() => setIndex(null), []);
   const step = useCallback(
     (dir: number) => setIndex((i) => (i === null ? i : (i + dir + items.length) % items.length)),
     [items.length]
   );
+
+  const swipe = usePhotoSwipe(!zoomed && items.length > 1, step);
 
   const onThumbError = (src: string) => {
     const tries = thumbs[src]?.tries ?? 0;
@@ -224,6 +231,14 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
           className={`lightbox-frame${zoomed ? " lightbox-frame--zoomed" : ""}`}
           ref={frameRef}
           {...handlers}
+          onPointerDown={(e) => { handlers.onPointerDown(e); swipe.onPointerDown(e); }}
+          onPointerMove={(e) => { handlers.onPointerMove(e); swipe.onPointerMove(e); }}
+          onPointerUp={(e) => { handlers.onPointerUp(); swipe.onPointerEnd(e); }}
+          onPointerCancel={(e) => { handlers.onPointerCancel(); swipe.onPointerEnd(e); }}
+          style={{
+            transform: `translateX(${swipe.dx}px)`,
+            transition: swipe.settling ? "transform 0.24s cubic-bezier(0.22, 1, 0.36, 1)" : "none",
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           <div
@@ -265,8 +280,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
             )}
           </div>
           {items.length > 1 &&
-            [1, -1].map((dir) => {
-              const n = (index + dir + items.length) % items.length;
+            [...new Set([1, -1].map((dir) => (index + dir + items.length) % items.length))].map((n) => {
               return (
                 <Image
                   key={`pre-${items[n].full}`}
@@ -282,6 +296,16 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               );
             })}
         </div>
+        {(items[index].name || items[index].device) && (
+          <div className="lightbox-title" aria-hidden="true">
+            {items[index].name && (
+              <span className="lightbox-title-name">{items[index].name}</span>
+            )}
+            {items[index].device && (
+              <span className="lightbox-title-device">{items[index].device}</span>
+            )}
+          </div>
+        )}
         <button type="button" className="lightbox-close" onClick={close} aria-label={t.close} data-tip={t.close}>
           <Icon name="close" size={18} />
         </button>
@@ -385,6 +409,16 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
                   opacity: thumbs[img.thumb]?.ready ? 1 : 0,
                 }}
               />
+              {(img.name || img.device) && !thumbs[img.thumb]?.dead && (
+                <span className="album-thumb-caption" aria-hidden="true">
+                  {img.device && (
+                    <span className="album-thumb-device">{img.device}</span>
+                  )}
+                  {img.name && (
+                    <span className="album-thumb-name">{img.name}</span>
+                  )}
+                </span>
+              )}
             </button>
           )
         )}

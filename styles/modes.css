@@ -253,8 +253,24 @@ html:where(.compact) {
 }
 
 
-@media (max-width: 600px) {
-  .album-thumb { flex-basis: calc((100% - 12px) / 2); }
+@media (min-width: 600px) and (max-width: 712px) {
+  .album-thumb {
+    height: auto;
+    aspect-ratio: var(--ratio, 1);
+    flex-grow: var(--ratio, 1);
+    flex-shrink: 1;
+    flex-basis: calc(var(--ratio, 1) * var(--row-h));
+  }
+}
+
+@media (max-width: 599px) {
+  .album-thumb {
+    height: auto;
+    aspect-ratio: 4 / 3;
+    flex: 0 0 100%;
+  }
+
+  .album-thumb-filler { display: none; }
 }
 
 @media (hover: none), (pointer: coarse) {

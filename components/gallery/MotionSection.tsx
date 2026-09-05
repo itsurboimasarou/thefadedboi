@@ -82,7 +82,7 @@ export default function MotionSection({
 
   return (
     <>
-      <VideoPlayer video={playing} onFullView={() => setFullView(true)} />
+      <VideoPlayer video={playing} onFullView={() => setFullView(true)} active={!fullView} />
 
       <div className="motion-box">
         <div className="motion-strip-wrap">
