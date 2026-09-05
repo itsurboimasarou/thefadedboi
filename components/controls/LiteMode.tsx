@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { setGlass, glassOn } from "./GlassMode";
+import { refreshGlass } from "./GlassMode";
 
 const EVT = "lite-mode-change";
 
@@ -11,7 +11,7 @@ export const liteMode = () =>
 export function setLiteMode(on: boolean) {
   document.documentElement.classList.toggle("lite-mode", on);
   try { localStorage.setItem("lite-mode", on ? "1" : "0"); } catch { }
-  setGlass(glassOn());
+  refreshGlass();
   window.dispatchEvent(new CustomEvent(EVT, { detail: on }));
 }
 

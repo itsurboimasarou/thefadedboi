@@ -44,9 +44,9 @@
   color-scheme: light;
 }
 
-:root[data-theme="light"] .glass,
-:root[data-theme="light"] .gear-card,
-:root[data-theme="light"] .spec-item summary,
+:root[data-theme="light"]:not(.glass-fx--all) .glass,
+:root[data-theme="light"]:not(.glass-fx--all) .gear-card,
+:root[data-theme="light"]:not(.glass-fx--all) .spec-item summary,
 :root[data-theme="light"] .contact-icon {
   background: #ffffff;
 }
@@ -110,9 +110,34 @@ html.glass-fx {
   --chrome-bg: color-mix(in srgb, var(--bg) 58%, transparent);
 }
 
+/* The "all elements" level. Lighter than the chrome's blur on purpose:
+   this lands on many large boxes at once, where 16px is both heavy to
+   composite and strong enough to muddy what is behind them. */
+html.glass-fx--all {
+  --surface-blur: blur(13px) saturate(1.2);
+  --surface-bg: color-mix(in srgb, var(--bg) 45%, transparent);
+  --panel-blur: var(--surface-blur);
+  --panel-bg: var(--surface-bg);
+}
+
+/* Lighter again in light mode: blurring toward white loses contrast faster
+   than blurring toward black, so the same radius reads heavier there.
+   :where keeps this at the same specificity as the rules around it, so the
+   block's "later declaration wins" ordering still holds and lite mode --
+   declared below -- still overrides it. */
+html.glass-fx--all:where([data-theme="light"]) {
+  --surface-blur: blur(9px) saturate(1.15);
+  --panel-blur: blur(6px) saturate(1.1);
+  --panel-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+
 /* Lite mode (and reduced motion) force opaque chrome: a live blur repaints
    whenever anything moves behind it. */
 html.lite-mode {
   --chrome-blur: none;
   --chrome-bg: var(--hubar-solid);
+  --surface-blur: none;
+  --surface-bg: var(--glass);
+  --panel-blur: none;
+  --panel-bg: var(--glass);
 }

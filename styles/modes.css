@@ -191,6 +191,14 @@ html:where(.compact) {
     --chrome-bg: var(--hubar-solid);
   }
 
+  html,
+  html.glass-fx--all {
+    --surface-blur: none;
+    --surface-bg: var(--glass);
+    --panel-blur: none;
+    --panel-bg: var(--glass);
+  }
+
   .panel-views,
   .panel-view-slide,
   .gallery-pillbar,
@@ -204,9 +212,6 @@ html:where(.compact) {
 }
 
 /* ── Narrow only, height irrelevant (was max-width: 798px) ─────── */
-/* HuBar never actually auto-hides on mobile regardless of this setting
-   — useHuBarAutoHide's schedule() bails out early whenever compact is
-   true — so the toggle has nothing to control here. */
 :where(html.narrow) .glance-row--autohide { display: none; }
 
 :where(html.narrow) .app-root:has(.hubar--bottom) .control-panel.control-panel {

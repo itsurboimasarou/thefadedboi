@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Icon from "../ui/Icons";
-import { glassOn, setGlass } from "@/components/controls/GlassMode";
+import { refreshGlass } from "@/components/controls/GlassMode";
 import {
   backdropSources,
   markBackdropUnavailable,
@@ -23,7 +23,7 @@ export function primeBgVideo(href: string) {
   const root = document.documentElement;
   if (!root.classList.contains("has-bg-video")) return;
   root.classList.remove("has-bg-video");
-  setGlass(glassOn());
+  refreshGlass();
 }
 
 export default function VideoBackground() {
@@ -46,11 +46,11 @@ export default function VideoBackground() {
     if (!kind) return;
     root.classList.add("has-bg-video");
     root.dataset.backdrop = kind;
-    setGlass(glassOn());
+    refreshGlass();
     return () => {
       root.classList.remove("has-bg-video");
       delete root.dataset.backdrop;
-      setGlass(glassOn());
+      refreshGlass();
     };
   }, [kind]);
 
