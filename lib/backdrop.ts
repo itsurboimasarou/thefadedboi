@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { bgImageUrl, bgVideoUrl } from "./assets";
+import { bgImageUrls, bgVideoUrl } from "./assets";
 import { createSetting } from "./setting";
 
 export type BackdropKind = "video" | "image";
@@ -7,13 +7,16 @@ export type BackdropKind = "video" | "image";
 export interface BackdropAvailability {
   video: boolean | null;
   image: boolean | null;
+  imageSrc: string | null;
 }
 
 const VIDEO_SRC = process.env.NEXT_PUBLIC_BG_VIDEO || bgVideoUrl;
-const IMAGE_SRC = process.env.NEXT_PUBLIC_BG_IMAGE || bgImageUrl;
+const IMAGE_SRCS = process.env.NEXT_PUBLIC_BG_IMAGE
+  ? [process.env.NEXT_PUBLIC_BG_IMAGE]
+  : bgImageUrls;
 const EVT = "backdrop-availability-change";
 
-let avail: BackdropAvailability = { video: null, image: null };
+let avail: BackdropAvailability = { video: null, image: null, imageSrc: null };
 let probed = false;
 
 function publish(next: Partial<BackdropAvailability>) {
@@ -28,6 +31,13 @@ function probeImage(src: string): Promise<boolean> {
     img.onerror = () => resolve(false);
     img.src = src;
   });
+}
+
+async function findImage(srcs: string[]): Promise<string | null> {
+  for (const src of srcs) {
+    if (await probeImage(src)) return src;
+  }
+  return null;
 }
 
 function probeVideo(src: string): Promise<boolean> {
@@ -45,25 +55,22 @@ function ensureProbed() {
   if (probed || typeof window === "undefined") return;
   probed = true;
   probeVideo(VIDEO_SRC).then((ok) => publish({ video: ok }));
-  probeImage(IMAGE_SRC).then((ok) => publish({ image: ok }));
+  findImage(IMAGE_SRCS).then((src) => publish({ image: src !== null, imageSrc: src }));
 }
 
 export function markBackdropUnavailable(kind: BackdropKind) {
   if (avail[kind] === false) return;
-  publish({ [kind]: false });
+  publish(kind === "image" ? { image: false, imageSrc: null } : { video: false });
 }
 
-export const backdropSources: Record<BackdropKind, string> = {
-  video: VIDEO_SRC,
-  image: IMAGE_SRC,
-};
+export const backdropVideoSrc = VIDEO_SRC;
 
 const subscribe = (onChange: () => void) => {
   ensureProbed();
   window.addEventListener(EVT, onChange);
   return () => window.removeEventListener(EVT, onChange);
 };
-const SERVER: BackdropAvailability = { video: null, image: null };
+const SERVER: BackdropAvailability = { video: null, image: null, imageSrc: null };
 
 export function useBackdropAvailability(): BackdropAvailability {
   return useSyncExternalStore(subscribe, () => avail, () => SERVER);

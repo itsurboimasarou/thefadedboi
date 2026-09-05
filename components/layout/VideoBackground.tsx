@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import Icon from "../ui/Icons";
 import { refreshGlass } from "@/components/controls/GlassMode";
 import {
-  backdropSources,
+  backdropVideoSrc,
   markBackdropUnavailable,
   resolveBackdrop,
   useBackdropAvailability,
@@ -79,7 +79,7 @@ export default function VideoBackground() {
       <video
         ref={ref}
         className="bg-video"
-        src={backdropSources.video}
+        src={backdropVideoSrc}
         muted
         loop
         playsInline
@@ -94,7 +94,7 @@ export default function VideoBackground() {
     ) : (
       <img
         className="bg-image"
-        src={backdropSources.image}
+        src={avail.imageSrc ?? ""}
         alt=""
         aria-hidden="true"
         decoding="async"
