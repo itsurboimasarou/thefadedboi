@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { Work_Sans, IBM_Plex_Sans, Momo_Signature, Space_Grotesk } from "next/font/google";
 import HuBar from "@/components/layout/HuBar";
 import { siteName, siteHandle, siteFooter, siteGithub, siteUrl, siteBanner, siteDescription } from "@/lib/configs/site.config";
-import LiteNotice from "@/components/controls/LiteNotice";
+import ImportantNotice from "@/components/controls/ImportantNotice";
 import PageLoader from "@/components/layout/PageLoader";
 import useTipFit from "@/lib/functions/useTipFit";
 import ControlPanel from "@/components/layout/ControlPanel";
@@ -80,7 +80,7 @@ function AppShell({ Component, pageProps }: AppProps) {
       </div>
       <HuBar />
       <ControlPanel changelog={changelog} />
-      <LiteNotice />
+      <ImportantNotice />
       <PageLoader />
     </div>
   );

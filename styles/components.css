@@ -419,9 +419,55 @@ html.glass-fx--all .control-panel {
   animation: lightbox-in 0.25s ease both;
 }
 
-.lite-notice {
+.important-notice {
   max-width: 580px;
   width: 100%;
+}
+
+.important-notice-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.important-notice-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.notice-section + .notice-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.notice-section-heading {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.notice-section p {
+  margin: 0;
+}
+
+.notice-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.notice-footnote {
+  margin: 16px 0 0;
+  color: var(--ink-dim);
+  font-size: 0.82rem;
 }
 
 .lite-switch[aria-checked="true"] {
@@ -458,7 +504,7 @@ html.glass-fx--all .control-panel {
 .changelog-body li { margin-left: 18px; color: var(--ink-dim); }
 .changelog-body p  { color: var(--ink-dim); }
 
-.lite-notice, .changelog-dialog {
+.important-notice, .changelog-dialog {
   background: var(--bg);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
