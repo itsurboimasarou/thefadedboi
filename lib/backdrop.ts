@@ -1,5 +1,4 @@
 import { useSyncExternalStore } from "react";
-import { bgImageUrls, bgVideoUrl } from "./assets";
 import { createSetting } from "./setting";
 
 export type BackdropKind = "video" | "image";
@@ -8,15 +7,12 @@ export interface BackdropAvailability {
   video: boolean | null;
   image: boolean | null;
   imageSrc: string | null;
+  videoSrc: string | null;
 }
 
-const VIDEO_SRC = process.env.NEXT_PUBLIC_BG_VIDEO || bgVideoUrl;
-const IMAGE_SRCS = process.env.NEXT_PUBLIC_BG_IMAGE
-  ? [process.env.NEXT_PUBLIC_BG_IMAGE]
-  : bgImageUrls;
 const EVT = "backdrop-availability-change";
 
-let avail: BackdropAvailability = { video: null, image: null, imageSrc: null };
+let avail: BackdropAvailability = { video: null, image: null, imageSrc: null, videoSrc: null };
 let probed = false;
 
 function publish(next: Partial<BackdropAvailability>) {
@@ -51,26 +47,52 @@ function probeVideo(src: string): Promise<boolean> {
   });
 }
 
-function ensureProbed() {
+interface BackdropManifest {
+  video: string | null;
+  images: string[];
+}
+
+async function ensureProbed() {
   if (probed || typeof window === "undefined") return;
   probed = true;
-  probeVideo(VIDEO_SRC).then((ok) => publish({ video: ok }));
-  findImage(IMAGE_SRCS).then((src) => publish({ image: src !== null, imageSrc: src }));
+
+  let manifest: BackdropManifest;
+  try {
+    const res = await fetch("/api/backdrop");
+    if (!res.ok) throw new Error(String(res.status));
+    manifest = await res.json();
+  } catch {
+    return;
+  }
+
+  const video = manifest.video;
+  if (video) {
+    probeVideo(video).then((ok) => publish({ video: ok, videoSrc: ok ? video : null }));
+  } else {
+    publish({ video: false, videoSrc: null });
+  }
+
+  findImage(manifest.images ?? []).then((src) =>
+    publish({ image: src !== null, imageSrc: src })
+  );
 }
 
 export function markBackdropUnavailable(kind: BackdropKind) {
   if (avail[kind] === false) return;
-  publish(kind === "image" ? { image: false, imageSrc: null } : { video: false });
+  publish(
+    kind === "image"
+      ? { image: false, imageSrc: null }
+      : { video: false, videoSrc: null }
+  );
 }
 
-export const backdropVideoSrc = VIDEO_SRC;
 
 const subscribe = (onChange: () => void) => {
   ensureProbed();
   window.addEventListener(EVT, onChange);
   return () => window.removeEventListener(EVT, onChange);
 };
-const SERVER: BackdropAvailability = { video: null, image: null, imageSrc: null };
+const SERVER: BackdropAvailability = { video: null, image: null, imageSrc: null, videoSrc: null };
 
 export function useBackdropAvailability(): BackdropAvailability {
   return useSyncExternalStore(subscribe, () => avail, () => SERVER);

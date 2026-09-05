@@ -95,6 +95,31 @@ export const bgImageUrls = [
   ...BG_IMAGE_EXTS.map((e) => e.toUpperCase()),
 ].map((ext) => `${CDN}/photos/bg.${ext}`);
 
+export interface BackdropManifest {
+  video: string | null;
+  images: string[];
+}
+
+const backdropUrl = (p: string) =>
+  /^https?:\/\//i.test(p) ? p : `${CDN}/${p.replace(/^\/+/, "")}`;
+
+const named = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : null);
+
+export async function getBackdrop(): Promise<BackdropManifest> {
+  const raw = section(await getMisc(), "backdrop");
+  if (!raw) return { video: bgVideoUrl, images: bgImageUrls };
+
+  const has = (k: string) => Object.prototype.hasOwnProperty.call(raw, k);
+  const video = has("video")
+    ? (named(raw.video) ? backdropUrl(named(raw.video)!) : null)
+    : bgVideoUrl;
+  const images = has("image")
+    ? (named(raw.image) ? [backdropUrl(named(raw.image)!)] : [])
+    : bgImageUrls;
+
+  return { video, images };
+}
+
 async function fetchRaw(path: string): Promise<string | null> {
   try {
     const res = await fetch(`${RAW}/${path}`, {
@@ -129,8 +154,17 @@ export interface ScannedImage {
   device?: string;
 }
 
+async function getMisc(): Promise<Record<string, unknown> | null> {
+  return fetchJson<Record<string, unknown>>("misc.json");
+}
+
+const section = (misc: Record<string, unknown> | null, key: string) => {
+  const v = misc?.[key];
+  return v && typeof v === "object" ? (v as Record<string, unknown>) : null;
+};
+
 export async function getCameras(): Promise<CameraTable> {
-  return validateCameras(await fetchJson("cameras.json"));
+  return validateCameras(section(await getMisc(), "cameras"));
 }
 
 export async function listImages(folder: string): Promise<ScannedImage[]> {

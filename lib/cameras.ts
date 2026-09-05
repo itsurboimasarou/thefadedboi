@@ -9,10 +9,10 @@ const clean = (s?: string) => s?.trim().replace(/\s+/g, " ") ?? "";
 
 export function validateCameras(raw: unknown): CameraTable {
   if (!raw || typeof raw !== "object") return EMPTY_CAMERAS;
-  const r = raw as { cameras?: unknown; showUnmapped?: unknown };
+  const r = raw as { names?: unknown; showUnmapped?: unknown };
   const names = new Map<string, string>();
-  if (r.cameras && typeof r.cameras === "object") {
-    for (const [k, v] of Object.entries(r.cameras as Record<string, unknown>)) {
+  if (r.names && typeof r.names === "object") {
+    for (const [k, v] of Object.entries(r.names as Record<string, unknown>)) {
       if (typeof v === "string" && clean(k)) names.set(clean(k).toLowerCase(), v);
     }
   }
