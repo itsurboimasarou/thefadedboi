@@ -7,10 +7,8 @@ export default async function handler(
 ) {
   const manifest = await getBackdrop();
   const video = process.env.NEXT_PUBLIC_BG_VIDEO || manifest.video;
-  const images = process.env.NEXT_PUBLIC_BG_IMAGE
-    ? [process.env.NEXT_PUBLIC_BG_IMAGE]
-    : manifest.images;
+  const image = process.env.NEXT_PUBLIC_BG_IMAGE || manifest.image;
 
   res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
-  res.status(200).json({ video, images });
+  res.status(200).json({ video, image });
 }

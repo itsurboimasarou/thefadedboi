@@ -21,7 +21,7 @@ const BRANCH = "main";
 const RAW = `https://gitea.com/${REPO}/raw/branch/${BRANCH}`;
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
-const VIDEO_EXT = /\.(mp4|webm|mov|m4v)$/i;
+const VIDEO_EXT = /\.(mp4|m4v|webm|mov|ogv|ogg|mkv|3gp|3g2)$/i;
 
 export const VIDEO_ROOT = "videos";
 const IGNORE_PREFIX = /^_/;
@@ -87,37 +87,26 @@ async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
 export const deviceImage = (file: string) =>
   `${RAW}/devices/${encodeURIComponent(file)}`;
 
-export const bgVideoUrl = `${CDN}/${VIDEO_ROOT}/bg.mp4`;
-const BG_IMAGE_EXTS = ["jpg", "jpeg", "png", "webp", "avif", "bmp", "gif"];
-
-export const bgImageUrls = [
-  ...BG_IMAGE_EXTS,
-  ...BG_IMAGE_EXTS.map((e) => e.toUpperCase()),
-].map((ext) => `${CDN}/photos/bg.${ext}`);
-
 export interface BackdropManifest {
   video: string | null;
-  images: string[];
+  image: string | null;
 }
 
 const backdropUrl = (p: string) =>
-  /^https?:\/\//i.test(p) ? p : `${CDN}/${p.replace(/^\/+/, "")}`;
+  /^https?:\/\//i.test(p) ? p : `${CDN}/${encPath(p.replace(/^\/+/, ""))}`;
 
 const named = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : null);
 
 export async function getBackdrop(): Promise<BackdropManifest> {
   const raw = section(await getMisc(), "backdrop");
-  if (!raw) return { video: bgVideoUrl, images: bgImageUrls };
+  if (!raw) return { video: null, image: null };
 
-  const has = (k: string) => Object.prototype.hasOwnProperty.call(raw, k);
-  const video = has("video")
-    ? (named(raw.video) ? backdropUrl(named(raw.video)!) : null)
-    : bgVideoUrl;
-  const images = has("image")
-    ? (named(raw.image) ? [backdropUrl(named(raw.image)!)] : [])
-    : bgImageUrls;
-
-  return { video, images };
+  const video = named(raw.video);
+  const image = named(raw.image);
+  return {
+    video: video ? backdropUrl(video) : null,
+    image: image ? backdropUrl(image) : null,
+  };
 }
 
 async function fetchRaw(path: string): Promise<string | null> {

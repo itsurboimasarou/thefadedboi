@@ -29,12 +29,6 @@ function probeImage(src: string): Promise<boolean> {
   });
 }
 
-async function findImage(srcs: string[]): Promise<string | null> {
-  for (const src of srcs) {
-    if (await probeImage(src)) return src;
-  }
-  return null;
-}
 
 function probeVideo(src: string): Promise<boolean> {
   return new Promise((resolve) => {
@@ -49,7 +43,7 @@ function probeVideo(src: string): Promise<boolean> {
 
 interface BackdropManifest {
   video: string | null;
-  images: string[];
+  image: string | null;
 }
 
 async function ensureProbed() {
@@ -72,9 +66,12 @@ async function ensureProbed() {
     publish({ video: false, videoSrc: null });
   }
 
-  findImage(manifest.images ?? []).then((src) =>
-    publish({ image: src !== null, imageSrc: src })
-  );
+  const image = manifest.image;
+  if (image) {
+    probeImage(image).then((ok) => publish({ image: ok, imageSrc: ok ? image : null }));
+  } else {
+    publish({ image: false, imageSrc: null });
+  }
 }
 
 export function markBackdropUnavailable(kind: BackdropKind) {
