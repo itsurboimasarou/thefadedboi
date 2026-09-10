@@ -2,7 +2,8 @@ import { contacts } from "@/lib/configs/contacts.config";
 import CopyEmailButton from "@/components/contact/CopyEmailButton";
 import { ContactIcon } from "@/components/contact/ContactIcon";
 import Icon from "@/components/ui/Icons";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { contactsPageUi as ui } from "@/lib/ui-strings";
 
 import type { LinkItem } from "@/lib/types";
 import { getChangelog } from "@/lib/assets";
@@ -10,32 +11,6 @@ import { getChangelog } from "@/lib/assets";
 export async function getStaticProps() {
   return { props: { changelog: await getChangelog() }, revalidate: 300 };
 }
-
-const ui: Localized<{
-  eyebrow: string;
-  heading: string;
-  intro: string;
-  workProfiles: string;
-  otherSocial: string;
-  buyCoffee: string;
-}> = {
-  en: {
-    eyebrow: "Contacts",
-    heading: "Say hello",
-    intro: "The fastest way to reach me is email — I usually reply within a day.",
-    workProfiles: "Work profiles",
-    otherSocial: "Other social media",
-    buyCoffee: "Buy me a coffee (Momo)",
-  },
-  vi: {
-    eyebrow: "Liên hệ",
-    heading: "Say hello",
-    intro: "Trường hợp nhanh nhất bạn có thể gửi email cho mình, mình thường sẽ luôn phản hồi trong ngày",
-    workProfiles: "Profile công việc",
-    otherSocial: "Các mạng xã hội khác",
-    buyCoffee: "Donate cho mình (Momo)",
-  },
-};
 
 function LinkCard({ item }: { item: LinkItem }) {
   return (

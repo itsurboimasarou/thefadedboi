@@ -1,45 +1,8 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Icon from "../ui/Icons";
 import type { GalleryVideo } from "@/lib/types";
-import { useLocalized, type Localized } from "@/lib/i18n";
-
-const ui: Localized<{
-  play: string;
-  pause: string;
-  seek: string;
-  volume: string;
-  mute: string;
-  unmute: string;
-  download: string;
-  fullView: string;
-  exitFullView: string;
-  nothing: string;
-}> = {
-  en: {
-    play: "Play",
-    pause: "Pause",
-    seek: "Seek",
-    volume: "Volume",
-    mute: "Mute",
-    unmute: "Unmute",
-    download: "Download video",
-    fullView: "Large view",
-    exitFullView: "Close large view",
-    nothing: "No video selected.",
-  },
-  vi: {
-    play: "Phát",
-    pause: "Tạm dừng",
-    seek: "Tua",
-    volume: "Âm lượng",
-    mute: "Tắt tiếng",
-    unmute: "Bật tiếng",
-    download: "Tải video xuống",
-    fullView: "Chế độ xem lớn",
-    exitFullView: "Đóng chế độ xem lớn",
-    nothing: "Chưa chọn video nào.",
-  },
-};
+import { useLocalized } from "@/lib/i18n";
+import { videoPlayerUi as ui } from "@/lib/ui-strings";
 
 const VOLUME_KEY = "video-volume";
 const MUTED_KEY = "video-muted";

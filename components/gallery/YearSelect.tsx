@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
-import { useLocalized, type Localized } from "@/lib/i18n";
-
-const ui: Localized<{ filterByYear: string; all: string }> = {
-  en: { filterByYear: "Filter by year", all: "All" },
-  vi: { filterByYear: "Lọc theo năm", all: "Tất cả" },
-};
+import { useLocalized } from "@/lib/i18n";
+import { yearSelectUi as ui } from "@/lib/ui-strings";
 
 interface YearSelectProps {
   years: number[];

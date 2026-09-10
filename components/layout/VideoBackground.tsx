@@ -1,28 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Icon from "../ui/Icons";
-import { refreshGlass } from "@/components/controls/GlassMode";
 import {
+  canSwapMedia,
   markBackdropUnavailable,
   resolveBackdrop,
+  setBackdropMedia,
   useBackdropAvailability,
-  useBackdropKind,
+  useBackdropChoice,
+  useBackdropMedia,
 } from "@/lib/backdrop";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { backdropToolsUi as ui } from "@/lib/ui-strings";
 
 const HOME = "/";
 
-const ui: Localized<{ pause: string; play: string }> = {
-  en: { pause: "Pause background video", play: "Play background video" },
-  vi: { pause: "Tạm dừng video nền", play: "Phát video nền" },
-};
+const BACKDROP_CLASSES = ["has-bg-video"];
 
 export function primeBgVideo(href: string) {
   if (href === HOME) return;
   const root = document.documentElement;
-  if (!root.classList.contains("has-bg-video")) return;
-  root.classList.remove("has-bg-video");
-  refreshGlass();
+  if (!BACKDROP_CLASSES.some((c) => root.classList.contains(c))) return;
+  root.classList.remove(...BACKDROP_CLASSES);
 }
 
 export default function VideoBackground() {
@@ -32,8 +31,11 @@ export default function VideoBackground() {
   const [body, setBody] = useState<HTMLElement | null>(null);
   const [paused, setPaused] = useState(false);
   const avail = useBackdropAvailability();
-  const pref = useBackdropKind();
-  const kind = resolveBackdrop(avail, pref);
+  const choice = useBackdropChoice();
+  const media = useBackdropMedia();
+  const kind = resolveBackdrop(avail, choice, media);
+  const isMedia = kind === "video" || kind === "image";
+  const canSwap = isMedia && canSwapMedia(avail);
 
   useEffect(() => {
     setOrbField(document.getElementById("orb-field"));
@@ -42,16 +44,11 @@ export default function VideoBackground() {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (!kind) return;
-    root.classList.add("has-bg-video");
-    root.dataset.backdrop = kind;
-    refreshGlass();
+    root.classList.toggle("has-bg-video", isMedia);
     return () => {
-      root.classList.remove("has-bg-video");
-      delete root.dataset.backdrop;
-      refreshGlass();
+      root.classList.remove(...BACKDROP_CLASSES);
     };
-  }, [kind]);
+  }, [isMedia]);
 
   useEffect(() => {
     const v = ref.current;
@@ -71,9 +68,9 @@ export default function VideoBackground() {
     else v.pause();
   };
 
-  if (!kind || !orbField) return null;
+  if (!isMedia || !orbField) return null;
 
-  const media =
+  const mediaEl =
     kind === "video" ? (
       <video
         ref={ref}
@@ -101,28 +98,44 @@ export default function VideoBackground() {
       />
     );
 
-  const control =
-    kind === "video" && body
+  const tools =
+    body && (kind === "video" || canSwap)
       ? createPortal(
-          <button
-            type="button"
-            className="backdrop-pause"
-            onClick={toggle}
-            aria-pressed={paused}
-            aria-label={paused ? t.play : t.pause}
-            data-tip={paused ? t.play : t.pause}
-            data-tip-pos="left"
-          >
-            <Icon name={paused ? "play" : "pause"} size={16} />
-          </button>,
+          <div className="backdrop-tools">
+            {kind === "video" && (
+              <button
+                type="button"
+                className="backdrop-tool"
+                onClick={toggle}
+                aria-pressed={paused}
+                aria-label={paused ? t.play : t.pause}
+                data-tip={paused ? t.play : t.pause}
+                data-tip-pos="left"
+              >
+                <Icon name={paused ? "play" : "pause"} size={16} />
+              </button>
+            )}
+            {canSwap && (
+              <button
+                type="button"
+                className="backdrop-tool"
+                onClick={() => setBackdropMedia(kind === "video" ? "image" : "video")}
+                aria-label={kind === "video" ? t.toPhoto : t.toVideo}
+                data-tip={kind === "video" ? t.toPhoto : t.toVideo}
+                data-tip-pos="left"
+              >
+                <Icon name={kind === "video" ? "image" : "film"} size={16} />
+              </button>
+            )}
+          </div>,
           body
         )
       : null;
 
   return (
     <>
-      {createPortal(media, orbField)}
-      {control}
+      {createPortal(mediaEl, orbField)}
+      {tools}
     </>
   );
 }

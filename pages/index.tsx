@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import StackLink from "@/components/layout/StackLink";
 import { site as siteConfig, siteName } from "@/lib/configs/site.config";
 import { homeEyebrow } from "@/lib/configs/home.config";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { homePageUi as ui } from "@/lib/ui-strings";
 import { getChangelog } from "@/lib/assets";
 import VideoBackground from "@/components/layout/VideoBackground";
 import Icon from "@/components/ui/Icons";
@@ -10,11 +11,6 @@ import Icon from "@/components/ui/Icons";
 export async function getStaticProps() {
   return { props: { changelog: await getChangelog() }, revalidate: 300 };
 }
-
-const ui: Localized<{ greeting: string; viewGallery: string; aboutMe: string }> = {
-  en: { greeting: "Hi, I'm", viewGallery: "View gallery", aboutMe: "About me" },
-  vi: { greeting: "Xin chào, mình là", viewGallery: "Xem thư viện", aboutMe: "Về mình" },
-};
 
 export default function Home() {
   const site = useLocalized(siteConfig);

@@ -119,6 +119,50 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
    clearance) live in modes.css now, alongside the rest of the @media
    rules. */
 
+/* ── Top bar (two-bar layout) ─────────────────────────── */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--topbar-h, 64px);
+  padding: 10px clamp(16px, 3vw, 28px);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.topbar--solid {
+  background: var(--chrome-bg);
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: var(--chrome-blur);
+}
+
+/* The mark sizes itself against its box, so the corner link has to have one. */
+.topbar .logo-corner {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Content clears the header the same way it clears a top-docked bar. */
+.app-root:has(.topbar) .main {
+  padding-top: calc(var(--topbar-h, 64px) + 24px);
+}
+
 /* ── Logo mark ──────────────────────────────────────── */
 .logo-mark {
   display: block;
@@ -138,12 +182,11 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
   align-items: center;
   gap: 6px;
   border-radius: 16px;
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  background: var(--chrome-bg);
+  backdrop-filter: var(--chrome-blur);
   border: 1px solid transparent;
   border-color: color-mix(in srgb, var(--accent) 35%, var(--glass-border));
   box-shadow: var(--shadow);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, border-radius 0.28s ease, translate 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
 }
 
@@ -348,6 +391,25 @@ html.glass-fx .hubar {
 }
 .hubar-trigger--open { color: var(--accent); }
 
+/* Points at the panel it opens -- up while closed, back down once it is. */
+.hubar-trigger--chevron .icn {
+  rotate: 180deg;
+  transition: rotate 0.25s ease;
+}
+.hubar-trigger--chevron.hubar-trigger--open .icn { rotate: 0deg; }
+
+.hubar-trigger--chevron .icn {
+  rotate: 180deg;
+  transition: rotate 0.25s ease;
+}
+.hubar-trigger--chevron.hubar-trigger--open .icn { rotate: 0deg; }
+
+.hubar--left .hubar-trigger--chevron .icn { rotate: -90deg; }
+.hubar--left .hubar-trigger--chevron.hubar-trigger--open .icn { rotate: 90deg; }
+
+.hubar--right .hubar-trigger--chevron .icn { rotate: 90deg; }
+.hubar--right .hubar-trigger--chevron.hubar-trigger--open .icn { rotate: -90deg; }
+
 .hubar-divider {
   width: 1px;
   height: 26px;
@@ -362,11 +424,7 @@ html.glass-fx .hubar {
   margin: 4px 0;
 }
 
-/* ── Now-playing + volume (top/bottom HuBar only) ─────
-   Compact by default — long titles rely on .marquee (hover/focus) rather
-   than expanding the bar. Hidden on narrow desktop widths and on the
-   Left/Right vertical docks (min-width gate + dock exclusion live in
-   modes.css) since the fixed-width bar has no room to spare there. */
+/* ── Now-playing + volume (top/bottom HuBar only) ───── */
 .hubar-nowplaying-group {
   display: flex;
   align-items: center;
@@ -446,9 +504,13 @@ html.glass-fx .hubar {
   padding-top: 20px;
   border: none;
   font-size: 0.85rem;
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+html.has-bg-video .footer {
   color: #fff;
   opacity: 0.5;
-  text-align: center;
 }
 
 .footer a {
@@ -464,10 +526,7 @@ html.glass-fx .hubar {
   text-decoration-color: currentColor;
 }
 
-/* ── Home: single-screen layout ──────────────────────
-   .main normally stretches to 100vh and lets content push past it. On home
-   the page IS the viewport, so it clips instead and the footer is hidden —
-   there is nowhere to scroll to reach it. */
+/* ── Home: single-screen layout ────────────────────── */
 html.no-scroll .shell,
 html.no-scroll .main {
   min-height: 100svh;

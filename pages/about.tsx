@@ -1,7 +1,8 @@
 import { siteName } from "@/lib/configs/site.config";
 import { details as detailsConfig, detailsAvatar, detailsSkills, detailsFacts } from "@/lib/configs/details.config";
 import { homeEyebrow } from "@/lib/configs/home.config";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { aboutPageUi as ui } from "@/lib/ui-strings";
 import Icon from "@/components/ui/Icons";
 import Favourites from "@/components/content/Favourites";
 import LiveAge from "@/components/widgets/LiveAge";
@@ -11,44 +12,6 @@ import { getChangelog } from "@/lib/assets";
 export async function getStaticProps() {
   return { props: { changelog: await getChangelog() }, revalidate: 300 };
 }
-
-const ui: Localized<{
-  eyebrow: string;
-  heading: string;
-  aboutMe: string;
-  favourites: string;
-  skills: string;
-  quickFacts: string;
-  birthday: string;
-  alias: string;
-  currently: string;
-  location: string;
-}> = {
-  en: {
-    eyebrow: "Details",
-    heading: "About me",
-    aboutMe: "A bit info about myself",
-    favourites: "Favourites",
-    skills: "Skills",
-    quickFacts: "Quick facts",
-    birthday: "Birthday",
-    alias: "Alias",
-    currently: "Currently",
-    location: "Location",
-  },
-  vi: {
-    eyebrow: "Chi tiết",
-    heading: "Mọi thứ về mình",
-    aboutMe: "Một chút thông tin về bản thân",
-    favourites: "Sở thích",
-    skills: "Kỹ năng",
-    quickFacts: "Tóm tắt bản thân",
-    birthday: "Sinh nhật",
-    alias: "Biệt danh",
-    currently: "Tình trạng hiện tại",
-    location: "Vị trí",
-  },
-};
 
 export default function About() {
   const details = useLocalized(detailsConfig);

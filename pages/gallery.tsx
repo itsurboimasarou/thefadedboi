@@ -7,30 +7,8 @@ import GalleryModeSwitch, { type GalleryMode } from "@/components/gallery/Galler
 import { getManifest, listImages, listVideos, getChangelog } from "@/lib/assets";
 import type { ScannedGalleryAlbum, ScannedVideoAlbum } from "@/lib/types";
 import { useLocalized, type Localized } from "@/lib/i18n";
+import { galleryPageUi as ui } from "@/lib/ui-strings";
 import { galleryQuotes } from "@/lib/configs/gallery.config";
-
-const ui: Localized<{
-  eyebrow: string;
-  heading: string;
-  all: string;
-  photosToBeAdded: string;
-  videosToBeAdded: string;
-}> = {
-  en: {
-    eyebrow: "Gallery",
-    heading: "Precious moments",
-    all: "All",
-    photosToBeAdded: "Photos to be added.",
-    videosToBeAdded: "Videos to be added.",
-  },
-  vi: {
-    eyebrow: "Thư viện",
-    heading: "Những khoảnh khắc đẹp nhất",
-    all: "Tất cả",
-    photosToBeAdded: "Ảnh sẽ được thêm sau.",
-    videosToBeAdded: "Video sẽ được thêm sau.",
-  },
-};
 
 const NO_TEXT: Localized<string> = { en: "", vi: "" };
 

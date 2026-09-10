@@ -1,45 +1,10 @@
 import { useEffect, useState } from "react";
 import { setLiteMode } from "./LiteMode";
 import LangSwitch from "./LangSwitch";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { noticeUi as ui } from "@/lib/ui-strings";
 
 const KEY = "important-notice-seen";
-
-const ui: Localized<{
-  title: string;
-  motionHeading: string;
-  motionBody: string;
-  keepDefault: string;
-  useLite: string;
-  blockerHeading: string;
-  blockerBody: string;
-  once: string;
-}> = {
-  en: {
-    title: "Important notice",
-    motionHeading: "Motion & effects",
-    motionBody:
-      "This site uses background animations and blurs. On an older browser or a weaker device you can turn them off, and change it again any time from the switch in the \u201CAt a glance\u201D panel.",
-    keepDefault: "Keep default",
-    useLite: "Switch to Lite mode",
-    blockerHeading: "Ad blockers",
-    blockerBody:
-      "If you use an ad blocker, allowing this site is recommended. Nothing here is an ad and nothing is tracked, but blockers might stop photo downloads and the home backdrop from loading properly.",
-    once: "This is a one time message, and your choice can be changed later.",
-  },
-  vi: {
-    title: "Lưu ý quan trọng",
-    motionHeading: "Chuyển động & hiệu ứng",
-    motionBody:
-      "Trang này dùng hiệu ứng chuyển động và làm mờ ở nền. Nếu bạn dùng trình duyệt cũ hoặc máy yếu, bạn có thể tắt chúng, và đổi lại bất cứ lúc nào bằng công tắc trong bảng \u201CTổng quan\u201D.",
-    keepDefault: "Giữ mặc định",
-    useLite: "Chuyển sang chế độ Lite",
-    blockerHeading: "Trình chặn quảng cáo",
-    blockerBody:
-      "Nếu bạn dùng trình chặn quảng cáo, nên cho phép trang này. Ở đây không có quảng cáo và không thu thập dữ liệu, nhưng các trình chặn có thể vô tình làm hỏng việc tải ảnh xuống và ảnh/video nền ở trang chủ.",
-    once: "Đây là thông báo một lần, và bạn có thể thay đổi lựa chọn sau đó.",
-  },
-};
 
 export default function ImportantNotice() {
   const t = useLocalized(ui);

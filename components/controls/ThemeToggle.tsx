@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Icon from "../ui/Icons";
 import { reapplyAccentForTheme } from "./AccentSwitch";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { themeUi as ui } from "@/lib/ui-strings";
 
 export const THEME_EVT = "theme-change";
 const MODE_EVT = "theme-mode-change";
@@ -11,19 +12,6 @@ export type ThemeMode = Theme | "auto";
 
 const SCHEME_MQ = "(prefers-color-scheme: light)";
 const KEY = "theme";
-
-const ui: Localized<{ toggle: string; auto: string; autoOn: string }> = {
-  en: {
-    toggle: "Toggle theme",
-    auto: "Match browser theme",
-    autoOn: "Matching browser theme",
-  },
-  vi: {
-    toggle: "Đổi giao diện",
-    auto: "Theo giao diện trình duyệt",
-    autoOn: "Đang theo giao diện trình duyệt",
-  },
-};
 
 export function getThemeMode(): ThemeMode {
   try {

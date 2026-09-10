@@ -1449,8 +1449,13 @@ body:has(.hubar--bottom) .gallery-page--motion {
   bottom: calc(16px + var(--hubar-h, 68px) + 14px);
   touch-action: pan-y;
   z-index: 65;
-  padding: 14px 16px;
+  --panel-pad-x: 16px;
+  padding: 14px var(--panel-pad-x);
   border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  --panel-max-h: calc(100dvh - var(--hubar-h, 68px) - 46px);
+  max-height: var(--panel-max-h);
   background: var(--glass);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
@@ -1522,6 +1527,19 @@ body:has(.hubar--bottom) .gallery-page--motion {
   transform: translateY(-24px);
 }
 .app-root:has(.hubar--top) .control-panel--open {
+  transform: translateY(0);
+}
+
+html[data-bar-mode="split"]:not(.compact) #music-player.player-panel {
+  bottom: auto;
+  top: calc(var(--topbar-h, 64px) + 14px);
+  left: auto;
+  right: clamp(16px, 3vw, 28px);
+  margin-inline: 0;
+  --panel-max-h: calc(100dvh - var(--topbar-h, 64px) - 30px);
+  transform: translateY(-24px);
+}
+html[data-bar-mode="split"]:not(.compact) #music-player.player-panel.control-panel--open {
   transform: translateY(0);
 }
 

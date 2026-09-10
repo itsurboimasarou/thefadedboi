@@ -6,87 +6,8 @@ import { useInert } from "@/lib/functions/useInert";
 import { useIsoLayoutEffect } from "@/lib/functions/useIsoLayoutEffect";
 import Marquee from "../ui/Marquee";
 import { useMusicPlayback, setNowPlaying, setVolume, setMuted, initMusicPrefs } from "@/lib/musicState";
-import { useLocalized, type Localized } from "@/lib/i18n";
-
-const ui: Localized<{
-  music: string;
-  mute: string;
-  unmute: string;
-  volume: string;
-  back: string;
-  trackList: string;
-  close: string;
-  loading: string;
-  noTrackPlaying: string;
-  shuffle: string;
-  previousTrack: string;
-  play: string;
-  pause: string;
-  nextTrack: string;
-  repeatOff: string;
-  repeatAll: string;
-  repeatOne: string;
-  none: string;
-  allTracks: string;
-  noAlbums: string;
-  loadError: string;
-  noTracks: string;
-  musicPlayerLabel: string;
-  swipeForControls: string;
-}> = {
-  en: {
-    music: "Music",
-    mute: "Mute",
-    unmute: "Unmute",
-    volume: "Volume",
-    back: "Back",
-    trackList: "Track list",
-    close: "Close",
-    loading: "Loading tracks…",
-    noTrackPlaying: "No current playing track",
-    shuffle: "Shuffle",
-    previousTrack: "Previous track",
-    play: "Play",
-    pause: "Pause",
-    nextTrack: "Next track",
-    repeatOff: "Repeat: off",
-    repeatAll: "Repeat: all",
-    repeatOne: "Repeat: one track",
-    none: "<None>",
-    allTracks: "All tracks",
-    noAlbums: "No albums available.",
-    loadError: "Couldn't load tracks — try again later.",
-    noTracks: "No tracks available.",
-    musicPlayerLabel: "Music player",
-    swipeForControls: "Swipe left for site controls",
-  },
-  vi: {
-    music: "Nhạc",
-    mute: "Tắt tiếng",
-    unmute: "Bật tiếng",
-    volume: "Âm lượng",
-    back: "Quay lại",
-    trackList: "Danh sách bài hát",
-    close: "Đóng",
-    loading: "Đang tải bài hát…",
-    noTrackPlaying: "Chưa phát bài nào",
-    shuffle: "Phát ngẫu nhiên",
-    previousTrack: "Bài trước",
-    play: "Phát",
-    pause: "Tạm dừng",
-    nextTrack: "Bài tiếp theo",
-    repeatOff: "Lặp lại: tắt",
-    repeatAll: "Lặp lại: tất cả",
-    repeatOne: "Lặp lại: một bài",
-    none: "<Không có>",
-    allTracks: "Tất cả bài hát",
-    noAlbums: "Không có album nào.",
-    loadError: "Không tải được bài hát — thử lại sau.",
-    noTracks: "Không có bài hát nào.",
-    musicPlayerLabel: "Trình phát nhạc",
-    swipeForControls: "Vuốt sang trái để mở điều khiển trang",
-  },
-};
+import { useLocalized } from "@/lib/i18n";
+import { musicPlayerUi as ui } from "@/lib/ui-strings";
 
 interface MusicPlayerProps {
   open: boolean;

@@ -2,12 +2,32 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import ThemeToggle, { AutoThemeToggle } from "../controls/ThemeToggle";
 import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
-import GlassToggle from "../controls/GlassMode";
+import StarToggle from "../controls/StarMode";
+import GlassToggle, { GlassTintControl, useGlass } from "../controls/GlassMode";
 import AutoHideToggle from "../controls/HuBarPinned";
 import DockControl, { useDock } from "../controls/HuBarDock";
+import BarModeControl, { useBarMode } from "../controls/BarMode";
 import ShapeControl from "../controls/HuBarShape";
-import { useBackdropAvailability, useBackdropKind, setBackdropKind, type BackdropKind } from "@/lib/backdrop";
-import { AccentBgToggle, AccentBgMixControl, AccentBgMotionToggle, useAccentBg, accentBgUi } from "../controls/AccentBackground";
+import {
+  useBackdropAvailability,
+  useBackdropChoice,
+  setBackdropChoice,
+  mediaAvailable,
+  type BackdropChoice,
+} from "@/lib/backdrop";
+import {
+  AccentBgMixControl,
+  AccentBgMotionToggle,
+  GradientAngleControl,
+  GradientDirControl,
+  GradientGrainControl,
+  GradientSpeedControl,
+  GradientPreview,
+  GradientStyleSelect,
+  useGradientChoice,
+  useAccentBgMotion,
+} from "../controls/AccentBackground";
+import SetSelect, { type SelectOption } from "../controls/SetSelect";
 import LangSwitch from "../controls/LangSwitch";
 import AccentSwitch from "../controls/AccentSwitch";
 import AccentSetSwitch from "../controls/AccentSetSwitch";
@@ -17,114 +37,19 @@ import ChangelogDialog from "../content/ChangelogDialog";
 import MusicPlayer from "../widgets/MusicPlayer";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { accentSets } from "@/lib/configs/accents.config";
-import { isCompact } from "@/lib/functions/useHuBarFit";
+import { isCompact, useCompact } from "@/lib/functions/useHuBarFit";
 import { useInert } from "@/lib/functions/useInert";
 import { useIsoLayoutEffect } from "@/lib/functions/useIsoLayoutEffect";
 import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { controlPanelUi as ui, accentBgUi, glassUi, barModeUi, starsUi } from "@/lib/ui-strings";
 
-const ui: Localized<{
-  atAGlance: string;
-  back: string;
-  changelog: string;
-  resetAll: string;
-  close: string;
-  appearance: string;
-  aboutAppearance: string;
-  appearanceTip: string;
-  glassBlur: string;
-  aboutGlass: string;
-  glassTip: string;
-  liteMode: string;
-  aboutLite: string;
-  liteTip: string;
-  autoHide: string;
-  aboutAutoHide: string;
-  autoHideTip: string;
-  huBarPosition: string;
-  huBarShape: string;
-  gradientBg: string;
-  backdrop: string;
-  backdropVideo: string;
-  backdropImage: string;
-  language: string;
-  customizeTheme: string;
-  colorSets: string;
-  accentColor: string;
-  logo: string;
-  swipeForMusic: string;
-  siteControls: string;
-  musicPlayer: string;
-  activePanel: string;
-}> = {
-  en: {
-    atAGlance: "At a glance",
-    back: "Back",
-    changelog: "Changelog",
-    resetAll: "Reset all to default",
-    close: "Close",
-    appearance: "Appearance",
-    aboutAppearance: "About appearance",
-    appearanceTip: "Switch between dark and light. The auto button follows your browser's theme setting instead, and changes along with it. Use the dark/light switch will turn auto theme off.",
-    glassBlur: "Glass blur",
-    aboutGlass: "About glass effect",
-    glassTip: "Frosted blur behind HuBar. Costs GPU when anything animates behind it.",
-    liteMode: "Lite mode",
-    aboutLite: "About Lite mode",
-    liteTip: "Turns off animations and transparency effects — recommended for older devices or weak hardware.",
-    autoHide: "Auto-hide",
-    aboutAutoHide: "About auto-hide",
-    autoHideTip: "HuBar hides itself after a moment and reappears on hover, edge-swipe, or focus. Turn this off to keep it always shown.",
-    huBarPosition: "HuBar position",
-    huBarShape: "HuBar shape",
-    gradientBg: "Gradient background",
-    backdrop: "Home backdrop",
-    backdropVideo: "Video",
-    backdropImage: "Image",
-    language: "Language",
-    customizeTheme: "Customize theme",
-    colorSets: "Color sets",
-    accentColor: "Accent color",
-    logo: "Logo",
-    swipeForMusic: "Swipe right for music player",
-    siteControls: "Site controls",
-    musicPlayer: "Music player",
-    activePanel: "Active panel",
-  },
-  vi: {
-    atAGlance: "Tổng quan",
-    back: "Quay lại",
-    changelog: "Nhật ký cập nhật",
-    resetAll: "Đặt lại về mặc định",
-    close: "Đóng",
-    appearance: "Giao diện",
-    aboutAppearance: "Về giao diện",
-    appearanceTip: "Chuyển giữa giao diện tối và sáng. Nút tự động sẽ theo cài đặt giao diện của trình duyệt và tự đổi theo, dùng công tắc sáng/tối sẽ tắt tự động chuyển giao diện theo trình duyệt",
-    glassBlur: "Hiệu ứng kính mờ",
-    aboutGlass: "Về hiệu ứng kính mờ",
-    glassTip: "Hiệu ứng mờ sương phía sau HuBar. Tiêu tốn GPU khi có chuyển động phía sau.",
-    liteMode: "Chế độ Lite",
-    aboutLite: "Về chế độ Lite",
-    liteTip: "Tắt hiệu ứng chuyển động và độ trong suốt — khuyên dùng cho máy cũ hoặc cấu hình yếu.",
-    autoHide: "Tự động ẩn",
-    aboutAutoHide: "Về tính năng tự động ẩn",
-    autoHideTip: "HuBar sẽ tự động ẩn sau một lúc và hiện lại khi di chuột tới, vuốt cạnh màn hình, hoặc focus vào. Tắt để luôn hiển thị.",
-    huBarPosition: "Vị trí HuBar",
-    huBarShape: "Kiểu HuBar",
-    gradientBg: "Nền chuyển sắc",
-    backdrop: "Nền trang chủ",
-    backdropVideo: "Video",
-    backdropImage: "Ảnh",
-    language: "Ngôn ngữ",
-    customizeTheme: "Tùy chỉnh giao diện",
-    colorSets: "Bộ màu",
-    accentColor: "Màu sắc",
-    logo: "Biểu tượng",
-    swipeForMusic: "Vuốt sang phải để mở trình phát nhạc",
-    siteControls: "Điều khiển trang",
-    musicPlayer: "Trình phát nhạc",
-    activePanel: "Bảng đang mở",
-  },
+const BACKDROPS: BackdropChoice[] = ["none", "gradient", "media"];
+
+const backdropIcons: Record<BackdropChoice, string> = {
+  none: "slash",
+  gradient: "gradient",
+  media: "media",
 };
 
 export const PANEL_EVT = "control-panel-toggle";
@@ -142,7 +67,9 @@ function resetAllToDefault() {
   const keys = [
     "theme", "glass-fx", "lite-mode", "hubar-pinned", "hubar-dock",
     "lang", "logo-custom", "accent-set", "hubar-shape",
-    "accent-bg", "accent-bg-mix", "accent-bg-motion", "bg-backdrop",
+    "accent-bg", "accent-bg-mix", "accent-bg-motion", "bg-backdrop", "bg-media",
+    "accent-bg-style", "accent-bg-dir", "accent-bg-angle", "accent-bg-speed",
+    "accent-bg-grain", "glass-tint", "bar-mode", "stars",
     ...accentSets.map((s) => `accent-element-${s.key}`),
   ];
   try {
@@ -156,8 +83,6 @@ type PanelView = "none" | "controls" | "player";
 export default function ControlPanel({ changelog }: { changelog: string }) {
   const home = useLocalized(homeConfig);
   const t = useLocalized(ui);
-  // The indicator is compact-only, where the bar is always top or bottom.
-  // Point its tips at the panel rather than across the HuBar.
   const tipPos = useDock() === "bottom" ? "up" : "down";
   const [visiblePanel, setVisiblePanel] = useState<PanelView>("none");
   const open = visiblePanel === "controls";
@@ -182,11 +107,33 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   const [logOpen, setLogOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const liteOn = useLiteMode();
-  const accentBgOn = useAccentBg();
+  const gradient = useGradientChoice();
+  const gradientOn = gradient !== "none";
+  const driftOn = useAccentBgMotion() && !liteOn;
   const backdropAvail = useBackdropAvailability();
-  const backdropKind = useBackdropKind();
-  const backdropChoice = backdropAvail.video === true && backdropAvail.image === true;
+  const backdropKind = useBackdropChoice();
+  const gradientUsable = backdropKind !== "none";
+  const noMedia =
+    !mediaAvailable(backdropAvail, "video") && !mediaAvailable(backdropAvail, "image");
+  const backdropLabels: Record<BackdropChoice, string> = {
+    none: t.backdropNone,
+    gradient: t.backdropGradient,
+    media: t.backdropMedia,
+  };
+  const backdropOptions: SelectOption<BackdropChoice>[] = BACKDROPS.map((k) => ({
+    key: k,
+    label: backdropLabels[k],
+    icon: backdropIcons[k],
+    disabled: k === "media" && noMedia,
+  }));
   const bgT = useLocalized(accentBgUi);
+  const glassT = useLocalized(glassUi);
+  const barT = useLocalized(barModeUi);
+  const starT = useLocalized(starsUi);
+  const split = useBarMode() === "split";
+  const compact = useCompact();
+  const showDock = !(split && compact);
+  const glassOn = useGlass() !== "off";
   const [sliding, setSliding] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const viewsRef = useRef<HTMLDivElement>(null);
@@ -243,21 +190,26 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         height = Math.max(height, extent);
       }
       wrap.style.height = `${height}px`;
+      if (wrap.clientHeight < height - 1) wrap.dataset.capped = "true";
+      else delete wrap.dataset.capped;
     };
     sync();
     const ro = new ResizeObserver(sync);
     ro.observe(main);
     ro.observe(theme);
     const mo = new MutationObserver(sync);
+    mo.observe(main, { childList: true, subtree: true });
     mo.observe(theme, { childList: true, subtree: true });
+    window.addEventListener("resize", sync);
     return () => {
       ro.disconnect();
       mo.disconnect();
+      window.removeEventListener("resize", sync);
     };
   }, [themeMenuOpen]);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("control-panel-state", { detail: visiblePanel !== "none" }));
+    window.dispatchEvent(new CustomEvent("control-panel-state", { detail: visiblePanel }));
   }, [visiblePanel]);
 
   useEffect(() => {
@@ -374,6 +326,27 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           ref={mainViewRef}
         >
         <dl className="fact-grid glance-grid">
+          <div className="glance-row--backdrop">
+            <dt>
+              <Icon name="image" size={15} />
+              {t.backdrop}
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutBackdrop}>
+                <Icon name="info" size={17} />
+                <span className="info-tip-bubble" role="tooltip">
+                  {t.backdropTip}
+                </span>
+              </span>
+            </dt>
+            <dd>
+              <SetSelect
+                value={backdropKind}
+                options={backdropOptions}
+                onPick={setBackdropChoice}
+                label={t.backdrop}
+              />
+            </dd>
+          </div>
+
           <div>
             <dt>
               <Icon name="shirt" size={15} />
@@ -390,36 +363,6 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               </span>
             </dd>
           </div>
-
-          {backdropChoice && (
-            <div>
-              <dt>
-                <Icon name="image" size={15} />
-                {t.backdrop}
-              </dt>
-              <dd className="dd-row">
-                <div className="shape-control" role="radiogroup" aria-label={t.backdrop}>
-                  {(["video", "image"] as BackdropKind[]).map((k) => {
-                    const label = k === "video" ? t.backdropVideo : t.backdropImage;
-                    return (
-                      <button
-                        key={k}
-                        type="button"
-                        role="radio"
-                        aria-checked={backdropKind === k}
-                        aria-label={label}
-                        data-tip={label}
-                        className={`shape-toggle${backdropKind === k ? " shape-toggle--on" : ""}`}
-                        onClick={() => setBackdropKind(k)}
-                      >
-                        <Icon name={k === "video" ? "film" : "image"} size={16} />
-                      </button>
-                    );
-                  })}
-                </div>
-              </dd>
-            </div>
-          )}
 
           <div className={liteOn ? "row--disabled" : undefined}>
             <dt>
@@ -453,6 +396,22 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dd>
           </div>
 
+          <div className={liteOn ? "row--disabled" : undefined}>
+            <dt>
+              <Icon name="star4" size={15} />
+              {starT.stars}
+            </dt>
+            <dd className="dd-row">
+              <StarToggle />
+              <span className="info-tip" tabIndex={liteOn ? -1 : 0} aria-hidden={liteOn || undefined} aria-label={starT.aboutStars}>
+                <Icon name="info" size={17} />
+                <span className="info-tip-bubble" role="tooltip">
+                  {starT.starsTip}
+                </span>
+              </span>
+            </dd>
+          </div>
+
           <div className="glance-row--autohide">
             <dt>
               <Icon name="thumbtack" size={15} />
@@ -469,20 +428,38 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dd>
           </div>
 
-          <div className="glance-row--dock">
+          <div className="glance-row--bars">
             <dt>
-              <Icon name="target" size={15} />
-              {t.huBarPosition}
+              <Icon name="display" size={15} />
+              {barT.bars}
+              <span className="info-tip" tabIndex={0} aria-label={barT.aboutBars}>
+                <Icon name="info" size={17} />
+                <span className="info-tip-bubble" role="tooltip">
+                  {barT.barsTip}
+                </span>
+              </span>
             </dt>
             <dd className="dd-row">
-              <DockControl />
+              <BarModeControl />
             </dd>
           </div>
+
+          {showDock && (
+            <div className="glance-row--dock">
+              <dt>
+                <Icon name="target" size={15} />
+                {split ? barT.position : t.huBarPosition}
+              </dt>
+              <dd className="dd-row">
+                <DockControl />
+              </dd>
+            </div>
+          )}
 
           <div className="glance-row--shape">
             <dt>
               <Icon name="star4" size={15} />
-              {t.huBarShape}
+              {split ? barT.shape : t.huBarShape}
             </dt>
             <dd className="dd-row">
               <ShapeControl />
@@ -500,6 +477,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
           </div>
 
         </dl>
+
+        {glassOn && <GlassTintControl disabled={liteOn} />}
 
         <div className="panel-quick-links">
           <div className="glance-row--mobile-only">
@@ -544,7 +523,9 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             <AccentSwitch />
           </div>
 
-          <div className="theme-menu-section">
+          <div
+            className={`theme-menu-section${gradientUsable ? "" : " theme-menu-section--off"}`}
+          >
             <h3 className="h-with-icon theme-menu-heading">
               <Icon name="spark" size={15} />
               {t.gradientBg}
@@ -555,20 +536,35 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
                 </span>
               </span>
             </h3>
-            <div className="theme-menu-options">
-              <div className="theme-menu-option">
-                <span className="theme-menu-option-name">{bgT.onOff}</span>
-                <AccentBgToggle />
-              </div>
-              <div className="theme-menu-option">
-                <span className="theme-menu-option-name">{bgT.tone}</span>
-                <AccentBgMixControl disabled={!accentBgOn} />
-              </div>
-              <div className="theme-menu-option">
-                <span className="theme-menu-option-name">{bgT.drifting}</span>
-                <AccentBgMotionToggle disabled={!accentBgOn} />
-              </div>
-            </div>
+            <GradientPreview />
+            {!gradientUsable && <p className="theme-menu-note">{t.gradientOffNote}</p>}
+            <GradientStyleSelect />
+            {gradientOn && (
+              <>
+                <div className="theme-menu-options theme-menu-options--stacked">
+                  <div className="theme-menu-option">
+                    <span className="theme-menu-option-name">{bgT.tone}</span>
+                    <AccentBgMixControl disabled={!gradientUsable} />
+                  </div>
+                  {gradient === "linear" ? (
+                    <div className="theme-menu-option">
+                      <span className="theme-menu-option-name">{bgT.direction}</span>
+                      <GradientDirControl disabled={!gradientUsable} />
+                    </div>
+                  ) : (
+                    <div className="theme-menu-option">
+                      <span className="theme-menu-option-name">{bgT.drifting}</span>
+                      <AccentBgMotionToggle disabled={!gradientUsable} />
+                    </div>
+                  )}
+                </div>
+                {gradient === "linear" && <GradientAngleControl disabled={!gradientUsable} />}
+                {gradient !== "linear" && driftOn && (
+                  <GradientSpeedControl disabled={!gradientUsable} />
+                )}
+                <GradientGrainControl disabled={!gradientUsable} />
+              </>
+            )}
           </div>
 
           <div className="theme-menu-section theme-menu-section--logo">

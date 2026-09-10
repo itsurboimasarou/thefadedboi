@@ -1,15 +1,11 @@
 import Icon from "../ui/Icons";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { shapeUi as ui } from "@/lib/ui-strings";
 import { createSetting } from "@/lib/setting";
 
 export type Shape = "rounded" | "pill";
 
 const SHAPES: Shape[] = ["rounded", "pill"];
-
-const ui: Localized<{ shape: string; rounded: string; pill: string }> = {
-  en: { shape: "HuBar shape", rounded: "Rounded corners", pill: "Pill" },
-  vi: { shape: "Kiểu viền HuBar", rounded: "Bo góc", pill: "Bo tròn" },
-};
 
 const shapeSetting = createSetting<Shape>({
   key: "hubar-shape",

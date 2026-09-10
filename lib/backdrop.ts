@@ -1,7 +1,13 @@
 import { useSyncExternalStore } from "react";
 import { createSetting } from "./setting";
 
-export type BackdropKind = "video" | "image";
+export type BackdropMedia = "video" | "image";
+
+export type BackdropKind = "none" | "gradient" | "image" | "video";
+
+export type BackdropChoice = "none" | "gradient" | "media";
+
+const CHOICES: BackdropChoice[] = ["none", "gradient", "media"];
 
 export interface BackdropAvailability {
   video: boolean | null;
@@ -74,7 +80,7 @@ async function ensureProbed() {
   }
 }
 
-export function markBackdropUnavailable(kind: BackdropKind) {
+export function markBackdropUnavailable(kind: BackdropMedia) {
   if (avail[kind] === false) return;
   publish(
     kind === "image"
@@ -95,21 +101,55 @@ export function useBackdropAvailability(): BackdropAvailability {
   return useSyncExternalStore(subscribe, () => avail, () => SERVER);
 }
 
-const kindSetting = createSetting<BackdropKind>({
+const choiceSetting = createSetting<BackdropChoice>({
   key: "bg-backdrop",
   event: "bg-backdrop-change",
-  fallback: "video",
-  parse: (raw) => (raw === "image" ? "image" : "video"),
+  fallback: "media",
+  parse: (raw) =>
+    raw === "video" || raw === "image"
+      ? "media"
+      : CHOICES.includes(raw as BackdropChoice)
+        ? (raw as BackdropChoice)
+        : "media",
+  apply: (v) => {
+    if (typeof document !== "undefined") document.documentElement.dataset.backdrop = v;
+  },
 });
 
-export const useBackdropKind = kindSetting.use;
-export const setBackdropKind = kindSetting.set;
+const mediaSetting = createSetting<BackdropMedia>({
+  key: "bg-media",
+  event: "bg-media-change",
+  fallback: "video",
+  parse: (raw) => {
+    if (raw === "image" || raw === "video") return raw;
+    try {
+      if (localStorage.getItem("bg-backdrop") === "image") return "image";
+    } catch {}
+    return "video";
+  },
+});
 
-export function resolveBackdrop(a: BackdropAvailability, pref: BackdropKind): BackdropKind | null {
-  const video = a.video !== false;
-  const image = a.image === true;
-  if (video && image) return pref;
-  if (video) return "video";
-  if (image) return "image";
-  return null;
+export const useBackdropChoice = choiceSetting.use;
+export const setBackdropChoice = choiceSetting.set;
+export const useBackdropMedia = mediaSetting.use;
+export const setBackdropMedia = mediaSetting.set;
+
+export function mediaAvailable(a: BackdropAvailability, kind: BackdropMedia): boolean {
+  return kind === "video" ? a.video !== false : a.image === true;
+}
+
+export function canSwapMedia(a: BackdropAvailability): boolean {
+  return mediaAvailable(a, "video") && mediaAvailable(a, "image");
+}
+
+export function resolveBackdrop(
+  a: BackdropAvailability,
+  choice: BackdropChoice,
+  media: BackdropMedia
+): BackdropKind {
+  if (choice !== "media") return choice;
+  const other: BackdropMedia = media === "video" ? "image" : "video";
+  if (mediaAvailable(a, media)) return media;
+  if (mediaAvailable(a, other)) return other;
+  return "gradient";
 }

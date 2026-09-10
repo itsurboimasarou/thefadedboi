@@ -1,6 +1,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 
 const SHORT_MQ = "(max-height: 600px)";
+const SPLIT_MQ = "(max-width: 699.98px)";
 export const FIT_KEY = "hubar-fit";
 
 let railEl: HTMLElement | null = null;
@@ -61,7 +62,9 @@ function isCosmetic(r: MutationRecord): boolean {
 
 function apply() {
   if (!railEl) return;
-  const nextNarrow = desktopOverflows(railEl);
+  const split = document.documentElement.dataset.barMode === "split";
+  const nextNarrow =
+    (split && window.matchMedia(SPLIT_MQ).matches) || desktopOverflows(railEl);
   const nextCompact = nextNarrow || window.matchMedia(SHORT_MQ).matches;
   if (nextNarrow === narrow && nextCompact === compact) return;
 
@@ -103,6 +106,7 @@ export function useHuBarFit(railRef: React.RefObject<HTMLElement>) {
     document.fonts?.ready.then(schedule).catch(() => {});
 
     const short = window.matchMedia(SHORT_MQ);
+    const splitMq = window.matchMedia(SPLIT_MQ);
     const mo = new MutationObserver((records) => {
       if (records.every(isCosmetic)) return;
       schedule();
@@ -110,11 +114,13 @@ export function useHuBarFit(railRef: React.RefObject<HTMLElement>) {
     mo.observe(rail, { childList: true, subtree: true });
     window.addEventListener("resize", schedule);
     short.addEventListener("change", schedule);
+    splitMq.addEventListener("change", schedule);
     return () => {
       if (queued) cancelAnimationFrame(queued);
       mo.disconnect();
       window.removeEventListener("resize", schedule);
       short.removeEventListener("change", schedule);
+      splitMq.removeEventListener("change", schedule);
       railEl = null;
     };
   }, [railRef]);

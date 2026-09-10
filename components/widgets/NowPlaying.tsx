@@ -2,12 +2,8 @@ import Icon from "../ui/Icons";
 import Marquee from "../ui/Marquee";
 import { useMusicPlayback } from "@/lib/musicState";
 import { toggleMusicPlayer } from "../layout/ControlPanel";
-import { useLocalized, type Localized } from "@/lib/i18n";
-
-const ui: Localized<{ openPlayer: string }> = {
-  en: { openPlayer: "Open music player" },
-  vi: { openPlayer: "Mở trình phát nhạc" },
-};
+import { useLocalized } from "@/lib/i18n";
+import { nowPlayingUi as ui } from "@/lib/ui-strings";
 
 export default function NowPlaying() {
   const t = useLocalized(ui);

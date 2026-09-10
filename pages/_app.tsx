@@ -12,11 +12,15 @@ import type { AppProps } from "next/app";
 import { useEffect } from "react";
 import { Work_Sans, IBM_Plex_Sans, Momo_Signature, Space_Grotesk } from "next/font/google";
 import HuBar from "@/components/layout/HuBar";
+import TopBar from "@/components/layout/TopBar";
+import NavPill from "@/components/layout/NavPill";
+import { useBarMode } from "@/components/controls/BarMode";
 import { siteName, siteHandle, siteFooter, siteGithub, siteUrl, siteBanner, siteDescription } from "@/lib/configs/site.config";
 import ImportantNotice from "@/components/controls/ImportantNotice";
 import PageLoader from "@/components/layout/PageLoader";
 import useTipFit from "@/lib/functions/useTipFit";
 import ControlPanel from "@/components/layout/ControlPanel";
+import ShootingStars from "@/components/layout/ShootingStars";
 import { LangProvider } from "@/components/controls/LangSwitch";
 import PageStackTransition from "@/components/layout/PageStackTransition";
 
@@ -37,6 +41,7 @@ export default function App(props: AppProps) {
 
 function AppShell({ Component, pageProps }: AppProps) {
   useTipFit();
+  const barMode = useBarMode();
   const changelog: string = (pageProps as { changelog?: string }).changelog ?? "";
   const [footerPre, footerPost] = siteFooter.split(siteHandle);
 
@@ -67,7 +72,9 @@ function AppShell({ Component, pageProps }: AppProps) {
 
         <meta name="theme-color" content="#6fd6b4" />
       </Head>
-      <div id="orb-field" className="orb-field" aria-hidden="true" />
+      <div id="orb-field" className="orb-field" aria-hidden="true">
+        <ShootingStars />
+      </div>
       <div className="shell">
         <main className="main">
           <Component {...pageProps} />
@@ -78,7 +85,14 @@ function AppShell({ Component, pageProps }: AppProps) {
           </footer>
         </main>
       </div>
-      <HuBar />
+      {barMode === "split" ? (
+        <>
+          <TopBar />
+          <NavPill />
+        </>
+      ) : (
+        <HuBar />
+      )}
       <ControlPanel changelog={changelog} />
       <ImportantNotice />
       <PageLoader />

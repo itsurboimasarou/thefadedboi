@@ -1,13 +1,9 @@
 import Icon from "../ui/Icons";
 import useHideOnScrollDown from "@/lib/functions/useHideOnScrollDown";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { galleryModeUi as ui } from "@/lib/ui-strings";
 
 export type GalleryMode = "still" | "motion";
-
-const ui: Localized<{ label: string; still: string; motion: string }> = {
-  en: { label: "Gallery view", still: "Still", motion: "Motion" },
-  vi: { label: "Chế độ xem", still: "Tĩnh", motion: "Động" },
-};
 
 export default function GalleryModeSwitch({
   mode,

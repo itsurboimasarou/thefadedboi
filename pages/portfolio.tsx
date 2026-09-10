@@ -1,6 +1,7 @@
 import type { InferGetStaticPropsType } from "next";
 import { portfolio as portfolioConfig } from "@/lib/configs/portfolio.config";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { portfolioPageUi as ui } from "@/lib/ui-strings";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
 import Icon from "@/components/ui/Icons";
 import { getChangelog, listImages } from "@/lib/assets";
@@ -14,29 +15,6 @@ export async function getStaticProps() {
     revalidate: 300,
   };
 }
-
-const ui: Localized<{
-  heading: string;
-  achievements: string;
-  projects: string;
-  workJourney: string;
-  photosToBeAdded: string;
-}> = {
-  en: {
-    heading: "Highlights",
-    achievements: "Achievements",
-    projects: "Projects",
-    workJourney: "Work journey",
-    photosToBeAdded: "Photos to be added.",
-  },
-  vi: {
-    heading: "Điểm nhấn",
-    achievements: "Thành tựu",
-    projects: "Dự án",
-    workJourney: "Work journey",
-    photosToBeAdded: "Ảnh sẽ được thêm sau.",
-  },
-};
 
 export default function Portfolio({
   achievements,

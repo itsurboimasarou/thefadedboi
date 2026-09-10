@@ -1,34 +1,13 @@
 import Icon from "../ui/Icons";
 import { useCompact } from "@/lib/functions/useHuBarFit";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useBarMode } from "./BarMode";
+import { useLocalized } from "@/lib/i18n";
+import { dockUi as ui } from "@/lib/ui-strings";
 import { createSetting } from "@/lib/setting";
 
 export type Dock = "top" | "bottom" | "left" | "right";
 
 const DOCKS: Dock[] = ["top", "bottom", "left", "right"];
-
-const ui: Localized<{
-  position: string;
-  top: string;
-  bottom: string;
-  left: string;
-  right: string;
-}> = {
-  en: {
-    position: "HuBar position",
-    top: "Top",
-    bottom: "Bottom",
-    left: "Left",
-    right: "Right",
-  },
-  vi: {
-    position: "Vị trí HuBar",
-    top: "Trên",
-    bottom: "Dưới",
-    left: "Trái",
-    right: "Phải",
-  },
-};
 
 const dockSetting = createSetting<Dock>({
   key: "hubar-dock",
@@ -52,7 +31,10 @@ export default function DockControl() {
   const t = useLocalized(ui);
   const dock = useDock();
   const compact = useCompact();
-  const visible = compact ? DOCKS.filter((d) => d !== "left" && d !== "right") : DOCKS;
+  const split = useBarMode() === "split";
+  const visible = DOCKS.filter(
+    (d) => !(compact && (d === "left" || d === "right")) && !(split && d === "top")
+  );
   const labels: Record<Dock, string> = {
     top: t.top,
     bottom: t.bottom,

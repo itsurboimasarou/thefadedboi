@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { logoUi as ui } from "@/lib/ui-strings";
 import { createSetting } from "@/lib/setting";
 
 const EVT = "logo-change";
 const KEY = "logo-custom";
-
-const ui: Localized<{ logo: string; default: string; noLogos: string }> = {
-  en: { logo: "Logo", default: "Default", noLogos: "No logo presented." },
-  vi: { logo: "Logo", default: "Mặc định", noLogos: "Chưa có logo nào." },
-};
 
 const logoSetting = createSetting<string | null>({
   key: KEY,

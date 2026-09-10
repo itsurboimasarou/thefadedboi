@@ -21,15 +21,35 @@ function edges(el: HTMLElement): [number, number] | null {
   return [centre - w / 2, centre + w / 2];
 }
 
+function clipper(el: HTMLElement): DOMRect | null {
+  for (let e = el.parentElement; e; e = e.parentElement) {
+    const o = getComputedStyle(e);
+    if (o.overflowX !== "visible" || o.overflowY !== "visible") return e.getBoundingClientRect();
+  }
+  return null;
+}
+
 function fit(el: HTMLElement) {
   el.style.removeProperty("--tip-shift");
+  el.removeAttribute("data-tip-flip");
   const box = edges(el);
   if (!box) return;
   const [left, right] = box;
-  const shift = right > window.innerWidth - MARGIN
-    ? window.innerWidth - MARGIN - right
-    : left < MARGIN ? MARGIN - left : 0;
+
+  const clip = clipper(el);
+  const lo = Math.max(MARGIN, (clip?.left ?? 0) + MARGIN);
+  const hi = Math.min(window.innerWidth - MARGIN, (clip?.right ?? window.innerWidth) - MARGIN);
+
+  const shift = right > hi ? hi - right : left < lo ? lo - left : 0;
   if (shift) el.style.setProperty("--tip-shift", `${Math.round(shift)}px`);
+
+  if (clip) {
+    const host = el.getBoundingClientRect();
+    const tip = el.querySelector<HTMLElement>(":scope > .tip--up");
+    const opensUp = !!tip || el.getAttribute("data-tip-pos") === "up";
+    const needed = (tip?.getBoundingClientRect().height ?? 28) + 10;
+    if (opensUp && host.top - needed < clip.top + MARGIN) el.setAttribute("data-tip-flip", "down");
+  }
 }
 
 export default function useTipFit() {

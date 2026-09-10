@@ -72,6 +72,14 @@ html:where(.compact) {
 }
 
 :where(html.compact) .hubar-group--end { display: none; }
+:where(html.compact) { --topbar-h: 52px; }
+:where(html.compact) .topbar { padding: 6px 12px; }
+:where(html.compact) .topbar .logo-corner { width: 36px; height: 36px; }
+:where(html.compact) .topbar-actions { gap: 6px; }
+html.compact { --topbar-h: 52px; }
+:where(html.compact) .topbar { padding: 6px 12px; }
+:where(html.compact) .topbar .logo-corner { width: 36px; height: 36px; }
+:where(html.compact) .topbar-actions { gap: 6px; }
 :where(html.compact) .hubar--top,
 :where(html.compact) .hubar--bottom {
   justify-content: center;
@@ -130,6 +138,11 @@ html:where(.compact) {
 /* Status specifically sits beside the "At a glance" title instead of
    its own grid row — an inline flex item there, not a block row. */
 :where(html.compact) .panel-head .glance-row--mobile-only { display: flex; align-items: center; }
+
+/* The panel carries a clock on a phone because the HuBar hides its end group
+   there. The two-bar layout keeps one in the header, so this would be the
+   same reading twice over. */
+html.compact[data-bar-mode="split"] .panel-head .glance-row--mobile-only { display: none; }
 
 :where(html.compact) .panel-swipe-hint { display: block; }
 
@@ -193,10 +206,8 @@ html:where(.compact) {
 
   html,
   html.glass-fx--all {
-    --surface-blur: none;
     --surface-bg: var(--glass);
     --panel-blur: none;
-    --panel-bg: var(--glass);
   }
 
   .panel-views,
@@ -216,10 +227,12 @@ html:where(.compact) {
 
 :where(html.narrow) .app-root:has(.hubar--bottom) .control-panel.control-panel {
   bottom: calc(16px + var(--hubar-h, 68px) + 52px);
+  --panel-max-h: calc(100dvh - var(--hubar-h, 68px) - 84px);
 }
 :where(html.narrow) .app-root:has(.hubar--top) .control-panel.control-panel {
   top: calc(16px + var(--hubar-h, 68px) + 52px);
   bottom: auto;
+  --panel-max-h: calc(100dvh - var(--hubar-h, 68px) - 84px);
   transform: translateY(-24px) scale(0.98);
   transform-origin: top center;
 }
@@ -470,7 +483,8 @@ html:where(.compact) {
 
 :where(html:not(.narrow)) .control-panel {
   width: min(500px, calc(100vw - 32px));
-  padding: 18px 20px;
+  --panel-pad-x: 20px;
+  padding: 18px var(--panel-pad-x);
 }
 :where(html:not(.narrow)) .panel-title {
   font-size: 1.15rem;
@@ -487,6 +501,9 @@ html:where(.compact) {
   right: auto;
   margin-inline: 0;
   bottom: auto;
+  /* Centred, with the bar beside it rather than above or below, so the only
+     thing to clear is a margin at each end. */
+  --panel-max-h: calc(100dvh - 32px);
   top: 50%;
   transform: translate(-16px, -50%);
 }
@@ -499,6 +516,7 @@ html:where(.compact) {
   left: auto;
   margin-inline: 0;
   bottom: auto;
+  --panel-max-h: calc(100dvh - 32px);
   top: 50%;
   transform: translate(16px, -50%);
 }
@@ -572,3 +590,11 @@ html.lite-mode .status-dot::after { animation: none; opacity: 0; }
 html.lite-mode .control-panel { transition: none; }
 html.lite-mode .gallery-pillbar,
 html.lite-mode .gallery-pillbar--hidden { transition: none; }
+
+/* Lite mode / reduced motion: no sky at all. ShootingStars already stops
+   spawning, this just makes sure nothing is mid-flight when it does. */
+html.lite-mode .sky { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sky { display: none; }
+}

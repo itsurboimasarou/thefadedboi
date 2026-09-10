@@ -2,19 +2,24 @@
    Design tokens: theme variables for dark & light mode.
    Load FIRST — everything else consumes these variables. */
 
+:root {
+  --chrome-blur: none;
+  --chrome-bg: color-mix(in srgb, var(--bg) 85%, transparent);
+  --surface-tint: 50%;
+  --tint: var(--surface-tint);
+  --topbar-h: 64px;
+}
+
 /* ── Overall theming ────────────────── */
 :root,
 :root[data-theme="dark"] {
-  /* HuBar's chrome surface is expressed as a custom property rather than a
-     competing rule. Only ONE backdrop-filter declaration exists for this
-     element in the whole stylesheet, so nothing can override it — the mode
-     classes just change these values. */
-  --chrome-blur: none;
-  --chrome-bg: color-mix(in srgb, var(--bg) 92%, transparent);
   /* Dark is pitch black by default */
   --bg: #000000;
+  --bg-tint: 30%;
   --ink: #eaf4fb;
   --ink-dim: #8fa6bf;
+  --ink-solid: #eaf4fb;
+  --ink-dim-solid: #8fa6bf;
   --accent: var(--accent-custom, #6fd6b4);
   --accent-soft: var(--accent-soft-custom, #a8ecd6);
   --accent-contrast: var(--accent-contrast-custom, #06291f);
@@ -29,10 +34,13 @@
 }
 
 :root[data-theme="light"] {
-  --chrome-bg: color-mix(in srgb, var(--bg) 92%, transparent);
+  --tint: min(100%, calc(var(--surface-tint) + 10%));
   --bg: #ffffff;
+  --bg-tint: 12%;
   --ink: #0d2137;
   --ink-dim: #4f6883;
+  --ink-solid: #0d2137;
+  --ink-dim-solid: #4f6883;
   --accent: var(--accent-custom, #14966f);
   --accent-soft: var(--accent-soft-custom, #6fd6b4);
   --accent-contrast: var(--accent-contrast-custom, #ffffff);
@@ -42,6 +50,10 @@
   --shadow: 0 4px 14px rgba(30, 60, 100, 0.10);
   --hubar-solid: #ffffff;
   color-scheme: light;
+}
+
+:root {
+  --bg-plain: color-mix(in oklch, var(--accent) var(--bg-tint), var(--bg));
 }
 
 :root[data-theme="light"]:not(.glass-fx--all) .glass,
@@ -85,7 +97,7 @@ html[data-theme="light"] {
 }
 
 body {
-  background: var(--bg);
+  background: var(--bg-plain);
   color: var(--ink);
   font-size: 16px;
   line-height: 1.65;
@@ -107,28 +119,18 @@ body {
    it wins when both are on. */
 html.glass-fx {
   --chrome-blur: blur(16px) saturate(1.3);
-  --chrome-bg: color-mix(in srgb, var(--bg) 58%, transparent);
+  --chrome-bg: color-mix(in srgb, var(--bg) var(--tint), transparent);
 }
 
-/* The "all elements" level. Lighter than the chrome's blur on purpose:
-   this lands on many large boxes at once, where 16px is both heavy to
-   composite and strong enough to muddy what is behind them. */
+
 html.glass-fx--all {
-  --surface-blur: blur(13px) saturate(1.2);
-  --surface-bg: color-mix(in srgb, var(--bg) 45%, transparent);
-  --panel-blur: var(--surface-blur);
-  --panel-bg: var(--surface-bg);
+  --surface-bg: color-mix(in srgb, var(--bg) var(--tint), transparent);
+  /* Panels only -- see the note beside the rule that reads this. */
+  --panel-blur: blur(14px) saturate(1.2);
 }
 
-/* Lighter again in light mode: blurring toward white loses contrast faster
-   than blurring toward black, so the same radius reads heavier there.
-   :where keeps this at the same specificity as the rules around it, so the
-   block's "later declaration wins" ordering still holds and lite mode --
-   declared below -- still overrides it. */
 html.glass-fx--all:where([data-theme="light"]) {
-  --surface-blur: blur(9px) saturate(1.15);
-  --panel-blur: blur(6px) saturate(1.1);
-  --panel-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+  --panel-blur: blur(10px) saturate(1.15);
 }
 
 /* Lite mode (and reduced motion) force opaque chrome: a live blur repaints
@@ -136,8 +138,6 @@ html.glass-fx--all:where([data-theme="light"]) {
 html.lite-mode {
   --chrome-blur: none;
   --chrome-bg: var(--hubar-solid);
-  --surface-blur: none;
   --surface-bg: var(--glass);
   --panel-blur: none;
-  --panel-bg: var(--glass);
 }

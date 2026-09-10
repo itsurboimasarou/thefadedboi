@@ -12,8 +12,6 @@
 html {
   --sb-size: 10px;
   --sb-pad: 2px;
-  /* Faint enough at rest to read as an edge rather than a control, and
-     clearly there the moment the pointer is over what it scrolls. */
   --sb-thumb: color-mix(in srgb, var(--ink) 14%, transparent);
   --sb-thumb-live: color-mix(in srgb, var(--ink) 38%, transparent);
   --sb-thumb-hover: color-mix(in srgb, var(--accent) 70%, var(--ink));
@@ -22,20 +20,20 @@ html {
   scrollbar-color: var(--sb-thumb) transparent;
 }
 
-/* CSS cannot ask "is this element scrollable", so the scrollers are named.
-   Hovering any of them brings its own bar up from faint to legible. */
 html:hover,
 .logo-grid:hover,
 .motion-strip:hover,
 .set-menu:hover,
-.year-menu:hover {
+.year-menu:hover,
+.panel-views:hover {
   scrollbar-color: var(--sb-thumb-live) transparent;
 }
 
 .logo-grid:hover::-webkit-scrollbar-thumb,
 .motion-strip:hover::-webkit-scrollbar-thumb,
 .set-menu:hover::-webkit-scrollbar-thumb,
-.year-menu:hover::-webkit-scrollbar-thumb {
+.year-menu:hover::-webkit-scrollbar-thumb,
+.panel-views:hover::-webkit-scrollbar-thumb {
   background: var(--sb-thumb-live);
   background-clip: padding-box;
 }

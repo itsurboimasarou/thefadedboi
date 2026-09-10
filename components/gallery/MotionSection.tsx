@@ -6,33 +6,8 @@ import type { GalleryVideo } from "@/lib/types";
 import type { AlbumChip } from "./AlbumPillBar";
 import useHorizontalScroller from "@/lib/functions/useHorizontalScroller";
 import Icon from "../ui/Icons";
-import { useLocalized, type Localized } from "@/lib/i18n";
-
-const ui: Localized<{
-  list: string;
-  albums: string;
-  pick: (n: string) => string;
-  empty: string;
-  earlier: string;
-  later: string;
-}> = {
-  en: {
-    list: "Videos",
-    albums: "Albums",
-    pick: (n) => `Play ${n}`,
-    empty: "Videos to be added.",
-    earlier: "Scroll left",
-    later: "Scroll right",
-  },
-  vi: {
-    list: "Video",
-    albums: "Album",
-    pick: (n) => `Phát ${n}`,
-    empty: "Video sẽ được thêm sau.",
-    earlier: "Cuộn sang trái",
-    later: "Cuộn sang phải",
-  },
-};
+import { useLocalized } from "@/lib/i18n";
+import { motionUi as ui } from "@/lib/ui-strings";
 
 export default function MotionSection({
   videos,

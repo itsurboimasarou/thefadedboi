@@ -174,7 +174,7 @@
   background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
-/* ── All-elements glass ───────────────────────────────── */
+/* ── All-elements glass ─────────────────────────────────*/
 html.glass-fx--all :is(
   .glass,
   .gear-card,
@@ -183,23 +183,21 @@ html.glass-fx--all :is(
   .motion-box,
   .gallery-pillbar
 ) {
-  backdrop-filter: var(--surface-blur);
   background: var(--surface-bg);
 }
 
-/* Both sliding panels -- the control panel and the music player share the
-   class -- on their own pair, so light mode can trade blur for opacity
-   without touching the page's boxes. */
 html.glass-fx--all .control-panel {
+  background: var(--surface-bg);
+}
+
+html.glass-fx--all .control-panel--open,
+html.glass-fx--all .control-panel--dragging {
   backdrop-filter: var(--panel-blur);
-  background: var(--panel-bg);
 }
 
 /* ── Glass panels ───────────────────────────────────── */
 .glass {
   background: color-mix(in srgb, var(--ink) 6%, var(--bg));
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: clamp(20px, 3vw, 32px);
@@ -234,10 +232,7 @@ html.glass-fx--all .control-panel {
   gap: 8px;
   padding: 12px 22px;
   border-radius: 14px;
-  /* Transparent rather than none, so a solid button is exactly the same
-     box as a --ghost one and the two line up when stacked. The gradient
-     paints through it, so there is nothing to see. */
-  border: 1px solid transparent;
+  background-origin: border-box;
   cursor: pointer;
   font-family: var(--font-display, system-ui, sans-serif);
   font-weight: 600;
@@ -311,11 +306,15 @@ html.glass-fx--all .control-panel {
   grid-template-columns: 1fr 1fr;
 }
 
-/* Status clock + language rows only show inside the panel on mobile — on
-   desktop they live in HuBar's own end-group instead. Shown via the
-   compact media query in modes.css (loaded after this, so it wins). */
 .glance-row--mobile-only {
   display: none;
+}
+
+.glance-row--backdrop {
+  grid-column: 1 / -1;
+}
+.glance-row--backdrop dd {
+  padding-left: 0;
 }
 
 .dock-control,
@@ -828,7 +827,7 @@ html.glass-fx--all .control-panel {
   bottom: calc(100% + 8px);
   left: 50%;
   translate: -50% 0;
-  width: 220px;
+  width: 264px;
   max-width: calc(100vw - 32px);
   padding: 8px 12px;
   border-radius: 10px;
@@ -836,6 +835,10 @@ html.glass-fx--all .control-panel {
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
   font-size: 0.78rem;
+  /* These tips sit inside a <dt> in the glance grid and an <h3> in the theme
+     menu, so they were inheriting 400 in one place and 700 in the other.
+     They are sentences, not labels: pin them to the body weight. */
+  font-weight: 400;
   line-height: 1.45;
   color: var(--ink);
   text-transform: none;
@@ -874,6 +877,68 @@ html.glass-fx--all .control-panel {
 
 .glance-grid .info-tip { position: static; }
 .glance-grid > div { position: relative; }
+
+/* The backdrop row is the first thing in the grid, so whether a bubble above
+   it has room depends on where the panel is -- which is the HuBar's doing. A
+   top-docked bar puts the panel at the top of the window, and narrow mode
+   puts it high whichever side the bar is on; in those two the bubble opens
+   downward, into the panel, where there is always room. Docked bottom, left
+   or right on a full-height window the panel sits low enough that the normal
+   upward bubble still clears the top of the screen, so it keeps it.
+
+   Anchored to the icon rather than to the row, unlike the rest of the grid.
+   These rows run the full width of the panel, so the grid's right-edge
+   alignment left the bubble floating a long way from what it explains. */
+/* Narrow is excluded from the anchoring, not from the flipping. There the
+   panel is barely wider than the bubble, so the grid stretches it edge to
+   edge -- and edge to edge means measured against the row, with a width of
+   auto. Anchoring it to the icon there left it with nothing to size against
+   and it collapsed into a column a thousand pixels tall. */
+:where(html:not(.narrow)) .glance-row--backdrop .info-tip { position: relative; }
+
+:where(html:not(.narrow)) .glance-row--backdrop .info-tip-bubble {
+  left: 0;
+  right: auto;
+}
+
+.glance-row--backdrop .info-tip-bubble {
+  translate: 0 4px;
+}
+
+.app-root:has(.hubar--top) .glance-row--backdrop .info-tip-bubble,
+:where(html.narrow) .glance-row--backdrop .info-tip-bubble {
+  top: calc(100% + 8px);
+  bottom: auto;
+  translate: 0 -4px;
+}
+
+.glance-row--backdrop .info-tip:hover .info-tip-bubble,
+.glance-row--backdrop .info-tip:focus-visible .info-tip-bubble {
+  translate: 0 0;
+}
+
+:where(html:not(.narrow)) .glance-row--backdrop .info-tip { position: relative; }
+
+:where(html:not(.narrow)) .glance-row--backdrop .info-tip-bubble {
+  left: 0;
+  right: auto;
+}
+
+.glance-row--backdrop .info-tip-bubble {
+  translate: 0 4px;
+}
+
+.app-root:has(.hubar--top) .glance-row--backdrop .info-tip-bubble,
+:where(html.narrow) .glance-row--backdrop .info-tip-bubble {
+  top: calc(100% + 8px);
+  bottom: auto;
+  translate: 0 -4px;
+}
+
+.glance-row--backdrop .info-tip:hover .info-tip-bubble,
+.glance-row--backdrop .info-tip:focus-visible .info-tip-bubble {
+  translate: 0 0;
+}
 
 .glance-grid .info-tip:hover .info-tip-bubble,
 .glance-grid .info-tip:focus-visible .info-tip-bubble {
@@ -926,7 +991,7 @@ html.glass-fx--all .control-panel {
 }
 
 @supports (-moz-appearance: none) and (not (text-box-trim: trim-both)) {
-  :is(.hubar--top, .hubar--bottom, .glance-row--mobile-only) .status-clock > * {
+  :is(.hubar--top, .hubar--bottom, .glance-row--mobile-only, .topbar) .status-clock > * {
     translate: 0 -0.14em;
   }
 }
@@ -955,13 +1020,19 @@ html.glass-fx--all .control-panel {
   opacity: 1;
 }
 
-.glance-row--mobile-only .status-clock-crossfade {
+/* Label and time side by side rather than one crossfading into the other on
+   hover. The panel uses it on a phone, and so does the two-bar header there:
+   it is the only clock on screen once the panel drops its own, and there is
+   no hover on a phone to reveal the half that is hidden. */
+.glance-row--mobile-only .status-clock-crossfade,
+:where(html.compact) .topbar .status-clock-crossfade {
   display: flex;
   flex-direction: row-reverse;
   align-items: baseline;
   gap: 6px;
 }
-.glance-row--mobile-only .status-clock-label {
+.glance-row--mobile-only .status-clock-label,
+:where(html.compact) .topbar .status-clock-label {
   opacity: 1;
 }
 
@@ -1145,7 +1216,29 @@ html.glass-fx--all .control-panel {
 
 .panel-views {
   position: relative;
+  min-height: 0;
   transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.panel-views[data-capped] {
+  --pv-bleed: 4px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  margin-left: calc(var(--pv-bleed) * -1);
+  margin-block: calc(var(--pv-bleed) * -1);
+  margin-right: calc(var(--panel-pad-x, 16px) * -1);
+  scrollbar-width: thin;
+}
+
+.panel-views[data-capped] .panel-view-slide {
+  padding-left: var(--pv-bleed);
+  padding-block: var(--pv-bleed);
+  padding-right: var(--panel-pad-x, 16px);
+}
+
+.control-panel:has(.panel-views[data-capped]) .panel-head {
+  padding-right: var(--sb-size, 10px);
 }
 .panel-views--sliding {
   overflow: hidden;
@@ -1200,7 +1293,7 @@ html.glass-fx--all .control-panel {
 
 .theme-menu-options {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
 }
 
@@ -1235,6 +1328,95 @@ html.glass-fx--all .control-panel {
 }
 .theme-menu-heading .icn { color: var(--accent); opacity: 0.9; }
 
+/* ── Gradient background controls ───────────────────── */
+
+.grad-preview {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  height: 56px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: var(--bg-plain);
+  transition: background 0.25s ease;
+}
+
+html.accent-bg .grad-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.75' intercept='0.125'/%3E%3CfeFuncG type='linear' slope='0.75' intercept='0.125'/%3E%3CfeFuncB type='linear' slope='0.75' intercept='0.125'/%3E%3CfeFuncA type='linear' slope='0' intercept='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  mix-blend-mode: overlay;
+  opacity: var(--grad-grain, 0.6);
+}
+
+html.accent-bg .grad-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.75' intercept='0.125'/%3E%3CfeFuncG type='linear' slope='0.75' intercept='0.125'/%3E%3CfeFuncB type='linear' slope='0.75' intercept='0.125'/%3E%3CfeFuncA type='linear' slope='0' intercept='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  mix-blend-mode: overlay;
+  opacity: var(--grad-grain, 0.4);
+}
+
+html.accent-bg[data-accent-bg-style="linear"] .grad-preview {
+  background: var(--grad-ramp);
+}
+
+html.accent-bg:not([data-accent-bg-style="linear"]) .grad-preview {
+  background:
+    radial-gradient(60% 120% at 12% 15%, var(--wash-soft) 0%, transparent 70%),
+    radial-gradient(70% 130% at 88% 85%, var(--wash-deep) 0%, transparent 72%),
+    radial-gradient(45% 90% at 95% 5%, var(--wash-warm) 0%, transparent 70%),
+    var(--wash-base);
+}
+
+.theme-menu-options--stacked {
+  margin-top: 14px;
+}
+
+.grad-slider {
+  margin-top: 14px;
+}
+
+.grad-slider-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.grad-slider-value {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: normal;
+}
+
+.grad-slider-input {
+  display: block;
+  width: 100%;
+  height: 4px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.grad-slider-input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.grad-slider-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
 .set-select-wrap {
   position: relative;
 }
@@ -1256,8 +1438,20 @@ html.glass-fx--all .control-panel {
   transition: border-color 0.2s;
 }
 .set-select-btn:hover { border-color: var(--accent); }
-.set-select-btn svg { flex-shrink: 0; color: var(--ink-dim); transition: rotate 0.2s; }
-.set-select-btn[aria-expanded="true"] svg { rotate: 180deg; }
+.set-select-btn > .icn svg { color: var(--ink-dim); transition: rotate 0.2s; }
+
+.set-select-current {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.set-select-current .icn { color: var(--accent); }
+
+.set-select-btn[aria-expanded="true"] > .icn svg { rotate: 180deg; }
 .set-select-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -1299,6 +1493,13 @@ html.glass-fx--all .control-panel {
 .set-option:hover { background: var(--glass-strong); }
 .set-option--on { background: var(--accent); color: var(--accent-contrast); }
 .set-option--on:hover { background: var(--accent); color: var(--accent-contrast); }
+.set-option .icn { color: var(--accent); flex-shrink: 0; }
+.set-option--on .icn { color: inherit; }
+.set-option:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.set-option:disabled:hover { background: none; }
 
 .accent-grid {
   display: flex;
@@ -1317,6 +1518,7 @@ html.glass-fx--all .control-panel {
   transition: transform 0.15s;
 }
 .accent-swatch:hover { transform: scale(1.08); }
+.accent-swatch--on:hover { transform: none; }
 .accent-swatch--on {
   box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--ink);
 }
@@ -1384,6 +1586,12 @@ html.glass-fx--all .control-panel {
   [data-tip]::after { display: none !important; }
 }
 
+[data-tip-flip="down"] > .tip--up,
+[data-tip][data-tip-pos="up"][data-tip-flip="down"]::after {
+  top: calc(100% + 10px);
+  bottom: auto;
+}
+
 .tip--up {
   bottom: calc(100% + 10px);
   left: 50%;
@@ -1425,10 +1633,6 @@ html.glass-fx--all .control-panel {
   );
   gap: var(--logo-gap);
   max-height: calc(var(--logo-rows) * (var(--logo-cell) + var(--logo-gap)) - var(--logo-gap));
-  /* scroll, not auto: the HuBar fit probe momentarily relayouts the panel,
-     and with auto the bar would drop out and come back each time it ran.
-     Always-on keeps it still, and reserves the gutter so the columns are
-     not resized by it appearing either. */
   overflow-y: scroll;
   overscroll-behavior: contain;
 }

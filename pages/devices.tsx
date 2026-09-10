@@ -2,21 +2,9 @@ import type { InferGetStaticPropsType } from "next";
 import { getDevices, deviceImage, getChangelog } from "@/lib/assets";
 import Icon, { specIconFor } from "@/components/ui/Icons";
 import type { DeviceItem } from "@/lib/types";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { devicesPageUi as ui } from "@/lib/ui-strings";
 import { useLang } from "@/components/controls/LangSwitch";
-
-const ui: Localized<{ eyebrow: string; heading: string; description: string }> = {
-  en: {
-    eyebrow: "Devices & Equipment",
-    heading: "Techy stuffs",
-    description: "The hardware behind the work — phones, laptop, and the gears around them.",
-  },
-  vi: {
-    eyebrow: "Thiết bị & Dụng cụ",
-    heading: "Mấy món đồ công nghệ",
-    description: "Phần cứng đằng sau mọi thứ mình làm — điện thoại, laptop, và các món đồ xung quanh nó.",
-  },
-};
 
 const chevron = (
   <svg className="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">

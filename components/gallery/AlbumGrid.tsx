@@ -4,49 +4,10 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import type { GalleryImage } from "@/lib/types";
 import Icon from "../ui/Icons";
-import { useLocalized, type Localized } from "@/lib/i18n";
+import { useLocalized } from "@/lib/i18n";
+import { albumGridUi as ui } from "@/lib/ui-strings";
 import useImageZoom from "@/lib/functions/useImageZoom";
 import usePhotoSwipe from "@/lib/functions/usePhotoSwipe";
-
-const ui: Localized<{
-  photoViewer: (title: string) => string;
-  fullSizeAlt: (title: string, n: number) => string;
-  close: string;
-  previousPhoto: string;
-  nextPhoto: string;
-  viewPhotoAria: (n: number, title: string) => string;
-  photoAlt: (title: string, n: number) => string;
-  download: string;
-  downloadBlocked: string;
-  dismiss: string;
-}> = {
-  en: {
-    photoViewer: (title) => `${title} photo viewer`,
-    fullSizeAlt: (title, n) => `${title} — photo ${n} full size`,
-    close: "Close",
-    previousPhoto: "Previous photo",
-    nextPhoto: "Next photo",
-    viewPhotoAria: (n, title) => `View photo ${n} of ${title} full size`,
-    photoAlt: (title, n) => `${title} — photo ${n}`,
-    download: "Download photo",
-    downloadBlocked:
-      "Download blocked — this looks like an ad blocker. This page doesn't run ads or collect data; try allowing it and downloading again.",
-    dismiss: "Dismiss",
-  },
-  vi: {
-    photoViewer: (title) => `Trình xem ảnh ${title}`,
-    fullSizeAlt: (title, n) => `${title} — ảnh ${n} kích thước đầy đủ`,
-    close: "Đóng",
-    previousPhoto: "Ảnh trước",
-    nextPhoto: "Ảnh sau",
-    viewPhotoAria: (n, title) => `Xem ảnh ${n} của ${title} kích thước đầy đủ`,
-    photoAlt: (title, n) => `${title} — ảnh ${n}`,
-    download: "Tải ảnh xuống",
-    downloadBlocked:
-      "Tải ảnh bị chặn — có vẻ do trình chặn quảng cáo. Trang này không chạy quảng cáo hay thu thập dữ liệu, hãy thử cho phép rồi tải lại.",
-    dismiss: "Đóng",
-  },
-};
 
 const FIT_SIZES = "(min-width: 1522px) 1400px, 92vw";
 const ZOOM_SIZES = "3840px";
