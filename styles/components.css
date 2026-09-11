@@ -422,6 +422,9 @@ html.glass-fx--all .control-panel--dragging {
 .important-notice {
   max-width: 580px;
   width: 100%;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .important-notice-head {

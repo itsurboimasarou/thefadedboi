@@ -6,11 +6,19 @@ import { noticeUi as ui } from "@/lib/ui-strings";
 
 const KEY = "important-notice-seen";
 
+function isLinuxDesktop() {
+  const ua = navigator.userAgent;
+  const platform = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform ?? "";
+  return (platform === "Linux" || /Linux/i.test(ua)) && !/Android|CrOS/i.test(ua);
+}
+
 export default function ImportantNotice() {
   const t = useLocalized(ui);
   const [show, setShow] = useState(false);
+  const [linux, setLinux] = useState(false);
 
   useEffect(() => {
+    setLinux(isLinuxDesktop());
     try {
       const osReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (!localStorage.getItem(KEY) && !osReduced) setShow(true);
@@ -64,6 +72,13 @@ export default function ImportantNotice() {
           <h3 className="notice-section-heading">{t.blockerHeading}</h3>
           <p>{t.blockerBody}</p>
         </section>
+
+        {linux && (
+          <section className="notice-section">
+            <h3 className="notice-section-heading">{t.videoHeading}</h3>
+            <p>{t.videoBody}</p>
+          </section>
+        )}
 
         <p className="notice-footnote">{t.once}</p>
       </div>

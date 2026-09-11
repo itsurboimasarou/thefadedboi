@@ -188,6 +188,8 @@ export const noticeUi: Localized<{
   useLite: string;
   blockerHeading: string;
   blockerBody: string;
+  videoHeading: string;
+  videoBody: string;
   once: string;
 }> = {
   en: {
@@ -200,6 +202,9 @@ export const noticeUi: Localized<{
     blockerHeading: "Ad blockers",
     blockerBody:
       "If you use an ad blocker, allowing this site is recommended. Nothing here is an ad and nothing is tracked, but blockers might stop photo downloads and the home backdrop from loading properly.",
+    videoHeading: "Videos on Linux",
+    videoBody:
+      "Videos on this site are encoded in H.265 (HEVC). On Linux, Chrome and other Chromium-based browsers can only play it through hardware decoding, so without a VA-API driver that supports HEVC the videos and their thumbnails show up black. Install a VA-API driver with HEVC support for your graphics card and turn on hardware video decoding in your browser. Firefox can usually play them through the system FFmpeg.",
     once: "This is a one time message, and your choice can be changed later.",
   },
   vi: {
@@ -212,6 +217,9 @@ export const noticeUi: Localized<{
     blockerHeading: "Trình chặn quảng cáo",
     blockerBody:
       "Nếu bạn dùng trình chặn quảng cáo, nên cho phép trang này. Ở đây không có quảng cáo và không thu thập dữ liệu, nhưng các trình chặn có thể vô tình làm hỏng việc tải ảnh xuống và ảnh/video nền ở trang chủ.",
+    videoHeading: "Video trên Linux",
+    videoBody:
+      "Video trên trang này được mã hoá bằng H.265 (HEVC). Trên Linux, Chrome và các trình duyệt nhân Chromium chỉ phát được định dạng này qua giải mã phần cứng, nên nếu thiếu driver VA-API hỗ trợ HEVC thì video và ảnh thu nhỏ sẽ bị đen. Hãy cài driver VA-API có hỗ trợ HEVC cho card đồ hoạ của bạn và bật giải mã video bằng phần cứng trong trình duyệt. Firefox thường vẫn phát được nhờ FFmpeg của hệ thống.",
     once: "Đây là thông báo một lần, và bạn có thể thay đổi lựa chọn sau đó.",
   },
 };
