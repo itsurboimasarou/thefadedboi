@@ -22,13 +22,13 @@ export default function HuBarTrigger({
       aria-expanded={open}
       aria-controls="control-panel"
       aria-label={label}
+      data-tip={label}
     >
       {icon === "chevron" ? (
         <Icon name="chevronDown" size={22} />
       ) : (
         <span className="logo-mark" role="img" aria-label={siteName} />
       )}
-      <span className="tip">{label}</span>
     </button>
   );
 }

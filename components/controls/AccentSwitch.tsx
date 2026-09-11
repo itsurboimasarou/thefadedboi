@@ -125,10 +125,10 @@ export default function AccentSwitch() {
             style={{ background: `linear-gradient(135deg, ${v.accent}, color-mix(in srgb, ${v.accent} 65%, ${mix}))` }}
             aria-pressed={active === a.key}
             aria-label={a.label}
+            data-tip={a.label}
+            data-tip-pos="up"
             onClick={() => setAccent(a.key)}
-          >
-            <span className="tip--up" aria-hidden="true">{a.label}</span>
-          </button>
+          />
         );
       })}
       <button
@@ -136,10 +136,11 @@ export default function AccentSwitch() {
         className="accent-swatch accent-swatch--reset"
         disabled={active === set.defaultKey}
         aria-label="Reset to default"
+        data-tip="Reset to default"
+        data-tip-pos="up"
         onClick={() => setAccent(set.defaultKey)}
       >
         <Icon name="circleArrow" size={16} />
-        <span className="tip--up" aria-hidden="true">Reset to default</span>
       </button>
     </div>
   );

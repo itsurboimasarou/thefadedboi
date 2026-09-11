@@ -18,7 +18,7 @@ import { useBarMode } from "@/components/controls/BarMode";
 import { siteName, siteHandle, siteFooter, siteGithub, siteUrl, siteBanner, siteDescription } from "@/lib/configs/site.config";
 import ImportantNotice from "@/components/controls/ImportantNotice";
 import PageLoader from "@/components/layout/PageLoader";
-import useTipFit from "@/lib/functions/useTipFit";
+import useTips from "@/lib/functions/useTips";
 import ControlPanel from "@/components/layout/ControlPanel";
 import ShootingStars from "@/components/layout/ShootingStars";
 import { LangProvider } from "@/components/controls/LangSwitch";
@@ -40,7 +40,7 @@ export default function App(props: AppProps) {
 }
 
 function AppShell({ Component, pageProps }: AppProps) {
-  useTipFit();
+  useTips();
   const barMode = useBarMode();
   const changelog: string = (pageProps as { changelog?: string }).changelog ?? "";
   const [footerPre, footerPost] = siteFooter.split(siteHandle);

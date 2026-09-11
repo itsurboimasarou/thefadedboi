@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import ThemeToggle, { AutoThemeToggle } from "../controls/ThemeToggle";
 import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
-import StarToggle from "../controls/StarMode";
+import StarToggle, { StarRateControl, useStars } from "../controls/StarMode";
 import GlassToggle, { GlassTintControl, useGlass } from "../controls/GlassMode";
 import AutoHideToggle from "../controls/HuBarPinned";
 import DockControl, { useDock } from "../controls/HuBarDock";
@@ -69,7 +69,7 @@ function resetAllToDefault() {
     "lang", "logo-custom", "accent-set", "hubar-shape",
     "accent-bg", "accent-bg-mix", "accent-bg-motion", "bg-backdrop", "bg-media",
     "accent-bg-style", "accent-bg-dir", "accent-bg-angle", "accent-bg-speed",
-    "accent-bg-grain", "glass-tint", "bar-mode", "stars",
+    "accent-bg-grain", "glass-tint", "bar-mode", "stars", "stars-rate",
     ...accentSets.map((s) => `accent-element-${s.key}`),
   ];
   try {
@@ -134,6 +134,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   const compact = useCompact();
   const showDock = !(split && compact);
   const glassOn = useGlass() !== "off";
+  const starsOn = useStars();
   const [sliding, setSliding] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const viewsRef = useRef<HTMLDivElement>(null);
@@ -168,9 +169,11 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
 
   useEffect(() => {
     if (!open) setThemeMenuOpen(false);
+    else if (viewsRef.current) viewsRef.current.scrollTop = 0;
   }, [open]);
 
   useIsoLayoutEffect(() => {
+    if (viewsRef.current) viewsRef.current.scrollTop = 0;
     setSliding(true);
     const t = setTimeout(() => setSliding(false), 340);
     return () => clearTimeout(t);
@@ -330,11 +333,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             <dt>
               <Icon name="image" size={15} />
               {t.backdrop}
-              <span className="info-tip" tabIndex={0} aria-label={t.aboutBackdrop}>
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutBackdrop} data-tip={t.backdropTip}>
                 <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {t.backdropTip}
-                </span>
               </span>
             </dt>
             <dd>
@@ -355,11 +355,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             <dd className="dd-row">
               <ThemeToggle />
               <AutoThemeToggle />
-              <span className="info-tip" tabIndex={0} aria-label={t.aboutAppearance}>
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutAppearance} data-tip={t.appearanceTip}>
                 <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {t.appearanceTip}
-                </span>
               </span>
             </dd>
           </div>
@@ -371,11 +368,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dt>
             <dd className="dd-row">
               <GlassToggle />
-              <span className="info-tip" tabIndex={liteOn ? -1 : 0} aria-hidden={liteOn || undefined} aria-label={t.aboutGlass}>
+              <span className="info-tip" tabIndex={liteOn ? -1 : 0} aria-hidden={liteOn || undefined} aria-label={t.aboutGlass} data-tip={t.glassTip}>
                 <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {t.glassTip}
-                </span>
               </span>
             </dd>
           </div>
@@ -387,11 +381,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dt>
             <dd className="dd-row">
               <LiteModeToggle />
-              <span className="info-tip" tabIndex={0} aria-label={t.aboutLite}>
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutLite} data-tip={t.liteTip}>
                 <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {t.liteTip}
-                </span>
               </span>
             </dd>
           </div>
@@ -403,11 +394,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dt>
             <dd className="dd-row">
               <StarToggle />
-              <span className="info-tip" tabIndex={liteOn ? -1 : 0} aria-hidden={liteOn || undefined} aria-label={starT.aboutStars}>
+              <span className="info-tip" tabIndex={liteOn ? -1 : 0} aria-hidden={liteOn || undefined} aria-label={starT.aboutStars} data-tip={starT.starsTip}>
                 <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {starT.starsTip}
-                </span>
               </span>
             </dd>
           </div>
@@ -419,11 +407,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </dt>
             <dd className="dd-row">
               <AutoHideToggle />
-              <span className="info-tip" tabIndex={0} aria-label={t.aboutAutoHide}>
+              <span className="info-tip" tabIndex={0} aria-label={t.aboutAutoHide} data-tip={t.autoHideTip}>
                 <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {t.autoHideTip}
-                </span>
               </span>
             </dd>
           </div>
@@ -432,11 +417,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             <dt>
               <Icon name="display" size={15} />
               {barT.bars}
-              <span className="info-tip" tabIndex={0} aria-label={barT.aboutBars}>
+              <span className="info-tip" tabIndex={0} aria-label={barT.aboutBars} data-tip={barT.barsTip}>
                 <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {barT.barsTip}
-                </span>
               </span>
             </dt>
             <dd className="dd-row">
@@ -479,6 +461,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         </dl>
 
         {glassOn && <GlassTintControl disabled={liteOn} />}
+        {starsOn && <StarRateControl disabled={liteOn} />}
 
         <div className="panel-quick-links">
           <div className="glance-row--mobile-only">
@@ -529,11 +512,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             <h3 className="h-with-icon theme-menu-heading">
               <Icon name="spark" size={15} />
               {t.gradientBg}
-              <span className="info-tip" tabIndex={0} aria-label={bgT.aboutBackground}>
+              <span className="info-tip" tabIndex={0} aria-label={bgT.aboutBackground} data-tip={`${bgT.backgroundTip} ${bgT.motionTip}`}>
                 <Icon name="info" size={17} />
-                <span className="info-tip-bubble" role="tooltip">
-                  {bgT.backgroundTip} {bgT.motionTip}
-                </span>
               </span>
             </h3>
             <GradientPreview />

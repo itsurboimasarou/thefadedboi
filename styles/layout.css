@@ -309,68 +309,13 @@ html.glass-fx .hubar {
   height: 22px;
 }
 
-:is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
-  position: absolute;
-  left: calc(100% + 12px);
-  top: 50%;
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: var(--bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow);
-  font-family: var(--font-body, system-ui, sans-serif);
-  font-size: 12.5px;
-  font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: normal;
-  text-transform: none;
-  color: var(--ink);
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 5;
-  translate: 0 -50%;
-  display: none;
-}
-
-.hubar--right :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
-  left: auto;
-  right: calc(100% + 12px);
-  translate: 0 -50%;
-}
-
-.hubar--top :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip,
-.hubar--bottom :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
-  left: 50%;
-  top: auto;
-  translate: calc(-50% + var(--tip-shift, 0px)) 4px;
-}
-.hubar--top :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
-  top: calc(100% + 12px);
-}
-.hubar--bottom :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
-  bottom: calc(100% + 12px);
-}
-
-:is(.hubar-item, .hubar-trigger, .hubar-nowplaying):hover .tip,
-:is(.hubar-item, .hubar-trigger, .hubar-nowplaying):focus-visible .tip {
-  display: block;
-}
-.hubar--top :is(.hubar-item, .hubar-trigger, .hubar-nowplaying):hover .tip,
-.hubar--top :is(.hubar-item, .hubar-trigger, .hubar-nowplaying):focus-visible .tip,
-.hubar--bottom :is(.hubar-item, .hubar-trigger, .hubar-nowplaying):hover .tip,
-.hubar--bottom :is(.hubar-item, .hubar-trigger, .hubar-nowplaying):focus-visible .tip {
-  translate: calc(-50% + var(--tip-shift, 0px)) 0;
-}
-
 .hubar-item:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -5px;
   background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
-/* ── HuBar trigger (logo mark) ─────────────────────────
-   Same 44px cell as the other items, on desktop and mobile alike — the
-   logo mark shows in both. */
+/* ── HuBar trigger (logo mark) ───────────────────────── */
 .hubar-trigger {
   position: relative;
   width: 44px;

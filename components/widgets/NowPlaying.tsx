@@ -22,6 +22,7 @@ export default function NowPlaying() {
             ? `${nowPlaying.playing ? "Playing" : "Paused"}: ${nowPlaying.title}${subtitle ? ` by ${subtitle}` : ""} — open music player`
             : "Open music player"
         }
+        data-tip={t.openPlayer}
       >
         <span className={`hubar-nowplaying-icon${nowPlaying.playing ? " hubar-nowplaying-icon--playing" : ""}`} aria-hidden="true">
           <Icon name="music" size={18} />
@@ -32,7 +33,6 @@ export default function NowPlaying() {
             {subtitle && <Marquee className="hubar-nowplaying-subtitle">{subtitle}</Marquee>}
           </span>
         )}
-        <span className="tip">{t.openPlayer}</span>
       </button>
     </div>
   );

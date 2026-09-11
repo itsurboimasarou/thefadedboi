@@ -232,13 +232,14 @@ html.glass-fx--all .control-panel--dragging {
   gap: 8px;
   padding: 12px 22px;
   border-radius: 14px;
-  background-origin: border-box;
+  border: 1px solid transparent;
   cursor: pointer;
   font-family: var(--font-display, system-ui, sans-serif);
   font-weight: 600;
   font-size: 0.95rem;
   color: var(--accent-contrast);
   background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  background-origin: border-box;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -822,43 +823,6 @@ html.glass-fx--all .control-panel--dragging {
   color: var(--accent);
 }
 
-.info-tip-bubble {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  translate: -50% 0;
-  width: 264px;
-  max-width: calc(100vw - 32px);
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: var(--bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow);
-  font-size: 0.78rem;
-  /* These tips sit inside a <dt> in the glance grid and an <h3> in the theme
-     menu, so they were inheriting 400 in one place and 700 in the other.
-     They are sentences, not labels: pin them to the body weight. */
-  font-weight: 400;
-  line-height: 1.45;
-  color: var(--ink);
-  text-transform: none;
-  letter-spacing: normal;
-  /* never wider than the viewport allows, whatever the anchor's position */
-  max-width: calc(100vw - 32px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s, translate 0.15s;
-  translate: -50% 4px;
-  z-index: 5;
-}
-
-.info-tip:hover .info-tip-bubble,
-.info-tip:focus-visible .info-tip-bubble {
-  opacity: 1;
-  translate: -50% 0;
-  transition-delay: 0.3s;
-}
-
 .glance-grid .info-tip .icn svg circle {
   fill: currentColor;
   stroke: none;
@@ -869,81 +833,8 @@ html.glass-fx--all .control-panel--dragging {
   stroke-width: 2.2;
 }
 
-.glance-grid .info-tip-bubble {
-  left: auto;
-  right: -6px;
-  translate: 0 4px;
-}
-
 .glance-grid .info-tip { position: static; }
 .glance-grid > div { position: relative; }
-
-/* The backdrop row is the first thing in the grid, so whether a bubble above
-   it has room depends on where the panel is -- which is the HuBar's doing. A
-   top-docked bar puts the panel at the top of the window, and narrow mode
-   puts it high whichever side the bar is on; in those two the bubble opens
-   downward, into the panel, where there is always room. Docked bottom, left
-   or right on a full-height window the panel sits low enough that the normal
-   upward bubble still clears the top of the screen, so it keeps it.
-
-   Anchored to the icon rather than to the row, unlike the rest of the grid.
-   These rows run the full width of the panel, so the grid's right-edge
-   alignment left the bubble floating a long way from what it explains. */
-/* Narrow is excluded from the anchoring, not from the flipping. There the
-   panel is barely wider than the bubble, so the grid stretches it edge to
-   edge -- and edge to edge means measured against the row, with a width of
-   auto. Anchoring it to the icon there left it with nothing to size against
-   and it collapsed into a column a thousand pixels tall. */
-:where(html:not(.narrow)) .glance-row--backdrop .info-tip { position: relative; }
-
-:where(html:not(.narrow)) .glance-row--backdrop .info-tip-bubble {
-  left: 0;
-  right: auto;
-}
-
-.glance-row--backdrop .info-tip-bubble {
-  translate: 0 4px;
-}
-
-.app-root:has(.hubar--top) .glance-row--backdrop .info-tip-bubble,
-:where(html.narrow) .glance-row--backdrop .info-tip-bubble {
-  top: calc(100% + 8px);
-  bottom: auto;
-  translate: 0 -4px;
-}
-
-.glance-row--backdrop .info-tip:hover .info-tip-bubble,
-.glance-row--backdrop .info-tip:focus-visible .info-tip-bubble {
-  translate: 0 0;
-}
-
-:where(html:not(.narrow)) .glance-row--backdrop .info-tip { position: relative; }
-
-:where(html:not(.narrow)) .glance-row--backdrop .info-tip-bubble {
-  left: 0;
-  right: auto;
-}
-
-.glance-row--backdrop .info-tip-bubble {
-  translate: 0 4px;
-}
-
-.app-root:has(.hubar--top) .glance-row--backdrop .info-tip-bubble,
-:where(html.narrow) .glance-row--backdrop .info-tip-bubble {
-  top: calc(100% + 8px);
-  bottom: auto;
-  translate: 0 -4px;
-}
-
-.glance-row--backdrop .info-tip:hover .info-tip-bubble,
-.glance-row--backdrop .info-tip:focus-visible .info-tip-bubble {
-  translate: 0 0;
-}
-
-.glance-grid .info-tip:hover .info-tip-bubble,
-.glance-grid .info-tip:focus-visible .info-tip-bubble {
-  translate: 0 0;
-}
 
 /* A control switched off by another setting: dim the whole row so the label
    reads as inactive too, not just the switch. */
@@ -952,10 +843,6 @@ html.glass-fx--all .control-panel--dragging {
 
 .row--disabled .info-tip {
   pointer-events: none;
-}
-
-.row--disabled .info-tip-bubble {
-  display: none;
 }
 
 /* ── Status clock (top bar) ────────────────────────── */
@@ -1277,6 +1164,12 @@ html.glass-fx--all .control-panel--dragging {
   --pvs-delay: 0s;
 }
 
+.panel-views:not(.panel-views--sliding) :is(.panel-view-slide--behind, .panel-view-slide--theme:not(.panel-view-slide--front)) {
+  height: 0;
+  padding-block: 0;
+  overflow: hidden;
+}
+
 /* Reduced-motion override for these lives in modes.css now. */
 
 /* ── Theme menu (accent + logo, swapped in for the glance grid) ── */
@@ -1532,74 +1425,41 @@ html.accent-bg:not([data-accent-bg-style="linear"]) .grad-preview {
   position: relative;
 }
 
-[data-tip]::after,
-.tip--up {
-  position: absolute;
-  padding: 5px 10px;
-  border-radius: 8px;
+.site-tip {
+  position: fixed;
+  inset: auto;
+  top: 0;
+  left: 0;
+  margin: 0;
+  overflow: visible;
+  z-index: 2147483647;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 16px));
+  padding: 6px 10px;
+  border-radius: 9px;
   background: var(--bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
   font-family: var(--font-body, system-ui, sans-serif);
   font-size: 12.5px;
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 1.4;
   letter-spacing: normal;
   text-transform: none;
-  color: var(--ink);
-  white-space: nowrap;
+  text-align: left;
+  color: var(--ink-solid, var(--ink));
   pointer-events: none;
-  z-index: 900;
+  transition: opacity 0.12s ease;
+}
+
+.site-tip[hidden] {
   display: none;
 }
 
-[data-tip]::after {
-  content: attr(data-tip);
-  top: calc(100% + 10px);
-  left: 50%;
-  translate: calc(-50% + var(--tip-shift, 0px)) 0;
-}
-[data-tip][data-tip-pos="up"]::after {
-  top: auto;
-  bottom: calc(100% + 10px);
-}
-[data-tip][data-tip-pos="left"]::after {
-  top: 50%;
-  left: auto;
-  right: calc(100% + 10px);
-  translate: 0 -50%;
-}
-[data-tip][data-tip-pos="right"]::after {
-  top: 50%;
-  left: calc(100% + 10px);
-  translate: 0 -50%;
-}
-
-[data-tip]:hover::after,
-[data-tip]:focus-visible::after {
-  display: block;
-}
-
-/* No hover to leave on a touch screen, so the tip would just linger after a
-   tap — same call the HuBar tips already make. */
-@media (hover: none), (pointer: coarse) {
-  [data-tip]::after { display: none !important; }
-}
-
-[data-tip-flip="down"] > .tip--up,
-[data-tip][data-tip-pos="up"][data-tip-flip="down"]::after {
-  top: calc(100% + 10px);
-  bottom: auto;
-}
-
-.tip--up {
-  bottom: calc(100% + 10px);
-  left: 50%;
-  translate: calc(-50% + var(--tip-shift, 0px)) 0;
-}
-.accent-swatch:hover .tip--up,
-.accent-swatch:focus-visible .tip--up {
-  display: block;
+@starting-style {
+  .site-tip:popover-open {
+    opacity: 0;
+  }
 }
 
 .accent-swatch--reset {

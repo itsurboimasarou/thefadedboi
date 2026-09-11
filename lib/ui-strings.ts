@@ -80,18 +80,24 @@ export const starsUi: Localized<{
   aboutStars: string;
   starsTip: string;
   lockedByLite: string;
+  rate: string;
+  rates: [string, string, string, string];
 }> = {
   en: {
     stars: "Shooting stars",
     aboutStars: "About shooting stars",
-    starsTip: "Occasional streaks across the background. Off by default. A star is only created while it is flying and thrown away when it lands, so between them the effect costs nothing — and nothing at all runs while the tab is in the background. Off in Lite mode and when your system prefers reduced motion.",
+    starsTip: "Showers of streaks from the top corners of the background. Off by default. Frequency sets how often they come, from Rare to Meteor shower — the busier the sky, the more of the time the GPU spends redrawing, so Meteor shower costs the most. A star only exists while it is flying, and nothing runs while the tab is in the background or while the home page is showing its video or photo. Off in Lite mode and when your system prefers reduced motion.",
     lockedByLite: "Disabled by Lite mode",
+    rate: "Star frequency",
+    rates: ["Rare", "Occasional", "Frequent", "Meteor shower"],
   },
   vi: {
     stars: "Sao băng",
     aboutStars: "Về sao băng",
-    starsTip: "Những vệt sao thi thoảng lướt qua nền. Mặc định tắt. Mỗi ngôi sao chỉ được tạo ra khi đang bay và bị bỏ đi khi rơi hết, nên giữa các lần bay hiệu ứng không tốn gì — và không có gì chạy khi thẻ đang ở nền. Tắt trong Chế độ nhẹ và khi hệ thống của bạn ưu tiên giảm chuyển động.",
-    lockedByLite: "Bị tắt bởi Chế độ nhẹ",
+    starsTip: "Những đợt sao băng lướt xuống từ các góc trên của nền. Mặc định tắt. Tần suất chỉnh độ dày của sao, từ Hiếm đến Mưa sao băng — trời càng nhiều sao thì GPU càng phải vẽ lại nhiều, nên Mưa sao băng tốn nhất. Mỗi ngôi sao chỉ tồn tại khi đang bay, và không có gì chạy khi thẻ đang ở nền hoặc khi trang chủ đang hiển thị video hay ảnh nền. Tắt trong Chế độ nhẹ và khi hệ thống của bạn ưu tiên giảm chuyển động.",
+    lockedByLite: "Bị tắt bởi Chế độ Lite",
+    rate: "Tần suất sao băng",
+    rates: ["Hiếm", "Thỉnh thoảng", "Thường xuyên", "Mưa sao băng"],
   },
 };
 

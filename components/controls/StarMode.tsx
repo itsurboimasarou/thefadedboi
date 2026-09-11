@@ -1,3 +1,4 @@
+import SliderRow from "../ui/SliderRow";
 import { useLiteMode } from "./LiteMode";
 import { createSetting } from "@/lib/setting";
 import { useLocalized } from "@/lib/i18n";
@@ -14,6 +15,41 @@ const starsSetting = createSetting<boolean>({
 
 export const useStars = starsSetting.use;
 export const setStars = starsSetting.set;
+
+export const STAR_RATE_MAX = 3;
+export const DEFAULT_STAR_RATE = 2;
+
+const clampRate = (n: number) =>
+  Number.isFinite(n) ? Math.min(STAR_RATE_MAX, Math.max(0, Math.round(n))) : DEFAULT_STAR_RATE;
+
+const rateSetting = createSetting<number>({
+  key: "stars-rate",
+  event: "stars-rate-change",
+  fallback: DEFAULT_STAR_RATE,
+  parse: (raw) => (raw === null ? DEFAULT_STAR_RATE : clampRate(parseFloat(raw))),
+  serialize: (v) => String(clampRate(v)),
+});
+
+export const useStarRate = rateSetting.use;
+export const setStarRate = rateSetting.set;
+
+export function StarRateControl({ disabled = false }: { disabled?: boolean }) {
+  const t = useLocalized(ui);
+  const rate = useStarRate();
+  return (
+    <SliderRow
+      id="star-rate-input"
+      label={t.rate}
+      readout={t.rates[rate]}
+      value={rate}
+      min={0}
+      max={STAR_RATE_MAX}
+      step={1}
+      disabled={disabled}
+      onChange={setStarRate}
+    />
+  );
+}
 
 export default function StarToggle() {
   const t = useLocalized(ui);

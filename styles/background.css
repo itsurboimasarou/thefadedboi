@@ -248,8 +248,6 @@ html.has-bg-video[data-tint-low] .control-panel :is(
   .set-menu,
   .theme-switch,
   .tri-switch,
-  .info-tip-bubble,
-  .tip,
   .logo-option
 ) {
   --ink: var(--ink-solid);
@@ -263,10 +261,6 @@ html.has-bg-video :is(.hubar, .topbar) {
 
 html.has-bg-video.lite-mode :is(.hubar, .topbar) {
   --chrome-bg: #0a0a0a;
-}
-
-html.has-bg-video :is(.hubar-item, .hubar-trigger, .hubar-nowplaying) .tip {
-  background: var(--glass-strong);
 }
 
 /* ── Shooting stars ───────────────────────────────── */

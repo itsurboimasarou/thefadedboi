@@ -74,9 +74,9 @@ export default function HuBar() {
               className="hubar-item"
               aria-current={pathname === item.href ? "page" : undefined}
               aria-label={item.label[lang]}
+              data-tip={item.label[lang]}
             >
               <Icon name={item.icon} size={22} />
-              <span className="tip">{item.label[lang]}</span>
             </StackLink>
           ))}
           <span
