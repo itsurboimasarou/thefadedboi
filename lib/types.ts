@@ -47,7 +47,14 @@ export type ScannedVideoAlbum = GalleryAlbum & {
 
 export type GalleryImage =
   | string
-  | { full: string; thumb?: string; name?: string; device?: string };
+  | {
+      full: string;
+      thumb?: string;
+      name?: string;
+      device?: string;
+      ratio?: number;
+      heavy?: boolean;
+    };
 
 export interface GalleryVideo {
   src: string;

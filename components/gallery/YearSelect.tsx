@@ -53,6 +53,7 @@ export default function YearSelect({
         aria-expanded={open}
         aria-label={t.filterByYear}
       >
+        <Icon name="calendar" size={14} />
         {value ?? t.all}
         <Icon name="chevronDown" size={14} />
       </button>

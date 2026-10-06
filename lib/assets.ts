@@ -8,7 +8,8 @@ import type {
   TrackMeta,
 } from "./types";
 import type { Localized } from "./i18n";
-import { readCamera } from "./photoMeta";
+import { readPhotoMeta } from "./photoMeta";
+import { HEAVY_BYTES } from "./thumbs";
 import { deviceFrom, validateCameras, type CameraTable } from "./cameras";
 
 const isLocalizedString = (v: any): v is Localized<string> =>
@@ -141,6 +142,8 @@ export interface ScannedImage {
   thumb: string;
   name: string;
   device?: string;
+  ratio?: number;
+  heavy?: true;
 }
 
 async function getMisc(): Promise<Record<string, unknown> | null> {
@@ -164,13 +167,15 @@ export async function listImages(folder: string): Promise<ScannedImage[]> {
   return Promise.all(
     names.map(async (name) => {
       const full = cdnUrl(folder, name);
-      const tags = await readCamera(full);
-      const device = deviceFrom(tags.make, tags.model, cameras);
+      const meta = await readPhotoMeta(full);
+      const device = deviceFrom(meta.make, meta.model, cameras);
       return {
         full,
         thumb: thumbUrl(folder, name),
         name: name.replace(/\.[^.]+$/, ""),
         ...(device ? { device } : {}),
+        ...(meta.ratio ? { ratio: meta.ratio } : {}),
+        ...(meta.bytes && meta.bytes > HEAVY_BYTES ? { heavy: true as const } : {}),
       };
     })
   );

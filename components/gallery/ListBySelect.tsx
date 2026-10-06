@@ -49,6 +49,7 @@ export default function ListBySelect({ value, onChange, direction = "down" }: Li
         aria-expanded={open}
         aria-label={`${t.listBy}: ${t[value]}`}
       >
+        <Icon name="list" size={14} />
         {t[value]}
         <Icon name="chevronDown" size={14} />
       </button>

@@ -320,8 +320,8 @@ body:has(.gallery-page) {
   transition: background 0.2s, border-color 0.2s;
 }
 .year-select-btn:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
-.year-select-btn svg { transition: rotate 0.2s; }
-.year-select-btn[aria-expanded="true"] svg { rotate: 180deg; }
+.year-select-btn .icn:last-child svg { transition: rotate 0.2s; }
+.year-select-btn[aria-expanded="true"] .icn:last-child svg { rotate: 180deg; }
 
 .year-menu {
   position: absolute; right: 0;
