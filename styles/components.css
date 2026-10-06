@@ -191,7 +191,9 @@ html.glass-fx--all .control-panel {
 }
 
 html.glass-fx--all .control-panel--open,
-html.glass-fx--all .control-panel--dragging {
+html.glass-fx--all .control-panel--dragging,
+html.glass-fx--all .gallery-pillbar:not(.gallery-pillbar--hidden) {
+  -webkit-backdrop-filter: var(--panel-blur);
   backdrop-filter: var(--panel-blur);
 }
 

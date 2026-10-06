@@ -516,6 +516,17 @@ export const yearSelectUi: Localized<{ filterByYear: string; all: string }> = {
   vi: { filterByYear: "Lọc theo năm", all: "Tất cả" },
 };
 
+/* components/gallery/ListBySelect.tsx */
+export const listBySelectUi: Localized<{
+  listBy: string;
+  album: string;
+  device: string;
+  unknownDevice: string;
+}> = {
+  en: { listBy: "List by", album: "Album", device: "Shot device", unknownDevice: "Unknown device" },
+  vi: { listBy: "Xếp theo", album: "Album", device: "Thiết bị chụp", unknownDevice: "Không rõ thiết bị" },
+};
+
 /* ── Widgets ───────────────────────────────────── */
 
 /* components/widgets/MusicPlayer.tsx */

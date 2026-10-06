@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import YearSelect from "./YearSelect";
+import ListBySelect, { type ListBy } from "./ListBySelect";
 import useHideOnScrollDown from "@/lib/functions/useHideOnScrollDown";
 import useHorizontalScroller from "@/lib/functions/useHorizontalScroller";
 
@@ -18,6 +19,8 @@ interface AlbumPillBarProps {
   years: number[];
   year: number | undefined;
   onYearChange: (y: number | undefined) => void;
+  listBy: ListBy;
+  onListByChange: (v: ListBy) => void;
 }
 
 export default function AlbumPillBar({
@@ -27,6 +30,8 @@ export default function AlbumPillBar({
   years,
   year,
   onYearChange,
+  listBy,
+  onListByChange,
 }: AlbumPillBarProps) {
   const hidden = useHideOnScrollDown();
   const [mounted, setMounted] = useState(false);
@@ -54,6 +59,7 @@ export default function AlbumPillBar({
           </button>
         ))}
       </div>
+      <ListBySelect value={listBy} onChange={onListByChange} direction="up" />
       {years.length > 0 && (
         <YearSelect
           years={years}

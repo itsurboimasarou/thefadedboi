@@ -333,6 +333,16 @@ body:has(.gallery-page) {
   box-shadow: var(--shadow);
   animation: page-in 0.18s ease both;
 }
+.year-menu-head {
+  padding: 4px 14px 6px;
+  color: var(--ink-dim);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.year-option { white-space: nowrap; }
 .year-menu--down { top: calc(100% + 8px); bottom: auto; }
 .year-menu--up { bottom: calc(100% + 8px); top: auto; }
 .year-option {
