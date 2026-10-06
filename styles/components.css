@@ -546,7 +546,7 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
 }
 .player-bg-cover {
   position: absolute;
-  inset: -20px;
+  inset: -80px;
   background-size: cover;
   background-position: center;
   filter: blur(36px) brightness(0.4) saturate(1.2);
@@ -557,6 +557,12 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
    no longer applies — tokens follow the cover's own brightness instead. */
 #music-player.player-panel[data-ambient] {
   color: var(--ink);
+  background: var(--bg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.player-panel[data-ambient] .player-bg-clip {
+  background: var(--bg);
 }
 #music-player.player-panel[data-ambient="dark"] {
   --bg: #0b0e13;
