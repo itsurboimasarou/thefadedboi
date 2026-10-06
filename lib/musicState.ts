@@ -12,11 +12,13 @@ export interface MusicPlayback {
   nowPlaying: NowPlaying;
   volume: number;
   muted: boolean;
+  ambient: boolean;
 }
 
 const EVT = "music-playback-change";
 const VOLUME_KEY = "music-volume";
 const MUTED_KEY = "music-muted";
+const AMBIENT_KEY = "music-ambient";
 
 const emptyNowPlaying: NowPlaying = {
   title: null,
@@ -26,7 +28,7 @@ const emptyNowPlaying: NowPlaying = {
   playing: false,
 };
 
-let state: MusicPlayback = { nowPlaying: emptyNowPlaying, volume: 1, muted: false };
+let state: MusicPlayback = { nowPlaying: emptyNowPlaying, volume: 1, muted: false, ambient: true };
 
 function readVolume(): number {
   try {
@@ -47,12 +49,20 @@ function readMuted(): boolean {
   }
 }
 
+function readAmbient(): boolean {
+  try {
+    return localStorage.getItem(AMBIENT_KEY) !== "0";
+  } catch {
+    return true;
+  }
+}
+
 function emit() {
   window.dispatchEvent(new CustomEvent<MusicPlayback>(EVT, { detail: state }));
 }
 
 export function initMusicPrefs() {
-  state = { ...state, volume: readVolume(), muted: readMuted() };
+  state = { ...state, volume: readVolume(), muted: readMuted(), ambient: readAmbient() };
   emit();
 }
 
@@ -74,6 +84,14 @@ export function setMuted(muted: boolean) {
   state = { ...state, muted };
   try {
     localStorage.setItem(MUTED_KEY, muted ? "1" : "0");
+  } catch {}
+  emit();
+}
+
+export function setAmbient(ambient: boolean) {
+  state = { ...state, ambient };
+  try {
+    localStorage.setItem(AMBIENT_KEY, ambient ? "1" : "0");
   } catch {}
   emit();
 }

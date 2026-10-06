@@ -88,6 +88,7 @@ const icons: Record<string, JSX.Element> = {
   repeat: <svg {...p}><path d="m17 1 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 23-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /></svg>,
   repeatOne: <svg {...p}><path d="m17 1 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 23-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /><text x="12" y="16.5" fontSize="12" fontWeight="700" fill="currentColor" stroke="none" textAnchor="middle">1</text></svg>,
   volumeHigh: <svg {...p}><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12" /></svg>,
+  ambient: <svg {...p}><circle cx="12" cy="12" r="3.4" /><circle cx="12" cy="12" r="8.6" strokeDasharray="1.6 3.8" /></svg>,
   volumeMute: <svg {...p}><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="m16 9 5 6M21 9l-5 6" /></svg>,
   shirt: <svg {...p}><path d="m8 4.5-4.4 2.1L2 10.5l3.4 1.2V20h13.2v-8.3l3.4-1.2-1.6-3.9L16 4.5a4 4 0 0 1-8 0Z" /></svg>,
 };

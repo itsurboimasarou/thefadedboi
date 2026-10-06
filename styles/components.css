@@ -547,6 +547,53 @@ html.glass-fx--all .control-panel--dragging {
   background-size: cover;
   background-position: center;
   filter: blur(36px) brightness(0.4) saturate(1.2);
+  transition: filter 0.4s ease;
+}
+
+/* Ambient mode: the blurred cover is the panel's backdrop, so the theme's ink
+   no longer applies — tokens follow the cover's own brightness instead. */
+#music-player.player-panel[data-ambient] {
+  color: var(--ink);
+}
+#music-player.player-panel[data-ambient="dark"] {
+  --bg: #0b0e13;
+  --ink: #ffffff;
+  --ink-dim: rgba(255, 255, 255, 0.72);
+  --accent: var(--accent-custom, #6fd6b4);
+  --accent-contrast: var(--accent-contrast-custom, #06291f);
+  --glass: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.22);
+}
+#music-player.player-panel[data-ambient="light"] {
+  --bg: #ffffff;
+  --ink: #0b1420;
+  --ink-dim: rgba(11, 20, 32, 0.72);
+  --accent: var(--accent-custom, #0f7a5a);
+  --accent-contrast: var(--accent-contrast-custom, #ffffff);
+  --glass: rgba(0, 0, 0, 0.08);
+  --glass-border: rgba(0, 0, 0, 0.2);
+}
+.player-panel[data-ambient="light"] .player-bg-cover {
+  filter: blur(36px) brightness(1.15) saturate(1.2);
+}
+.player-bg-clip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.player-panel[data-ambient="light"] .player-bg-clip::after {
+  opacity: 0.45;
+}
+
+.player-panel > .player-ambient-btn {
+  position: absolute;
+  right: var(--panel-pad-x);
+  bottom: 14px;
+  width: 28px;
+  height: 28px;
 }
 
 .player-now-playing {

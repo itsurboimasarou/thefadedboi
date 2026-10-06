@@ -5,7 +5,8 @@ import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
 import { useInert } from "@/lib/functions/useInert";
 import { useIsoLayoutEffect } from "@/lib/functions/useIsoLayoutEffect";
 import Marquee from "../ui/Marquee";
-import { useMusicPlayback, setNowPlaying, setVolume, setMuted, initMusicPrefs } from "@/lib/musicState";
+import { useMusicPlayback, setNowPlaying, setVolume, setMuted, setAmbient, initMusicPrefs } from "@/lib/musicState";
+import { useCoverTone } from "@/lib/functions/useCoverTone";
 import { useLocalized } from "@/lib/i18n";
 import { musicPlayerUi as ui } from "@/lib/ui-strings";
 
@@ -63,7 +64,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   const [scrubbing, setScrubbing] = useState(false);
   const [dragTime, setDragTime] = useState(0);
 
-  const { volume, muted } = useMusicPlayback();
+  const { volume, muted, ambient } = useMusicPlayback();
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -112,6 +113,11 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
 
   const current = activeTrack !== null ? queueItems[activeTrack] : undefined;
   const currentPlaylist = current ? playlists?.[current.playlistIdx] : undefined;
+  const cover = current?.cover ?? currentPlaylist?.cover;
+
+  // Ambient mode: blurred cover behind the panel, text recoloured to suit it.
+  const ambientOn = ambient && !!cover;
+  const tone = useCoverTone(cover, ambient);
 
   useEffect(() => {
     if (!albumMenuOpen) return;
@@ -319,16 +325,17 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         transform: `translateX(calc(${(dragProgress - 1) * 100}% - ${(1 - dragProgress) * 16}px))`,
         opacity: dragProgress,
       } : undefined}
+      data-ambient={ambientOn ? tone : undefined}
       role="dialog"
       aria-modal="true"
       aria-label={t.musicPlayerLabel}
       {...swipe}
     >
       <div className="player-bg-clip" aria-hidden="true">
-        {(current?.cover ?? currentPlaylist?.cover) && (
+        {ambientOn && (
           <div
             className="player-bg-cover"
-            style={{ backgroundImage: `url(${current?.cover ?? currentPlaylist?.cover})` }}
+            style={{ backgroundImage: `url(${cover})` }}
           />
         )}
       </div>
@@ -417,8 +424,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
           ref={playerViewRef}
         >
               <div className="player-now-playing">
-                {(current?.cover ?? currentPlaylist?.cover) ? (
-                  <img src={current?.cover ?? currentPlaylist?.cover} alt="" className="player-cover" />
+                {cover ? (
+                  <img src={cover} alt="" className="player-cover" />
                 ) : (
                   <span className="player-cover player-cover--placeholder" aria-hidden="true">
                     <Icon name="music" size={28} />
@@ -581,6 +588,20 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       </div>
 
       <p className="panel-swipe-hint">{t.swipeForControls}</p>
+
+      {current && !listOpen && (
+        <button
+          type="button"
+          className={`panel-icon-btn player-ambient-btn${ambient ? " panel-icon-btn--active" : ""}`}
+          onClick={() => setAmbient(!ambient)}
+          aria-pressed={ambient}
+          aria-label={ambient ? t.ambientOn : t.ambientOff}
+          data-tip={ambient ? t.ambientOn : t.ambientOff}
+          data-tip-pos="up"
+        >
+          <Icon name="ambient" size={16} />
+        </button>
+      )}
 
       <audio
         ref={audioRef}
