@@ -1314,8 +1314,6 @@ body:has(.hubar--bottom) .gallery-page--motion {
 
 .collection-grid {
   display: grid;
-  /* --collection-cols per row on a wide page; drops columns only once a card
-     would get narrower than 150px. */
   --collection-cols: 5;
   --collection-gap: 14px;
   grid-template-columns: repeat(
@@ -1335,7 +1333,7 @@ body:has(.hubar--bottom) .gallery-page--motion {
 .collection-photo {
   width: 100%;
   aspect-ratio: 1;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 10px;
   background: var(--glass);
   display: block;
@@ -1364,7 +1362,7 @@ body:has(.hubar--bottom) .gallery-page--motion {
 }
 
 .collection-meta .spec-tag {
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--accent);
@@ -1373,12 +1371,18 @@ body:has(.hubar--bottom) .gallery-page--motion {
 .collection-year {
   margin-left: auto;
   color: var(--ink-dim);
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
 }
 
 .collection-card h3 {
-  font-size: 1rem;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.collection-card h3 + p {
+  margin-top: 6px;
+  line-height: 1.5;
 }
 
 /* empty-state note for an event with no local photos yet */

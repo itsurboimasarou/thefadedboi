@@ -17,8 +17,8 @@ const isLocalizedString = (v: any): v is Localized<string> =>
 export const CDN = "https://cdn.thefadedboi.me";
 
 const REPO = "itsurboimasarou/site-assets";
-const BRANCH = "main";
-const RAW = `https://gitea.com/${REPO}/raw/branch/${BRANCH}`;
+const BRANCH = "stomp";
+const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
 const VIDEO_EXT = /\.(mp4|m4v|webm|mov|ogv|ogg|mkv|3gp|3g2)$/i;
