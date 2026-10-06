@@ -13,6 +13,7 @@ export interface FileTrackMeta {
   bitrate?: number;
   bitDepth?: number;
   sampleRate?: number;
+  lossless?: boolean;
   duration?: number;
   picture?: TrackPicture;
 }
@@ -47,6 +48,7 @@ async function fetchTrackMeta(url: string): Promise<FileTrackMeta> {
       bitrate: format.bitrate ? Math.round(format.bitrate / 1000) : undefined,
       bitDepth: format.bitsPerSample,
       sampleRate: format.sampleRate ? format.sampleRate / 1000 : undefined,
+      lossless: format.lossless,
       duration: format.duration,
       picture: cover ? { data: cover.data, format: cover.format } : undefined,
     };

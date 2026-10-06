@@ -640,6 +640,10 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   font-size: 0.82rem;
   max-width: 100%;
 }
+.player-track-album {
+  font-size: 0.76rem;
+  opacity: 0.85;
+}
 
 /* ── Generic single-line autoscroll ────────────────── */
 .marquee {
@@ -696,11 +700,20 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   transform: translate(-50%, -50%) scale(1.15);
 }
 .player-time {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: 8px;
   margin-top: 4px;
   color: var(--ink-dim);
   font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.player-time > :last-child { text-align: right; }
+.player-quality { white-space: nowrap; }
+.player-quality-ext--lossless {
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .player-controls {

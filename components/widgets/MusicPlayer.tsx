@@ -30,14 +30,14 @@ function formatTime(s: number): string {
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
-function formatQuality(t: Track): string {
-  if (!t.format) return "";
-  if (t.format === "FLAC" || t.format === "WAV") {
-    return t.bitDepth && t.sampleRate
-      ? `${t.format}, ${t.bitDepth}-bit/${t.sampleRate}kHz`
-      : t.format;
-  }
-  return t.bitrate ? `${t.format}, ${t.bitrate}kbps` : t.format;
+function trackQuality(t: Track): { ext: string; lossless: boolean; rate: string } | null {
+  if (!t.format) return null;
+  const lossless = t.lossless ?? (t.format === "FLAC" || t.format === "WAV");
+  const ext = t.format === "M4A" ? (lossless ? "ALAC" : "AAC") : t.format;
+  const depth = t.bitDepth && t.sampleRate ? `${t.bitDepth}-bit/${t.sampleRate}kHz` : "";
+  const kbps = t.bitrate ? `${t.bitrate}kbps` : "";
+  const rate = lossless ? depth || kbps : kbps || depth;
+  return { ext, lossless, rate };
 }
 
 function randomIndex(exclude: number, len: number): number {
@@ -114,10 +114,10 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   const current = activeTrack !== null ? queueItems[activeTrack] : undefined;
   const currentPlaylist = current ? playlists?.[current.playlistIdx] : undefined;
   const cover = current?.cover ?? currentPlaylist?.cover;
-
-  // Ambient mode: blurred cover behind the panel, text recoloured to suit it.
-  const ambientOn = ambient && !!cover;
-  const tone = useCoverTone(cover, ambient);
+  const quality = current ? trackQuality(current) : null;
+  // Waits for the cover to load; until then the last loaded one stays up.
+  const ambientCover = useCoverTone(cover, ambient);
+  const ambientOn = ambient && !!cover && !!ambientCover.src;
 
   useEffect(() => {
     if (!albumMenuOpen) return;
@@ -325,7 +325,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         transform: `translateX(calc(${(dragProgress - 1) * 100}% - ${(1 - dragProgress) * 16}px))`,
         opacity: dragProgress,
       } : undefined}
-      data-ambient={ambientOn ? tone : undefined}
+      data-ambient={ambientOn ? ambientCover.tone : undefined}
       role="dialog"
       aria-modal="true"
       aria-label={t.musicPlayerLabel}
@@ -335,7 +335,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         {ambientOn && (
           <div
             className="player-bg-cover"
-            style={{ backgroundImage: `url(${cover})` }}
+            style={{ backgroundImage: `url(${ambientCover.src})` }}
           />
         )}
       </div>
@@ -437,11 +437,14 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
                 >
                   {current ? current.title : t.noTrackPlaying}
                 </Marquee>
-                {current && (
+                {(current?.artist ?? currentPlaylist?.artist) && (
                   <Marquee as="p" className="player-track-subtext">
-                    {[current.artist ?? currentPlaylist?.artist, current.album ?? currentPlaylist?.folder, formatQuality(current)]
-                      .filter(Boolean)
-                      .join(" • ")}
+                    {current?.artist ?? currentPlaylist?.artist}
+                  </Marquee>
+                )}
+                {(current?.album ?? currentPlaylist?.folder) && (
+                  <Marquee as="p" className="player-track-subtext player-track-album">
+                    {current?.album ?? currentPlaylist?.folder}
                   </Marquee>
                 )}
               </div>
@@ -465,6 +468,16 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               </div>
               <div className="player-time">
                 <span>{formatTime(displayProgress)}</span>
+                <span className="player-quality">
+                  {quality && (
+                    <>
+                      <span className={quality.lossless ? "player-quality-ext--lossless" : undefined}>
+                        {quality.ext}
+                      </span>
+                      {quality.rate && ` • ${quality.rate}`}
+                    </>
+                  )}
+                </span>
                 <span>{formatTime(duration)}</span>
               </div>
 

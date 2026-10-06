@@ -32,6 +32,7 @@ export default async function handler(
             bitrate: meta.bitrate ?? t.bitrate,
             bitDepth: meta.bitDepth ?? t.bitDepth,
             sampleRate: meta.sampleRate ?? t.sampleRate,
+            lossless: meta.lossless ?? t.lossless,
             duration: meta.duration ?? t.duration,
           };
         })

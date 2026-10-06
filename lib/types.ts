@@ -66,6 +66,7 @@ export interface TrackMeta {
   bitrate?: number;
   bitDepth?: number;
   sampleRate?: number;
+  lossless?: boolean;
   duration?: number;
 }
 
