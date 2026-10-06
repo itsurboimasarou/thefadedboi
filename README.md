@@ -6,7 +6,7 @@ This wasn't just a new alias to me, but also a brand new identity — and this s
 my web space corner where you can find everything around me: my hobbies, my
 photographs, my cosplays, my own stuff, etc.
 
-<img width="1300" alt="thefadedboi — masarou's sandbox" src="https://raw.githubusercontent.com/itsurboimasarou/itsurboimasarou/refs/heads/main/banner/banner-frost.png" />
+<img width="1300" alt="thefadedboi — masarou's sandbox" src="https://raw.githubusercontent.com/itsurboimasarou/itsurboimasarou/refs/heads/main/banner/bannerdefault.png" />
 
 ## How to run it
 
