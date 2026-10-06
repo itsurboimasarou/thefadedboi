@@ -147,8 +147,8 @@
   top: 3px;
   left: 3px;
   width: 36px;
-  height: 26px;
-  border-radius: 6px;
+  height: 27px;
+  border-radius: 7px;
 }
 .lang-switch[aria-checked="true"] .knob {
   translate: 34px 0;
@@ -192,7 +192,8 @@ html.glass-fx--all .control-panel {
 
 html.glass-fx--all .control-panel--open,
 html.glass-fx--all .control-panel--dragging,
-html.glass-fx--all .gallery-pillbar:not(.gallery-pillbar--hidden) {
+html.glass-fx--all .gallery-pillbar:not(.gallery-pillbar--hidden),
+html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   -webkit-backdrop-filter: var(--panel-blur);
   backdrop-filter: var(--panel-blur);
 }
