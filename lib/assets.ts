@@ -262,10 +262,13 @@ function validateDevices(raw: any): DeviceSection[] {
     .map((s: any) => ({
       categoryName: s.categoryName,
       category: s.category ?? "gear",
+      ...(s.layout === "collection" ? { layout: "collection" as const } : {}),
+      ...(isLocalizedString(s.description) ? { description: s.description } : {}),
       items: s.items
         .filter((i: any) => i && typeof i.name === "string")
         .map((i: any) => {
-          const { specs, detail, ...rest } = i;
+          const { specs, detail, year, ...rest } = i;
+          if (typeof year === "string" || typeof year === "number") rest.year = String(year);
           const ok = Array.isArray(specs)
             ? specs.filter(
                 (sp: any) =>

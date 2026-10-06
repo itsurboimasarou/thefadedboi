@@ -1294,6 +1294,83 @@ body:has(.hubar--bottom) .gallery-page--motion {
   font-size: 0.9rem;
 }
 
+/* Collection: vintage devices kept for the shelf, shown as photo cards
+   rather than spec sheets. */
+.collection-desc {
+  margin-bottom: 14px;
+  color: var(--ink-dim);
+  font-size: 0.92rem;
+}
+
+.collection-grid {
+  display: grid;
+  /* --collection-cols per row on a wide page; drops columns only once a card
+     would get narrower than 150px. */
+  --collection-cols: 5;
+  --collection-gap: 14px;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(max(150px, calc((100% - (var(--collection-cols) - 1) * var(--collection-gap)) / var(--collection-cols))), 1fr)
+  );
+  gap: var(--collection-gap);
+}
+
+.gear-card.collection-card {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 12px;
+}
+
+.collection-photo {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 10px;
+  background: var(--glass);
+  display: block;
+}
+
+.collection-photo--placeholder {
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--glass-border);
+}
+
+.collection-card .collection-photo--placeholder .icn {
+  color: var(--ink-dim);
+}
+
+.collection-info {
+  min-width: 0;
+}
+
+.collection-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.collection-meta .spec-tag {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+.collection-year {
+  margin-left: auto;
+  color: var(--ink-dim);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.collection-card h3 {
+  font-size: 1rem;
+}
+
 /* empty-state note for an event with no local photos yet */
 .album-empty {
   padding: 18px 4px;

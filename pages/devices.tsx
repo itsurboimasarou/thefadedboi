@@ -40,6 +40,31 @@ function SpecDropdown({ item }: { item: DeviceItem }) {
   );
 }
 
+function CollectionCard({ item }: { item: DeviceItem }) {
+  const lang = useLang();
+  return (
+    <article className="gear-card collection-card">
+      {item.image ? (
+        <img src={deviceImage(item.image)} alt={item.name} className="collection-photo" loading="lazy" />
+      ) : (
+        <span className="collection-photo collection-photo--placeholder" aria-hidden="true">
+          <Icon name={item.icon ?? "collection"} size={30} />
+        </span>
+      )}
+      <div className="collection-info">
+        {(item.tag || item.year) && (
+          <p className="collection-meta">
+            {item.tag && <span className="spec-tag">{item.tag}</span>}
+            {item.year && <span className="collection-year">{item.year}</span>}
+          </p>
+        )}
+        <h3>{item.name}</h3>
+        {item.detail && <p>{item.detail[lang]}</p>}
+      </div>
+    </article>
+  );
+}
+
 export async function getStaticProps() {
   return { props: { changelog: await getChangelog(), devices: await getDevices() }, revalidate: 300 };
 }
@@ -62,7 +87,12 @@ export default function Devices({
       {devices.map((group) => (
         <section key={group.category} className="glass">
           <h2 className="h-with-icon"><Icon name={group.category} />{group.categoryName[lang]}</h2>
-          {group.items.some((i) => i.specs) ? (
+          {group.description && <p className="collection-desc">{group.description[lang]}</p>}
+          {group.layout === "collection" ? (
+            <div className="collection-grid">
+              {group.items.map((item) => <CollectionCard key={item.name} item={item} />)}
+            </div>
+          ) : group.items.some((i) => i.specs) ? (
             group.items.map((item) => <SpecDropdown key={item.name} item={item} />)
           ) : (
             <div className="grid grid--2">

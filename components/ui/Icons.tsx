@@ -37,7 +37,7 @@ const icons: Record<string, JSX.Element> = {
   weight: <svg {...p}><path d="M6 8h12l2 12H4L6 8Z" /><circle cx="12" cy="5.5" r="2.2" /></svg>,
   storage: <svg {...p}><ellipse cx="12" cy="5.5" rx="8" ry="2.8" /><path d="M4 5.5v13c0 1.55 3.58 2.8 8 2.8s8-1.25 8-2.8v-13" /><path d="M4 12c0 1.55 3.58 2.8 8 2.8s8-1.25 8-2.8" /></svg>,
   tag: <svg {...p}><path d="M4 4h7l9 9-7 7-9-9V4Z" /><circle cx="8.5" cy="8.5" r="1.2" /></svg>,
-  keyboard: <svg {...p}><rect x="2.5" y="6" width="19" height="12" rx="2" /><path d="M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6 12.5h.01M9.5 12.5h.01M13 12.5h.01M16.5 12.5h.01M7.5 15.5h9" /></svg>,
+  keyboard: <svg {...p}><rect x="2.5" y="6" width="19" height="12" rx="2" /><path d="M6.75 9h.01M10.25 9h.01M13.75 9h.01M17.25 9h.01M6.75 12h.01M10.25 12h.01M13.75 12h.01M17.25 12h.01M7.5 15h9" /></svg>,
   mouse: <svg {...p}><rect x="7" y="3" width="10" height="18" rx="5" /><path d="M12 6.5v3.5" /></svg>,
   headphones: <svg {...p}><path d="M4 14v-2a8 8 0 0 1 16 0v2" /><rect x="3" y="14" width="4.5" height="6.5" rx="2" /><rect x="16.5" y="14" width="4.5" height="6.5" rx="2" /></svg>,
   microphone: <svg {...p}><rect x="9" y="2.5" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0" /><path d="M12 17.5v3M9 20.5h6" /></svg>,
@@ -88,6 +88,7 @@ const icons: Record<string, JSX.Element> = {
   repeat: <svg {...p}><path d="m17 1 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 23-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /></svg>,
   repeatOne: <svg {...p}><path d="m17 1 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 23-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /><text x="12" y="16.5" fontSize="12" fontWeight="700" fill="currentColor" stroke="none" textAnchor="middle">1</text></svg>,
   volumeHigh: <svg {...p}><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12" /></svg>,
+  collection: <svg {...p}><rect x="3" y="4" width="18" height="5" rx="1.5" /><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4" /></svg>,
   ambient: <svg {...p}><circle cx="12" cy="12" r="3.4" /><circle cx="12" cy="12" r="8.6" strokeDasharray="1.6 3.8" /></svg>,
   volumeMute: <svg {...p}><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="m16 9 5 6M21 9l-5 6" /></svg>,
   shirt: <svg {...p}><path d="m8 4.5-4.4 2.1L2 10.5l3.4 1.2V20h13.2v-8.3l3.4-1.2-1.6-3.9L16 4.5a4 4 0 0 1-8 0Z" /></svg>,
@@ -95,7 +96,7 @@ const icons: Record<string, JSX.Element> = {
 
 const specMap: ReadonlyArray<readonly [string, string]> = [
   ["display", "display"], ["screen", "display"],
-  ["chip", "chip"], ["cpu", "chip"], ["processor", "chip"], ["soc", "chip"],
+  ["chip", "chip"], ["cpu", "chip"], ["processor", "chip"], ["soc", "chip"], ["apu", "chip"],
   ["memory", "memory"], ["ram", "memory"],
   ["camera", "camera"],
   ["battery", "battery"],

@@ -99,7 +99,14 @@ export interface DeviceItem {
   specs?: Spec[];
   detail?: Localized<string>;
   icon?: string;
+  year?: string;
 }
-export interface DeviceSection { categoryName: Localized<string>; category: string; items: DeviceItem[] }
+export interface DeviceSection {
+  categoryName: Localized<string>;
+  category: string;
+  layout?: "collection";
+  description?: Localized<string>;
+  items: DeviceItem[];
+}
 
 export interface WithChildren { children?: ReactNode }
