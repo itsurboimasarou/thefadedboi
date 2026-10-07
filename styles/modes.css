@@ -243,6 +243,9 @@ html.compact[data-bar-mode="split"] .panel-head .glance-row--mobile-only { displ
 :where(html.narrow) .panel-head-actions { display: none; }
 :where(html.narrow) .player-panel .panel-head-actions { display: flex; }
 :where(html.narrow) .player-close-btn { display: none; }
+/* Theme menu open: only Back survives in the head, as in the player. */
+:where(html.narrow) .panel-head-actions--back { display: flex; }
+:where(html.narrow) .panel-head-actions--back .panel-icon-btn { display: none; }
 
 :where(html.narrow) .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
 
@@ -453,8 +456,6 @@ html.compact[data-bar-mode="split"] .panel-head .glance-row--mobile-only { displ
 
 
 /* ── Not narrow (was min-width: 799px) ─────────────────────────── */
-:where(html:not(.narrow)) .theme-menu-back-mobile { display: none; }
-
 :where(html:not(.narrow)) .theme-menu-heading {
   font-size: 0.85rem;
 }

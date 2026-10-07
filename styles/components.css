@@ -1015,14 +1015,6 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   border-radius: 4px;
 }
 
-.text-btn--center {
-  justify-content: center;
-  width: 100%;
-  margin: 14px 0 0;
-  padding: 10px 0 0;
-  border-top: 1px solid var(--glass-border);
-}
-
 .panel-quick-links {
   display: flex;
   align-items: center;
@@ -1187,9 +1179,6 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   padding-right: var(--panel-pad-x, 16px);
 }
 
-.control-panel:has(.panel-views[data-capped]) .panel-head {
-  padding-right: var(--sb-size, 10px);
-}
 .panel-views--sliding {
   overflow: hidden;
 }

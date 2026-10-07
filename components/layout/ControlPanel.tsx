@@ -280,7 +280,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               onClick={() => navigateTo("player")}
             />
           </div>
-          <div className="panel-head-actions">
+          <div className={`panel-head-actions${themeMenuOpen ? " panel-head-actions--back" : ""}`}>
             {themeMenuOpen ? (
               <button
                 type="button"
@@ -554,15 +554,6 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </h3>
             <LogoSwitch />
           </div>
-
-          <button
-            type="button"
-            className="text-btn text-btn--center theme-menu-back-mobile"
-            onClick={() => setThemeMenuOpen(false)}
-          >
-            <Icon name="chevronLeft" size={14} />
-            {t.back}
-          </button>
         </div>
         </div>
 
