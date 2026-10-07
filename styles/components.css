@@ -1051,7 +1051,6 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
 .player-header-volume-slider {
   width: 84px;
   height: 4px;
-  accent-color: var(--accent);
   cursor: pointer;
 }
 
@@ -1362,7 +1361,6 @@ html.accent-bg:not([data-accent-bg-style="linear"]) .grad-preview {
   display: block;
   width: 100%;
   height: 4px;
-  accent-color: var(--accent);
   cursor: pointer;
   touch-action: none;
 }
@@ -1633,4 +1631,78 @@ html[data-theme="light"] .logo-option-swatch--default {
    browser may claim the drag to scroll the panel underneath it. */
 .control-panel input[type="range"] {
   touch-action: none;
+}
+
+/* ── Range sliders ──────────────────────────────────────
+   Native range inputs draw a different knob and fill in every engine, so
+   these are drawn from scratch: one rail, one fill, one knob, written once
+   for WebKit/Blink and once for Gecko with the same numbers. The fill comes
+   from --fill (a percentage set inline by the component) rather than Gecko's
+   own progress pseudo, so both engines paint it the same way. Sizes are
+   logical so the vertical volume slider needs no rules of its own. */
+.grad-slider-input,
+.player-header-volume-slider,
+.vplayer-volume-slider {
+  --range-knob: 14px;
+  --range-rail-size: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+:is(.grad-slider-input, .player-header-volume-slider, .vplayer-volume-slider)::-webkit-slider-runnable-track {
+  inline-size: 100%;
+  block-size: var(--range-rail-size);
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    var(--range-dir, to right),
+    var(--accent) var(--fill, 0%),
+    var(--range-rail, color-mix(in srgb, var(--ink) 20%, transparent)) var(--fill, 0%)
+  );
+}
+:is(.grad-slider-input, .player-header-volume-slider, .vplayer-volume-slider)::-moz-range-track {
+  inline-size: 100%;
+  block-size: var(--range-rail-size);
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    var(--range-dir, to right),
+    var(--accent) var(--fill, 0%),
+    var(--range-rail, color-mix(in srgb, var(--ink) 20%, transparent)) var(--fill, 0%)
+  );
+}
+
+:is(.grad-slider-input, .player-header-volume-slider, .vplayer-volume-slider)::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: var(--range-knob);
+  height: var(--range-knob);
+  margin-block-start: calc((var(--range-rail-size) - var(--range-knob)) / 2);
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transition: scale 0.1s ease;
+}
+:is(.grad-slider-input, .player-header-volume-slider, .vplayer-volume-slider)::-moz-range-thumb {
+  box-sizing: border-box;
+  width: var(--range-knob);
+  height: var(--range-knob);
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transition: scale 0.1s ease;
+}
+
+:is(.grad-slider-input, .player-header-volume-slider, .vplayer-volume-slider):active::-webkit-slider-thumb {
+  scale: 1.15;
+}
+:is(.grad-slider-input, .player-header-volume-slider, .vplayer-volume-slider):active::-moz-range-thumb {
+  scale: 1.15;
 }

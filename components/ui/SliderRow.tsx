@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 interface SliderRowProps {
   id: string;
   label: string;
@@ -36,6 +38,7 @@ export default function SliderRow({
         step={step}
         value={value}
         disabled={disabled}
+        style={{ "--fill": `${max > min ? ((value - min) / (max - min)) * 100 : 0}%` } as CSSProperties}
         onChange={(e) => onChange(Number(e.target.value))}
       />
     </div>

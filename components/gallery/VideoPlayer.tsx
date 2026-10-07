@@ -272,6 +272,7 @@ export default function VideoPlayer({
                 <input
                   type="range"
                   className="vplayer-volume-slider"
+                  style={{ "--fill": `${level}%` } as CSSProperties}
                   min={0}
                   max={100}
                   value={level}

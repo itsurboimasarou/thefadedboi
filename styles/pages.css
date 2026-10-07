@@ -717,10 +717,11 @@ body:has(.topbar) .mode-switch {
 .vplayer-volume-slider {
   writing-mode: vertical-lr;
   direction: rtl;
-  width: 6px;
+  width: 4px;
   height: 92px;
-  accent-color: var(--accent);
   cursor: pointer;
+  --range-dir: to top;
+  --range-rail: rgba(255, 255, 255, 0.26);
 }
 
 .vplayer--empty {

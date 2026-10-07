@@ -367,6 +367,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               <input
                 type="range"
                 className="player-header-volume-slider"
+                style={{ "--fill": `${Math.round((muted ? 0 : volume) * 100)}%` } as CSSProperties}
                 min={0}
                 max={100}
                 value={Math.round((muted ? 0 : volume) * 100)}
