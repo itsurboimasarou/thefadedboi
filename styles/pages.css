@@ -571,6 +571,7 @@ body:has(.topbar) .mode-switch {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center;
   display: block;
   border-radius: 0 0 15px 15px;
   cursor: pointer;
@@ -799,17 +800,84 @@ body:has(.topbar) .mode-switch {
   color: var(--ink-dim);
 }
 
-.lightbox.vplayer-overlay {
-  --vp-pad: clamp(4px, 1.2vw, 20px);
-  padding: var(--vp-pad);
-}
-.vplayer--full {
-  --vp-chrome: calc(var(--vp-head) + 2px);
-  width: min(100%, 2400px, calc((100vh - 2 * var(--vp-pad) - var(--vp-chrome)) / 9 * 16));
-  width: min(100%, 2400px, calc((100dvh - 2 * var(--vp-pad) - var(--vp-chrome)) / 9 * 16));
+/* ── Motion: player, full screen ────────────────────────
+   The picture takes the whole screen, letterboxed to the clip's own shape.
+   The head stops being a row above it and floats over the top edge instead:
+   name as a pill on the left, the two buttons on the right. */
+.vplayer--fs {
+  width: 100%;
+  height: 100%;
   max-width: none;
   margin: 0;
-  background: var(--bg);
+  border: 0;
+  border-radius: 0;
+  background: #000;
+}
+
+.vplayer--fs .vplayer-stage {
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+.vplayer--fs .vplayer-video { border-radius: 0; }
+.vplayer--fs .vplayer-bar {
+  padding: 48px 18px 16px;
+  border-radius: 0;
+}
+
+.vplayer--fs .vplayer-head {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: auto;
+  gap: 8px;
+  padding: 16px 18px;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.vplayer--fs .vplayer-head > * { pointer-events: auto; }
+
+.vplayer--fs .vplayer-name {
+  flex: 0 1 auto;
+  max-width: min(60%, 720px);
+  margin-right: auto;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(8, 10, 14, 0.62);
+  color: #fff;
+}
+
+.vplayer--fs .vplayer-head .panel-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(8, 10, 14, 0.62);
+  color: rgba(255, 255, 255, 0.86);
+}
+.vplayer--fs .vplayer-head .panel-icon-btn:hover,
+.vplayer--fs .vplayer-head .panel-icon-btn:focus-visible {
+  border-color: var(--accent);
+  color: #fff;
+}
+.vplayer--fs .vplayer-head .vplayer-head-btn--on,
+.vplayer--fs .vplayer-head .vplayer-head-btn--on:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.vplayer--fs.vplayer--idle:not(.vplayer--paused) { cursor: none; }
+.vplayer--fs.vplayer--idle:not(.vplayer--paused) .vplayer-video { cursor: none; }
+.vplayer--fs.vplayer--idle:not(.vplayer--paused) .vplayer-bar,
+.vplayer--fs.vplayer--idle:not(.vplayer--paused) .vplayer-head {
+  opacity: 0;
+  pointer-events: none;
+}
+.vplayer--fs.vplayer--idle:not(.vplayer--paused) .vplayer-bar > *,
+.vplayer--fs.vplayer--idle:not(.vplayer--paused) .vplayer-head > * {
+  pointer-events: none;
 }
 
 /* ── Motion: clips and albums ─────────────────────────── */

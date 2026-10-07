@@ -107,19 +107,15 @@ function infoRows(
   return rows.filter((r): r is [string, string] => !!r[1]);
 }
 
-export default function VideoPlayer({
-  video,
-  onFullView,
-  full = false,
-  active = true,
-}: {
-  video: GalleryVideo | undefined;
-  onFullView?: () => void;
-  full?: boolean;
-  active?: boolean;
-}) {
+const IDLE_MS = 2600;
+
+export default function VideoPlayer({ video }: { video: GalleryVideo | undefined }) {
   const t = useLocalized(ui);
   const ref = useRef<HTMLVideoElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [idle, setIdle] = useState(false);
+  const idleTimer = useRef<ReturnType<typeof setTimeout>>();
   const [playing, setPlaying] = useState(false);
   const [at, setAt] = useState(0);
   const [length, setLength] = useState(0);
@@ -149,11 +145,6 @@ export default function VideoPlayer({
     const el = ref.current;
     if (!el || !video) return;
 
-    if (!active) {
-      el.pause();
-      return;
-    }
-
     const carry = handoff;
     if (carry && carry.src === video.src) {
       resumeAt(el, carry.time, carry.playing);
@@ -164,7 +155,53 @@ export default function VideoPlayer({
       if (el.ended) return;
       handoff = { src: video.src, time: el.currentTime, playing: !el.paused };
     };
-  }, [active, video?.src]);
+  }, [video?.src]);
+
+  useEffect(() => {
+    const onChange = () => {
+      setFullscreen(!!root.current && document.fullscreenElement === root.current);
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          const el = ref.current;
+          if (!el || !el.paused || el.readyState < 1) return;
+          try {
+            el.currentTime = el.currentTime;
+          } catch {}
+        })
+      );
+    };
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  const wake = useCallback(() => {
+    setIdle(false);
+    clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => setIdle(true), IDLE_MS);
+  }, []);
+
+  useEffect(() => {
+    if (!fullscreen) {
+      clearTimeout(idleTimer.current);
+      setIdle(false);
+      return;
+    }
+    wake();
+    return () => clearTimeout(idleTimer.current);
+  }, [fullscreen, wake]);
+
+  const toggleFullscreen = () => {
+    const el = root.current;
+    if (!el) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    } else if (el.requestFullscreen) {
+      el.requestFullscreen().catch(() => {});
+    } else {
+      (ref.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null)
+        ?.webkitEnterFullscreen?.();
+    }
+  };
 
   useEffect(() => {
     loadLevel();
@@ -252,7 +289,7 @@ export default function VideoPlayer({
 
   if (!video) {
     return (
-      <div className={`vplayer${full ? " vplayer--full" : ""} vplayer--empty`}>
+      <div className="vplayer vplayer--empty">
         <p>{t.nothing}</p>
       </div>
     );
@@ -262,9 +299,13 @@ export default function VideoPlayer({
 
   return (
     <div
-      className={`vplayer${full ? " vplayer--full" : ""}${
+      ref={root}
+      className={`vplayer${fullscreen ? " vplayer--fs" : ""}${
         playing ? "" : " vplayer--paused"
-      }`}
+      }${fullscreen && idle && !infoOpen && !volOpen ? " vplayer--idle" : ""}`}
+      onPointerMove={fullscreen ? wake : undefined}
+      onPointerDown={fullscreen ? wake : undefined}
+      onKeyDown={fullscreen ? wake : undefined}
     >
       <div className="vplayer-head">
         <span className="vplayer-name" title={video.name}>{video.name}</span>
@@ -419,18 +460,16 @@ export default function VideoPlayer({
           <Icon name="repeat" size={18} />
         </button>
 
-        {onFullView && (
-          <button
-            type="button"
-            className="vplayer-btn"
-            onClick={onFullView}
-            aria-label={full ? t.exitFullView : t.fullView}
-            data-tip={full ? t.exitFullView : t.fullView}
-            data-tip-pos="up"
-          >
-            <Icon name={full ? "close" : "expand"} size={18} />
-          </button>
-        )}
+        <button
+          type="button"
+          className="vplayer-btn"
+          onClick={toggleFullscreen}
+          aria-label={fullscreen ? t.exitFullScreen : t.fullScreen}
+          data-tip={fullscreen ? t.exitFullScreen : t.fullScreen}
+          data-tip-pos="up"
+        >
+          <Icon name={fullscreen ? "shrink" : "expand"} size={18} />
+        </button>
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import VideoPlayer from "./VideoPlayer";
 import YearSelect from "./YearSelect";
 import type { GalleryVideo } from "@/lib/types";
@@ -28,13 +27,10 @@ export default function MotionSection({
 }) {
   const t = useLocalized(ui);
   const [current, setCurrent] = useState(0);
-  const [fullView, setFullView] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [settled, setSettled] = useState(false);
   const strip = useHorizontalScroller([videos]);
   const albumRow = useHorizontalScroller([chips]);
 
-  useEffect(() => setMounted(true), []);
   useEffect(() => { setCurrent(0); }, [videos]);
   
   useEffect(() => {
@@ -42,22 +38,11 @@ export default function MotionSection({
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    if (!fullView) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setFullView(false); };
-    window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [fullView]);
-
   const playing = videos[current];
 
   return (
     <>
-      <VideoPlayer video={playing} onFullView={() => setFullView(true)} active={!fullView} />
+      <VideoPlayer video={playing} />
 
       <div className="motion-box">
         <div className="motion-strip-wrap">
@@ -126,14 +111,6 @@ export default function MotionSection({
           )}
         </div>
       </div>
-
-      {mounted && fullView && playing &&
-        createPortal(
-          <div className="lightbox vplayer-overlay" role="dialog" aria-modal="true">
-            <VideoPlayer video={playing} onFullView={() => setFullView(false)} full />
-          </div>,
-          document.body
-        )}
     </>
   );
 }

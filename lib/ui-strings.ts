@@ -492,8 +492,8 @@ export const videoPlayerUi: Localized<{
   mute: string;
   unmute: string;
   download: string;
-  fullView: string;
-  exitFullView: string;
+  fullScreen: string;
+  exitFullScreen: string;
   nothing: string;
   loopOn: string;
   loopOff: string;
@@ -516,8 +516,8 @@ export const videoPlayerUi: Localized<{
     mute: "Mute",
     unmute: "Unmute",
     download: "Download video",
-    fullView: "Large view",
-    exitFullView: "Close large view",
+    fullScreen: "Full screen",
+    exitFullScreen: "Exit full screen",
     nothing: "No video selected.",
     loopOn: "Loop: on",
     loopOff: "Loop: off",
@@ -540,8 +540,8 @@ export const videoPlayerUi: Localized<{
     mute: "Tắt tiếng",
     unmute: "Bật tiếng",
     download: "Tải video xuống",
-    fullView: "Chế độ xem lớn",
-    exitFullView: "Đóng chế độ xem lớn",
+    fullScreen: "Toàn màn hình",
+    exitFullScreen: "Thoát toàn màn hình",
     nothing: "Chưa chọn video nào.",
     loopOn: "Lặp lại: bật",
     loopOff: "Lặp lại: tắt",
