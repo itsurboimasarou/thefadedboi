@@ -37,7 +37,7 @@ export default function LiteModeToggle() {
   return (
     <button type="button" role="switch" aria-checked={on} aria-label="Lite mode"
       className="theme-switch lite-switch" onClick={() => setLiteMode(!on)}>
-      <span className="knob" style={{ translate: on ? "32px 0" : "0 0" }} />
+      <span className="knob" aria-hidden="true" />
     </button>
   );
 }
