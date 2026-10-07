@@ -197,6 +197,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
     const state = thumbs[img.thumb];
     const kept = seen.get(img.thumb);
     return {
+      loaded: !!state?.ready,
       ready: state?.ready ?? (kept !== undefined && !state?.tries),
       dead: !!state?.dead,
       tries: state?.tries ?? 0,
@@ -391,7 +392,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
       <div className="album-grid">
         {items.map((img, i) => {
           if (leaving) return <span key={img.full} className="album-thumb" aria-hidden="true" />;
-          const { ready, dead, tries, ratio } = tileState(img);
+          const { loaded, ready, dead, tries, ratio } = tileState(img);
           return (
             <button
               key={img.full}
@@ -403,7 +404,7 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
               onClick={() => !dead && setIndex(i)}
               aria-label={t.viewPhotoAria(i + 1, title)}
             >
-              {!ready && !dead && <span className="thumb-loader" aria-hidden="true" />}
+              {!loaded && !dead && <span className="thumb-loader" aria-hidden="true" />}
               {dead && (
                 <span className="thumb-failed" aria-hidden="true">
                   <Icon name="image" size={20} />
