@@ -479,6 +479,15 @@ html.no-scroll .main {
   overflow: hidden;
 }
 
+html.no-scroll .main {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+html.no-scroll .main::-webkit-scrollbar { display: none; }
+
 html.no-scroll .hero--bottom {
+  flex: 1 0 auto;
+  min-height: auto;
   padding-bottom: clamp(40px, 6vh, 70px);
 }
