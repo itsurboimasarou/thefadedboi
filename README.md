@@ -18,7 +18,7 @@ npm run dev        # → http://localhost:3000
 ## Tech notes
 
 - Deployed on **Vercel**, domain via **Cloudflare DNS**
-- Changelog renders in-page from `CHANGELOG.md`, <a href="https://github.com/itsurboimasarou/site-assets/blob/stomp/changelog.md">you can read it from here</a>
+- Changelog renders in-page from `CHANGELOG.md`, <a href="https://github.com/itsurboimasarou/thefadedboi/blob/chuntian/changelog.md">you can read it from here</a>
 
 ## License & purpose
 

@@ -56,9 +56,25 @@ export type GalleryImage =
       heavy?: boolean;
     };
 
+export interface VideoInfo {
+  container?: string;
+  bytes?: number;
+  width?: number;
+  height?: number;
+  duration?: number;
+  frameRate?: number;
+  bitrate?: number;
+  videoCodec?: string;
+  bitDepth?: number;
+  hdr?: string;
+  audioCodec?: string;
+  recordedAt?: string;
+}
+
 export interface GalleryVideo {
   src: string;
   name: string;
+  info?: VideoInfo;
 }
 
 export type AudioFormat = "MP3" | "FLAC" | "OGG" | "WAV" | "M4A";
@@ -75,6 +91,7 @@ export interface TrackMeta {
   sampleRate?: number;
   lossless?: boolean;
   duration?: number;
+  hasCover?: boolean;
 }
 
 export interface Playlist {
@@ -89,7 +106,7 @@ export interface MusicManifest {
   playlists: Playlist[];
 }
 
-export interface Track extends Omit<TrackMeta, "title"> {
+export interface Track extends Omit<TrackMeta, "title" | "hasCover"> {
   title: string;
   url: string;
 }

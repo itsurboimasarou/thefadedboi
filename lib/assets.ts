@@ -2,13 +2,13 @@ import type {
   Manifest,
   GalleryAlbum,
   GalleryVideo,
+  VideoInfo,
   DeviceSection,
   MusicManifest,
   Playlist,
   TrackMeta,
 } from "./types";
 import type { Localized } from "./i18n";
-import { readPhotoMeta } from "./photoMeta";
 import { HEAVY_BYTES } from "./thumbs";
 import { deviceFrom, validateCameras, type CameraTable } from "./cameras";
 
@@ -17,15 +17,13 @@ const isLocalizedString = (v: any): v is Localized<string> =>
 
 export const CDN = "https://cdn.thefadedboi.me";
 
-const REPO = "itsurboimasarou/site-assets";
-const BRANCH = "stomp";
-const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
+export const API = (
+  process.env.ASSETS_API ?? "https://site-assets-api.itsurboimasarou.workers.dev"
+).replace(/\/+$/, "");
 
-const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
 const VIDEO_EXT = /\.(mp4|m4v|webm|mov|ogv|ogg|mkv|3gp|3g2)$/i;
 
 export const VIDEO_ROOT = "videos";
-const IGNORE_PREFIX = /^_/;
 
 const encPath = (p: string) =>
   p.split(/[\/\\]/).map(encodeURIComponent).join("/");
@@ -58,32 +56,22 @@ export async function cdnFetch(target: URL | string): Promise<Response | null> {
   return res?.ok ? res : null;
 }
 
-const indexUrl = (folder: string) =>
-  `${CDN}/${encPath(folder)}/index.json`;
-
-async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
+async function fetchApi<T = any>(path: string): Promise<T | null> {
   try {
-    const res = await fetch(indexUrl(folder), { cache: "no-store" });
-
-    const data = await res.json();
-    const names: string[] = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.files)
-        ? data.files
-        : [];
-
-    return names
-      .filter((n) => {
-        if (typeof n !== "string") return false;
-        const base = n.split("/").pop() ?? n;
-        return ext.test(base) && !IGNORE_PREFIX.test(base);
-      })
-      .sort();
+    const res = await fetch(`${API}${path}`);
+    if (!res.ok) {
+      if (res.status !== 404) console.warn(`[assets] ${res.status} fetching ${path}`);
+      return null;
+    }
+    return (await res.json()) as T;
   } catch (err) {
-    console.warn(`[assets] failed reading ${folder}/index.json:`, err);
-    return [];
+    console.warn(`[assets] failed fetching ${path}:`, err);
+    return null;
   }
 }
+
+const albumPath = (folder: string) =>
+  `/album?folder=${encodeURIComponent(folder)}`;
 
 export const deviceImage = (file: string) =>
   `${CDN}/devices/${encodeURIComponent(file)}`;
@@ -110,33 +98,6 @@ export async function getBackdrop(): Promise<BackdropManifest> {
   };
 }
 
-async function fetchRaw(path: string): Promise<string | null> {
-  try {
-    const res = await fetch(`${RAW}/${path}`, {
-      headers: { "Cache-Control": "no-cache" },
-    });
-    if (!res.ok) {
-      console.warn(`[assets] ${res.status} fetching ${path}`);
-      return null;
-    }
-    return await res.text();
-  } catch (err) {
-    console.warn(`[assets] failed fetching ${path}:`, err);
-    return null;
-  }
-}
-
-async function fetchJson<T = any>(path: string): Promise<T | null> {
-  const text = await fetchRaw(path);
-  if (text === null) return null;
-  try {
-    return JSON.parse(text) as T;
-  } catch (err) {
-    console.warn(`[assets] ${path} is not valid JSON:`, err);
-    return null;
-  }
-}
-
 export interface ScannedImage {
   full: string;
   thumb: string;
@@ -147,7 +108,7 @@ export interface ScannedImage {
 }
 
 async function getMisc(): Promise<Record<string, unknown> | null> {
-  return fetchJson<Record<string, unknown>>("misc.json");
+  return fetchApi<Record<string, unknown>>("/misc");
 }
 
 const section = (misc: Record<string, unknown> | null, key: string) => {
@@ -159,26 +120,35 @@ export async function getCameras(): Promise<CameraTable> {
   return validateCameras(section(await getMisc(), "cameras"));
 }
 
+const byFile = (a: { file: string }, b: { file: string }) =>
+  a.file < b.file ? -1 : a.file > b.file ? 1 : 0;
+
+const text = (v: unknown) => (typeof v === "string" ? v : undefined);
+const positive = (v: unknown) => (typeof v === "number" && v > 0 ? v : undefined);
+
 export async function listImages(folder: string): Promise<ScannedImage[]> {
-  const [names, cameras] = await Promise.all([
-    listFiles(folder, IMAGE_EXT),
+  const [album, cameras] = await Promise.all([
+    fetchApi(albumPath(folder)),
     getCameras(),
   ]);
-  return Promise.all(
-    names.map(async (name) => {
-      const full = cdnUrl(folder, name);
-      const meta = await readPhotoMeta(full);
-      const device = deviceFrom(meta.make, meta.model, cameras);
+  const photos: any[] = Array.isArray(album?.photos) ? album.photos : [];
+  return photos
+    .filter((p) => p && typeof p.file === "string")
+    .sort(byFile)
+    .map((p) => {
+      const name: string = p.file;
+      const device = deviceFrom(text(p.cameraMake), text(p.cameraModel), cameras);
+      const ratio = positive(p.ratio);
+      const bytes = positive(p.bytes);
       return {
-        full,
+        full: cdnUrl(folder, name),
         thumb: thumbUrl(folder, name),
-        name: name.replace(/\.[^.]+$/, ""),
+        name: name.replace(/.[^.]+$/, ""),
         ...(device ? { device } : {}),
-        ...(meta.ratio ? { ratio: meta.ratio } : {}),
-        ...(meta.bytes && meta.bytes > HEAVY_BYTES ? { heavy: true as const } : {}),
+        ...(ratio ? { ratio } : {}),
+        ...(bytes && bytes > HEAVY_BYTES ? { heavy: true as const } : {}),
       };
-    })
-  );
+    });
 }
 
 export const videoOrigin = (file: string) =>
@@ -194,31 +164,40 @@ export function isSafeVideoPath(file: string): boolean {
   return VIDEO_EXT.test(file);
 }
 
-async function exists(url: string): Promise<boolean> {
-  try {
-    const res = await fetch(url, { method: "HEAD", cache: "no-store" });
-    return res.ok;
-  } catch {
-    return false;
+const VIDEO_INFO_KEYS = [
+  "container", "bytes", "width", "height", "duration", "frameRate",
+  "bitrate", "videoCodec", "bitDepth", "hdr", "audioCodec", "recordedAt",
+] as const satisfies readonly (keyof VideoInfo)[];
+
+function videoInfo(v: any): VideoInfo {
+  const info: Record<string, string | number> = {};
+  for (const key of VIDEO_INFO_KEYS) {
+    const value = v[key];
+    if (typeof value === "string" || typeof value === "number") info[key] = value;
   }
+  return info as VideoInfo;
+}
+
+const albumVideos = async (folder: string): Promise<any[]> => {
+  const album = await fetchApi(albumPath(folder));
+  const videos: any[] = Array.isArray(album?.videos) ? album.videos : [];
+  return videos.filter((v) => v && typeof v.file === "string").sort(byFile);
+};
+
+export async function getVideoInfo(folder: string): Promise<Map<string, VideoInfo>> {
+  return new Map((await albumVideos(folder)).map((v) => [v.file as string, videoInfo(v)]));
 }
 
 export async function listVideos(folder: string): Promise<GalleryVideo[]> {
   const rel = folder.replace(new RegExp(`^${VIDEO_ROOT}/`), "");
-  const names = await listFiles(folder, VIDEO_EXT);
-
-  const checked = await Promise.all(
-    names.map(async (name) => {
-      const file = `${rel}/${name}`;
-      if (await exists(videoOrigin(file))) {
-        return { src: videoUrl(file), name: name.replace(/\.[^.]+$/, "") };
-      }
-      console.warn(`[assets] ${folder}/${name} is listed but missing from R2 — skipping`);
-      return null;
-    })
-  );
-
-  return checked.filter((v): v is GalleryVideo => v !== null);
+  return (await albumVideos(folder)).map((v) => {
+    const name: string = v.file;
+    return {
+      src: videoUrl(`${rel}/${name}`),
+      name: name.replace(/.[^.]+$/, ""),
+      info: videoInfo(v),
+    };
+  });
 }
 
 function validateAlbums(list: any): GalleryAlbum[] {
@@ -229,11 +208,11 @@ function validateAlbums(list: any): GalleryAlbum[] {
 }
 
 export async function getManifest(): Promise<Manifest> {
-  const raw = await fetchJson("gallery.json");
-  if (!raw) return { version: 4, photos: [], videos: [] };
+  const raw = await fetchApi("/gallery");
+  if (!raw) return { version: 5, photos: [], videos: [] };
   return {
-    version: raw.version ?? 4,
-    photos: validateAlbums(raw.photos ?? raw.albums),
+    version: 5,
+    photos: validateAlbums(raw.photos),
     videos: validateAlbums(raw.videos),
   };
 }
@@ -252,9 +231,9 @@ function validatePlaylists(raw: any): Playlist[] {
 }
 
 export async function getMusicManifest(): Promise<MusicManifest> {
-  const raw = await fetchJson("music.json");
-  if (!raw) return { version: 1, playlists: [] };
-  return { version: raw.version ?? 1, playlists: validatePlaylists(raw) };
+  const raw = await fetchApi("/music");
+  if (!raw) return { version: 2, playlists: [] };
+  return { version: 2, playlists: validatePlaylists(raw) };
 }
 
 function validateDevices(raw: any): DeviceSection[] {
@@ -290,5 +269,5 @@ function validateDevices(raw: any): DeviceSection[] {
 }
 
 export async function getDevices(): Promise<DeviceSection[]> {
-  return validateDevices(await fetchJson("devices.json"));
+  return validateDevices(await fetchApi("/devices"));
 }
