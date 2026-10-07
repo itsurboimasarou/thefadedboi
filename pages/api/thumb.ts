@@ -11,6 +11,8 @@ export const config = { maxDuration: 30 };
 
 type Format = "avif" | "webp";
 
+const SOURCE_EXT = /\.(png|jpe?g|webp|gif|avif)$/i;
+
 interface Tier { quality: number; effort: number }
 const TILE: Tier = { quality: 60, effort: 4 };
 const VIEW: Tier = { quality: 68, effort: 3 };
@@ -149,6 +151,10 @@ function widthFrom(raw: unknown): number {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { folder, file, w } = req.query;
   if (typeof folder !== "string" || typeof file !== "string" || !folder || !file) {
+    res.status(400).end();
+    return;
+  }
+  if (!SOURCE_EXT.test(file) || folder.length > 512 || file.length > 512) {
     res.status(400).end();
     return;
   }

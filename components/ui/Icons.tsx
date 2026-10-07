@@ -19,6 +19,7 @@ const icons: Record<string, JSX.Element> = {
   spark: <svg {...p}><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.5 6.5l2 2M15.5 15.5l2 2M17.5 6.5l-2 2M8.5 15.5l-2 2" /></svg>,
   pen: <svg {...p}><path d="m4 20 1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1Z" /><path d="m14.5 6.5 3 3" /></svg>,
   info: <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.8v.2" /></svg>,
+  infoFilled: <svg {...p} fill="currentColor" stroke="none"><path fillRule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4.4a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6Zm-1.1 5.2a1.1 1.1 0 0 1 2.2 0v5a1.1 1.1 0 0 1-2.2 0Z" /></svg>,
   mail: <svg {...p}><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m4 7 8 6 8-6" /></svg>,
   share: <svg {...p}><circle cx="6" cy="12" r="2.4" /><circle cx="17.5" cy="5.5" r="2.4" /><circle cx="17.5" cy="18.5" r="2.4" /><path d="m8.2 10.8 7-4M8.2 13.2l7 4" /></svg>,
   briefcase: <svg {...p}><rect x="3" y="7" width="18" height="13" rx="3" /><path d="M8.5 7V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V7" /><path d="M3 12.5h18" /></svg>,

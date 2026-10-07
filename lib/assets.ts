@@ -58,7 +58,10 @@ export async function cdnFetch(target: URL | string): Promise<Response | null> {
 
 async function fetchApi<T = any>(path: string): Promise<T | null> {
   try {
-    const res = await fetch(`${API}${path}`);
+    const key = process.env.ASSETS_API_KEY;
+    const res = await fetch(`${API}${path}`, {
+      headers: key ? { Authorization: `Bearer ${key}` } : undefined,
+    });
     if (!res.ok) {
       if (res.status !== 404) console.warn(`[assets] ${res.status} fetching ${path}`);
       return null;
@@ -81,8 +84,11 @@ export interface BackdropManifest {
   image: string | null;
 }
 
-const backdropUrl = (p: string) =>
-  /^https?:\/\//i.test(p) ? p : `${CDN}/${encPath(p.replace(/^\/+/, ""))}`;
+const backdropUrl = (p: string, version: string | null) => {
+  if (/^https?:\/\//i.test(p)) return p;
+  const url = `${CDN}/${encPath(p.replace(/^\/+/, ""))}`;
+  return version ? `${url}?v=${encodeURIComponent(version)}` : url;
+};
 
 const named = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : null);
 
@@ -93,8 +99,8 @@ export async function getBackdrop(): Promise<BackdropManifest> {
   const video = named(raw.video);
   const image = named(raw.image);
   return {
-    video: video ? backdropUrl(video) : null,
-    image: image ? backdropUrl(image) : null,
+    video: video ? backdropUrl(video, named(raw.videoVersion)) : null,
+    image: image ? backdropUrl(image, named(raw.imageVersion)) : null,
   };
 }
 

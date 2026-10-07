@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Icon from "../ui/Icons";
-import type { GalleryVideo } from "@/lib/types";
+import type { GalleryVideo, VideoInfo } from "@/lib/types";
 import { useLocalized } from "@/lib/i18n";
 import { videoPlayerUi as ui } from "@/lib/ui-strings";
 
@@ -9,6 +9,7 @@ const MUTED_KEY = "video-muted";
 
 let lastVolume: number | null = null;
 let lastMuted = false;
+let lastLoop = false;
 
 function loadLevel() {
   if (lastVolume !== null) return;
@@ -61,6 +62,51 @@ const pad = (n: number) => String(Math.floor(n)).padStart(2, "0");
 const clock = (s: number) =>
   Number.isFinite(s) ? `${Math.floor(s / 60)}:${pad(s % 60)}` : "0:00";
 
+const CODEC_NAMES: Record<string, string> = {
+  h264: "H.264 (AVC)",
+  hevc: "H.265 (HEVC)",
+  av1: "AV1",
+  vp9: "VP9",
+  vp8: "VP8",
+  mpeg4: "MPEG-4",
+  prores: "ProRes",
+};
+const HDR_NAMES: Record<string, string> = {
+  hdr10: "HDR10",
+  hlg: "HLG",
+  "dolby-vision": "Dolby Vision",
+};
+
+const trim = (n: number, digits: number) => String(Number(n.toFixed(digits)));
+const bitrateText = (kbps: number) =>
+  kbps >= 1000 ? `${trim(kbps / 1000, 2)} Mbps` : `${Math.round(kbps)} kbps`;
+
+type InfoLabels = Record<
+  "resolution" | "codec" | "fileType" | "duration" | "frameRate" | "bitrate" | "bitDepth" | "range",
+  string
+>;
+
+function infoRows(
+  info: VideoInfo | undefined,
+  labels: InfoLabels,
+  el: { width: number; height: number; length: number }
+): [string, string][] {
+  const width = info?.width || el.width;
+  const height = info?.height || el.height;
+  const duration = info?.duration || el.length;
+  const rows: [string, string | undefined][] = [
+    [labels.resolution, width && height ? `${width} × ${height}` : undefined],
+    [labels.codec, info?.videoCodec ? CODEC_NAMES[info.videoCodec] ?? info.videoCodec.toUpperCase() : undefined],
+    [labels.fileType, info?.container?.toUpperCase()],
+    [labels.duration, duration ? clock(duration) : undefined],
+    [labels.frameRate, info?.frameRate ? `${trim(info.frameRate, 2)} fps` : undefined],
+    [labels.bitrate, info?.bitrate ? bitrateText(info.bitrate) : undefined],
+    [labels.bitDepth, info?.bitDepth ? `${info.bitDepth}-bit` : undefined],
+    [labels.range, info ? (info.hdr ? `HDR (${HDR_NAMES[info.hdr] ?? info.hdr})` : "SDR") : undefined],
+  ];
+  return rows.filter((r): r is [string, string] => !!r[1]);
+}
+
 export default function VideoPlayer({
   video,
   onFullView,
@@ -81,6 +127,10 @@ export default function VideoPlayer({
   const [volume, setVolume] = useState(lastVolume ?? 1);
   const [muted, setMuted] = useState(lastMuted);
   const [volOpen, setVolOpen] = useState(false);
+  const [loop, setLoop] = useState(lastLoop);
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [natural, setNatural] = useState({ width: 0, height: 0 });
+  const infoWrap = useRef<HTMLDivElement>(null);
   const scrubbing = useRef(false);
   const sliding = useRef(false);
   const coarse = useRef(false);
@@ -91,6 +141,8 @@ export default function VideoPlayer({
     setLength(0);
     setBuffered(0);
     setPlaying(false);
+    setInfoOpen(false);
+    setNatural({ width: 0, height: 0 });
   }, [video?.src]);
 
   useEffect(() => {
@@ -143,6 +195,27 @@ export default function VideoPlayer({
     };
   }, [volOpen]);
 
+  useEffect(() => {
+    if (!infoOpen) return;
+    const onDown = (e: PointerEvent) => {
+      if (!infoWrap.current?.contains(e.target as Node)) setInfoOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setInfoOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [infoOpen]);
+
+  const toggleLoop = () => {
+    lastLoop = !loop;
+    setLoop(!loop);
+  };
+
   const toggle = useCallback(() => {
     const el = ref.current;
     if (!el) return;
@@ -185,12 +258,55 @@ export default function VideoPlayer({
     );
   }
 
+  const rows = infoRows(video.info, t, { ...natural, length });
+
   return (
     <div
       className={`vplayer${full ? " vplayer--full" : ""}${
         playing ? "" : " vplayer--paused"
       }`}
     >
+      <div className="vplayer-head">
+        <span className="vplayer-name" title={video.name}>{video.name}</span>
+        <div className="vplayer-info" ref={infoWrap}>
+          <button
+            type="button"
+            className={`panel-icon-btn${infoOpen ? " vplayer-head-btn--on" : ""}`}
+            onClick={() => setInfoOpen((v) => !v)}
+            aria-expanded={infoOpen}
+            aria-label={t.info}
+            data-tip={infoOpen ? undefined : t.info}
+          >
+            <Icon name="infoFilled" size={20} />
+          </button>
+          {infoOpen && (
+            <div className="vplayer-info-panel" role="dialog" aria-label={t.info}>
+              {rows.length ? (
+                <dl>
+                  {rows.map(([label, value]) => (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : (
+                <p>{t.noInfo}</p>
+              )}
+            </div>
+          )}
+        </div>
+        <a
+          className="panel-icon-btn"
+          href={video.src}
+          download={`${video.name}.${video.info?.container ?? "mp4"}`}
+          aria-label={t.download}
+          data-tip={t.download}
+        >
+          <Icon name="download" size={16} />
+        </a>
+      </div>
+
       <div className="vplayer-stage">
         <video
           ref={ref}
@@ -198,11 +314,15 @@ export default function VideoPlayer({
           src={video.src}
           className="vplayer-video"
           playsInline
+          loop={loop}
           preload="metadata"
           onClick={toggle}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          onLoadedMetadata={(e) => setLength(e.currentTarget.duration || 0)}
+          onLoadedMetadata={(e) => {
+            setLength(e.currentTarget.duration || 0);
+            setNatural({ width: e.currentTarget.videoWidth, height: e.currentTarget.videoHeight });
+          }}
           onProgress={(e) => setBuffered(bufferedTo(e.currentTarget))}
           onTimeUpdate={(e) => {
             if (!scrubbing.current) setAt(e.currentTarget.currentTime);
@@ -213,7 +333,6 @@ export default function VideoPlayer({
             handoff = null;
           }}
         />
-        <span className="vplayer-title" title={video.name}>{video.name}</span>
 
         <div className="vplayer-bar">
           <button
@@ -288,16 +407,17 @@ export default function VideoPlayer({
             </div>
         </div>
 
-        <a
-          className="vplayer-btn"
-          href={video.src}
-          download={`${video.name}.mp4`}
-          aria-label={t.download}
-          data-tip={t.download}
+        <button
+          type="button"
+          className={`vplayer-btn${loop ? " vplayer-btn--on" : ""}`}
+          onClick={toggleLoop}
+          aria-pressed={loop}
+          aria-label={loop ? t.loopOn : t.loopOff}
+          data-tip={loop ? t.loopOn : t.loopOff}
           data-tip-pos="up"
         >
-          <Icon name="download" size={18} />
-        </a>
+          <Icon name="repeat" size={18} />
+        </button>
 
         {onFullView && (
           <button

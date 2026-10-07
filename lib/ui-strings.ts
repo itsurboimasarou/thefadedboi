@@ -495,6 +495,18 @@ export const videoPlayerUi: Localized<{
   fullView: string;
   exitFullView: string;
   nothing: string;
+  loopOn: string;
+  loopOff: string;
+  info: string;
+  noInfo: string;
+  resolution: string;
+  codec: string;
+  fileType: string;
+  duration: string;
+  frameRate: string;
+  bitrate: string;
+  bitDepth: string;
+  range: string;
 }> = {
   en: {
     play: "Play",
@@ -507,6 +519,18 @@ export const videoPlayerUi: Localized<{
     fullView: "Large view",
     exitFullView: "Close large view",
     nothing: "No video selected.",
+    loopOn: "Loop: on",
+    loopOff: "Loop: off",
+    info: "Video info",
+    noInfo: "No info available for this video.",
+    resolution: "Resolution",
+    codec: "Codec",
+    fileType: "File type",
+    duration: "Duration",
+    frameRate: "Frame rate",
+    bitrate: "Bitrate",
+    bitDepth: "Bit depth",
+    range: "Range",
   },
   vi: {
     play: "Phát",
@@ -519,6 +543,18 @@ export const videoPlayerUi: Localized<{
     fullView: "Chế độ xem lớn",
     exitFullView: "Đóng chế độ xem lớn",
     nothing: "Chưa chọn video nào.",
+    loopOn: "Lặp lại: bật",
+    loopOff: "Lặp lại: tắt",
+    info: "Thông tin video",
+    noInfo: "Chưa có thông tin cho video này.",
+    resolution: "Độ phân giải",
+    codec: "Codec",
+    fileType: "Định dạng tệp",
+    duration: "Thời lượng",
+    frameRate: "Tốc độ khung hình",
+    bitrate: "Bitrate",
+    bitDepth: "Độ sâu màu",
+    range: "Dải tương phản",
   },
 };
 
