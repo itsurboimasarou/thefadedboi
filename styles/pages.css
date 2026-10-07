@@ -342,6 +342,41 @@ body:has(.gallery-page) {
   letter-spacing: 0.1em;
   white-space: nowrap;
 }
+.year-menu-head .icn { margin-right: 6px; vertical-align: -1px; }
+.year-menu-head:not(:first-child) {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--glass-border);
+}
+.gallery-filter-menu { min-width: 150px; }
+.gallery-filter-btn {
+  position: relative;
+  display: grid; place-items: center;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.gallery-filter-btn:hover,
+.gallery-filter-btn[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.gallery-filter-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.gallery-filter-btn--on::after {
+  content: "";
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+}
 .year-option { white-space: nowrap; }
 .year-menu--down { top: calc(100% + 8px); bottom: auto; }
 .year-menu--up { bottom: calc(100% + 8px); top: auto; }
@@ -387,6 +422,10 @@ body:has(.gallery-page) {
 
 body:has(.hubar--top) .mode-switch {
   top: calc(16px + var(--hubar-h, 68px) + 16px);
+}
+
+body:has(.topbar) .mode-switch {
+  top: calc(var(--topbar-h, 64px) + 12px);
 }
 
 .mode-switch--hidden {
@@ -1645,7 +1684,7 @@ html[data-bar-mode="split"]:not(.compact) #music-player.player-panel.control-pan
   z-index: 64;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 16px;
   width: fit-content;
   opacity: 0;
   visibility: hidden;
@@ -1699,11 +1738,12 @@ html[data-bar-mode="split"]:not(.compact) #music-player.player-panel.control-pan
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 1px solid var(--glass-border);
-  background: var(--glass);
-  color: var(--ink-dim);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--glass-border));
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  color: var(--ink);
   cursor: pointer;
-  transform: scale(0.95);
+  transform: scale(1);
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s, border-color 0.2s, background 0.2s;
 }
 .panel-indicator-btn:hover,

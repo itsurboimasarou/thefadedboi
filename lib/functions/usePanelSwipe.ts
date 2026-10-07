@@ -11,6 +11,10 @@ interface PanelSwipeOptions {
   wheelEnabled?: boolean;
 }
 
+const BARS = 'input[type="range"], [role="slider"], .player-progress';
+
+const onBar = (target: EventTarget) => !!(target as Element).closest?.(BARS);
+
 const isHorizontal = (dx: number, dy: number) =>
   Math.abs(dx) >= 10 && Math.abs(dx) > Math.abs(dy) * 1.2;
 
@@ -27,8 +31,8 @@ export function usePanelSwipe(o: PanelSwipeOptions) {
     Math.min(1, Math.max(0, (toRight ? 0 : 1) + dx / width));
   const passedThreshold = (p: number) => (toRight ? p > 0.35 : p < 0.65);
 
-  const begin = (x: number, y: number) => {
-    if (!enabled || !isCompact()) return false;
+  const begin = (x: number, y: number, target: EventTarget) => {
+    if (!enabled || !isCompact() || onBar(target)) return false;
     metaRef.current = { x, y, width: panelRef.current?.getBoundingClientRect().width || 1 };
     return true;
   };
@@ -74,7 +78,7 @@ export function usePanelSwipe(o: PanelSwipeOptions) {
   return {
     onTouchStart: (e: React.TouchEvent) => {
       const t = e.touches[0];
-      begin(t.clientX, t.clientY);
+      begin(t.clientX, t.clientY, e.target);
     },
     onTouchMove: (e: React.TouchEvent) => {
       const t = e.touches[0];
@@ -82,7 +86,7 @@ export function usePanelSwipe(o: PanelSwipeOptions) {
     },
     onTouchEnd: () => finish(dragProgress),
     onMouseDown: (e: React.MouseEvent) => {
-      if (begin(e.clientX, e.clientY)) setMouseDragging(true);
+      if (begin(e.clientX, e.clientY, e.target)) setMouseDragging(true);
     },
     onWheel: (e: React.WheelEvent) => {
       if (!wheelEnabled) return;

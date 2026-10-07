@@ -246,8 +246,6 @@ html.compact[data-bar-mode="split"] .panel-head .glance-row--mobile-only { displ
 
 :where(html.narrow) .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
 
-:where(html.narrow) .lang-switch .track-icon--left { top: 2px; left: 3px }
-:where(html.narrow) .lang-switch .track-icon--right { top: 2px; left: 37px }
 
 /* Mobile: plain uniform squares, ignoring each photo's real ratio —
    height comes from aspect-ratio: 1 against the flex-basis width, so no
@@ -411,33 +409,24 @@ html.compact[data-bar-mode="split"] .panel-head .glance-row--mobile-only { displ
 
 :where(html:not(.compact)) .hubar--left .lang-switch,
 :where(html:not(.compact)) .hubar--right .lang-switch {
+  flex-direction: column;
   width: 34px;
   height: 78px;
 }
-:where(html:not(.compact)) .hubar--left .lang-switch .track-icon,
-:where(html:not(.compact)) .hubar--right .lang-switch .track-icon {
-  width: 26px;
-  height: 36px;
-  left: 3px;
-}
-:where(html:not(.compact)) .hubar--left .lang-switch .track-icon--left,
-:where(html:not(.compact)) .hubar--right .lang-switch .track-icon--left {
-  top: 3px;
-}
-:where(html:not(.compact)) .hubar--left .lang-switch .track-icon--right,
-:where(html:not(.compact)) .hubar--right .lang-switch .track-icon--right {
-  top: 38px;
-}
 :where(html:not(.compact)) .hubar--left .lang-switch .knob,
 :where(html:not(.compact)) .hubar--right .lang-switch .knob {
-  top: 3px;
-  left: 3px;
-  width: 26px;
-  height: 36px;
+  top: var(--pad);
+  right: var(--pad);
+  bottom: auto;
+  width: auto;
+  height: calc(50% - var(--pad));
+  aspect-ratio: auto;
 }
 :where(html:not(.compact)) .hubar--left .lang-switch[aria-checked="true"] .knob,
 :where(html:not(.compact)) .hubar--right .lang-switch[aria-checked="true"] .knob {
-  translate: 0 34px;
+  top: 50%;
+  left: var(--pad);
+  translate: none;
 }
 
 /* Left/Right: the 62px vertical capsule has no room for a marquee title

@@ -2,13 +2,10 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import YearSelect from "./YearSelect";
 import ListBySelect, { type ListBy } from "./ListBySelect";
+import GalleryFilterMenu from "./GalleryFilterMenu";
+import { useCompact } from "@/lib/functions/useHuBarFit";
 import useHideOnScrollDown from "@/lib/functions/useHideOnScrollDown";
 import useHorizontalScroller from "@/lib/functions/useHorizontalScroller";
-
-/* The bar lives at the bottom now, full stop: the top of the gallery belongs
-   to the Still/Motion switch, so there is nothing left to move it to and the
-   position toggle went with it. The hide-on-scroll behaviour it had is
-   unchanged, and the switch shares it. */
 
 export interface AlbumChip { key: string; label: string; count: number }
 
@@ -33,9 +30,17 @@ export default function AlbumPillBar({
   listBy,
   onListByChange,
 }: AlbumPillBarProps) {
-  const hidden = useHideOnScrollDown();
+  const scrolledAway = useHideOnScrollDown();
+  const compact = useCompact();
+  const [panelOpen, setPanelOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const onPanel = (e: Event) => setPanelOpen((e as CustomEvent<string>).detail !== "none");
+    window.addEventListener("control-panel-state", onPanel);
+    return () => window.removeEventListener("control-panel-state", onPanel);
+  }, []);
+  const hidden = scrolledAway || (panelOpen && compact);
   const { ref: chipScrollRef, overflow } = useHorizontalScroller([chips]);
 
   const bar = (
@@ -59,15 +64,27 @@ export default function AlbumPillBar({
           </button>
         ))}
       </div>
-      <ListBySelect value={listBy} onChange={onListByChange} direction="up" />
-      {years.length > 0 && (
-        <YearSelect
+      {compact ? (
+        <GalleryFilterMenu
+          listBy={listBy}
+          onListByChange={onListByChange}
           years={years}
-          value={year}
-          onChange={onYearChange}
-          allowAll
-          direction="up"
+          year={year}
+          onYearChange={onYearChange}
         />
+      ) : (
+        <>
+          <ListBySelect value={listBy} onChange={onListByChange} direction="up" />
+          {years.length > 0 && (
+            <YearSelect
+              years={years}
+              value={year}
+              onChange={onYearChange}
+              allowAll
+              direction="up"
+            />
+          )}
+        </>
       )}
     </div>
   );

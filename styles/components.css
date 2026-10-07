@@ -4,14 +4,18 @@
 
 /* ── Theme slider switch (puck slides under fixed icons) ── */
 .theme-switch {
+  --pad: 2px;
   position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
   width: 62px;
   height: 30px;
   border-radius: 999px;
   border: 1px solid var(--glass-border);
   background: var(--glass-strong);
   cursor: pointer;
-  padding: 0;
+  padding: var(--pad);
   flex-shrink: 0;
   transition: background 0.25s, border-color 0.25s;
 }
@@ -21,15 +25,12 @@
 }
 
 .theme-switch .track-icon {
-  position: absolute;
-  top: 2px;
-  translate: none;
-  width: 24px;
-  height: 24px;
-  color: var(--ink-dim);
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
-  z-index: 1;
+  aspect-ratio: 1;
+  color: var(--ink-dim);
   transition: color 0.2s;
 }
 
@@ -38,21 +39,20 @@
   height: 16px;
 }
 
-.theme-switch .track-icon--left  { left: 2px; }
-.theme-switch .track-icon--right { left: 34px; right: auto; }
-
 .theme-switch[aria-checked="false"] .track-icon--left,
 .theme-switch[aria-checked="true"]  .track-icon--right {
   color: var(--accent-contrast);
 }
 
 .tri-switch {
+  --pad: 2px;
   position: relative;
   display: flex;
-  gap: 8px;
+  align-items: stretch;
+  justify-content: space-between;
   width: 92px;
   height: 30px;
-  padding: 2px;
+  padding: var(--pad);
   border-radius: 999px;
   border: 1px solid var(--glass-border);
   background: var(--glass-strong);
@@ -61,27 +61,37 @@
 }
 .tri-switch:hover { border-color: var(--accent); }
 
+.theme-switch .knob,
 .tri-switch .knob {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+  top: var(--pad);
+  bottom: var(--pad);
+  left: var(--pad);
+  aspect-ratio: 1;
+  border-radius: 999px;
   background: var(--accent);
   z-index: 0;
-  transition: translate 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    left 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    translate 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.tri-switch[data-pos="1"] .knob { translate: 32px 0; }
-.tri-switch[data-pos="2"] .knob { translate: 62px 0; }
+.tri-switch[data-pos="1"] .knob {
+  left: 50%;
+  translate: -50% 0;
+}
+.theme-switch[aria-checked="true"] .knob,
+.tri-switch[data-pos="2"] .knob {
+  left: calc(100% - var(--pad));
+  translate: -100% 0;
+}
 
 .tri-switch-slot {
   position: relative;
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  aspect-ratio: 1;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -99,22 +109,6 @@
 .tri-switch[aria-disabled="true"] { opacity: 0.45; }
 .tri-switch-slot:disabled { cursor: default; }
 
-.theme-switch .knob {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--accent);
-  z-index: 0;
-  transition: translate 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.theme-switch[aria-checked="true"] .knob {
-  translate: 32px 0;
-}
-
 .theme-switch:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -126,32 +120,24 @@
 }
 
 .lang-switch {
+  --pad: 2px;
   width: 78px;
   height: 34px;
   border-radius: 10px;
 }
 
 .lang-switch .track-icon {
-  top: 2px;
-  width: 36px;
-  height: 28px;
+  flex: 1 1 0;
+  aspect-ratio: auto;
   font-family: var(--font-lang), monospace;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.03em;
 }
-.lang-switch .track-icon--left { left: 3px; }
-.lang-switch .track-icon--right { left: 38px; }
 
 .lang-switch .knob {
-  top: 3px;
-  left: 3px;
-  width: 36px;
-  height: 27px;
-  border-radius: 7px;
-}
-.lang-switch[aria-checked="true"] .knob {
-  translate: 34px 0;
+  aspect-ratio: 36 / 28;
+  border-radius: 6px;
 }
 
 /* ── Small square icon toggle (HuBar dock buttons) ──── */
@@ -292,7 +278,7 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
 
 .fact-grid dd .theme-switch {
   /* obeys the dd's padding-left cleanly */
-  display: block;
+  display: flex;
 }
 
 .fact-grid dt .icn {
@@ -994,6 +980,12 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
 :where(html.compact) .topbar .status-clock-label {
   opacity: 1;
 }
+/* Both halves are already on screen here, so the hover/focus crossfade has
+   nothing to swap and must not blank the time. */
+.glance-row--mobile-only .status-clock .status-clock-time,
+:where(html.compact) .topbar .status-clock .status-clock-time {
+  opacity: 1;
+}
 
 .status-clock:focus-visible {
   outline: 2px solid var(--accent);
@@ -1372,6 +1364,7 @@ html.accent-bg:not([data-accent-bg-style="linear"]) .grad-preview {
   height: 4px;
   accent-color: var(--accent);
   cursor: pointer;
+  touch-action: none;
 }
 .grad-slider-input:disabled {
   opacity: 0.45;
@@ -1635,3 +1628,9 @@ html[data-theme="light"] .logo-option-swatch--default {
   color: var(--ink-dim);
 }
 
+
+/* A finger on a slider drives the slider and nothing else: without this the
+   browser may claim the drag to scroll the panel underneath it. */
+.control-panel input[type="range"] {
+  touch-action: none;
+}

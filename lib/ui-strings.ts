@@ -527,6 +527,12 @@ export const listBySelectUi: Localized<{
   vi: { listBy: "Xếp theo", album: "Album", device: "Thiết bị chụp", unknownDevice: "Không rõ thiết bị" },
 };
 
+/* components/gallery/GalleryFilterMenu.tsx */
+export const galleryFilterUi: Localized<{ filters: string; year: string }> = {
+  en: { filters: "Filters", year: "Year" },
+  vi: { filters: "Bộ lọc", year: "Năm" },
+};
+
 /* ── Widgets ───────────────────────────────────── */
 
 /* components/widgets/MusicPlayer.tsx */
