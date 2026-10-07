@@ -6,7 +6,7 @@ import { useLocalized } from "@/lib/i18n";
 import { contactsPageUi as ui } from "@/lib/ui-strings";
 
 import type { LinkItem } from "@/lib/types";
-import { getChangelog } from "@/lib/assets";
+import { getChangelog } from "@/lib/changelog";
 
 export async function getStaticProps() {
   return { props: { changelog: await getChangelog() }, revalidate: 300 };

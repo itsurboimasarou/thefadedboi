@@ -4,7 +4,7 @@ import { site as siteConfig, siteName } from "@/lib/configs/site.config";
 import { homeEyebrow } from "@/lib/configs/home.config";
 import { useLocalized } from "@/lib/i18n";
 import { homePageUi as ui } from "@/lib/ui-strings";
-import { getChangelog } from "@/lib/assets";
+import { getChangelog } from "@/lib/changelog";
 import VideoBackground from "@/components/layout/VideoBackground";
 import Icon from "@/components/ui/Icons";
 

@@ -7,7 +7,7 @@ import Icon from "@/components/ui/Icons";
 import Favourites from "@/components/content/Favourites";
 import LiveAge from "@/components/widgets/LiveAge";
 import Image from "next/image";
-import { getChangelog } from "@/lib/assets";
+import { getChangelog } from "@/lib/changelog";
 
 export async function getStaticProps() {
   return { props: { changelog: await getChangelog() }, revalidate: 300 };

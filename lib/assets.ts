@@ -86,7 +86,7 @@ async function listFiles(folder: string, ext: RegExp): Promise<string[]> {
 }
 
 export const deviceImage = (file: string) =>
-  `${RAW}/devices/${encodeURIComponent(file)}`;
+  `${CDN}/devices/${encodeURIComponent(file)}`;
 
 export interface BackdropManifest {
   video: string | null;
@@ -291,8 +291,4 @@ function validateDevices(raw: any): DeviceSection[] {
 
 export async function getDevices(): Promise<DeviceSection[]> {
   return validateDevices(await fetchJson("devices.json"));
-}
-
-export async function getChangelog(): Promise<string> {
-  return (await fetchRaw("changelog.md")) ?? "";
 }

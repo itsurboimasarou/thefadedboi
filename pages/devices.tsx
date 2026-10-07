@@ -1,5 +1,6 @@
 import type { InferGetStaticPropsType } from "next";
-import { getDevices, deviceImage, getChangelog } from "@/lib/assets";
+import { getDevices, deviceImage } from "@/lib/assets";
+import { getChangelog } from "@/lib/changelog";
 import Icon, { specIconFor } from "@/components/ui/Icons";
 import type { DeviceItem } from "@/lib/types";
 import { useLocalized } from "@/lib/i18n";

@@ -4,7 +4,8 @@ import { useLocalized } from "@/lib/i18n";
 import { portfolioPageUi as ui } from "@/lib/ui-strings";
 import AlbumGrid from "@/components/gallery/AlbumGrid";
 import Icon from "@/components/ui/Icons";
-import { getChangelog, listImages } from "@/lib/assets";
+import { listImages } from "@/lib/assets";
+import { getChangelog } from "@/lib/changelog";
 
 export async function getStaticProps() {
   return {
