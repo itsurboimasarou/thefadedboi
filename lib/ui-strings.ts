@@ -94,7 +94,7 @@ export const starsUi: Localized<{
   vi: {
     stars: "Sao băng",
     aboutStars: "Về sao băng",
-    starsTip: "Những đợt sao băng lướt xuống từ các góc trên của nền. Mặc định tắt. Tần suất chỉnh độ dày của sao, từ Hiếm đến Mưa sao băng — trời càng nhiều sao thì GPU càng phải vẽ lại nhiều, nên Mưa sao băng tốn nhất. Mỗi ngôi sao chỉ tồn tại khi đang bay, và không có gì chạy khi thẻ đang ở nền hoặc khi trang chủ đang hiển thị video hay ảnh nền. Tắt trong Chế độ nhẹ và khi hệ thống của bạn ưu tiên giảm chuyển động.",
+    starsTip: "Những đợt sao băng lướt xuống từ các góc trên của nền. Mặc định tắt. Tần suất chỉnh độ dày của sao, từ Hiếm đến Mưa sao băng — trời càng nhiều sao thì GPU càng phải vẽ lại nhiều, nên Mưa sao băng tốn nhất. Mỗi ngôi sao chỉ tồn tại khi đang bay, và không có gì chạy khi thẻ đang ở nền hoặc khi trang chủ đang hiển thị video hay ảnh nền. Tắt trong Chế độ Lite và khi hệ thống của bạn ưu tiên giảm chuyển động.",
     lockedByLite: "Bị tắt bởi Chế độ Lite",
     rate: "Tần suất sao băng",
     rates: ["Hiếm", "Thỉnh thoảng", "Thường xuyên", "Mưa sao băng"],
@@ -262,6 +262,10 @@ export const controlPanelUi: Localized<{
   back: string;
   changelog: string;
   resetAll: string;
+  resetTitle: string;
+  resetWarning: string;
+  resetConfirm: string;
+  cancel: string;
   close: string;
   appearance: string;
   aboutAppearance: string;
@@ -300,6 +304,10 @@ export const controlPanelUi: Localized<{
     back: "Back",
     changelog: "Changelog",
     resetAll: "Reset all to default",
+    resetTitle: "Reset everything?",
+    resetWarning: "This clears every setting you have changed — theme, colours, backdrop, HuBar layout, language and logo — and reloads the page. It cannot be undone.",
+    resetConfirm: "Reset all",
+    cancel: "Cancel",
     close: "Close",
     appearance: "Appearance",
     aboutAppearance: "About appearance",
@@ -338,6 +346,10 @@ export const controlPanelUi: Localized<{
     back: "Quay lại",
     changelog: "Nhật ký cập nhật",
     resetAll: "Đặt lại về mặc định",
+    resetTitle: "Đặt lại tất cả?",
+    resetWarning: "Thao tác này sẽ xóa mọi cài đặt bạn đã thay đổi — giao diện, màu sắc, kiểu nền, bố cục HuBar, ngôn ngữ và biểu tượng — rồi tải lại trang. Bạn sẽ không thể hoàn tác.",
+    resetConfirm: "Đặt lại tất cả",
+    cancel: "Hủy",
     close: "Đóng",
     appearance: "Giao diện",
     aboutAppearance: "Về giao diện",

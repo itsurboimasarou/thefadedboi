@@ -469,6 +469,9 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
 }
 
 .changelog-dialog { max-width: 630px; width: 100%; }
+.confirm-dialog { max-width: 420px; }
+.confirm-message { margin: 10px 0 0; color: var(--ink-dim); }
+.confirm-dialog .notice-actions { justify-content: flex-end; margin-top: 18px; }
 .changelog-body {
   max-height: 55vh;
   overflow-y: auto;
@@ -692,7 +695,9 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   gap: 8px;
   margin-top: 4px;
   color: var(--ink-dim);
-  font-size: 0.75rem;
+  font-family: var(--font-lang), var(--font-body, system-ui, sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 .player-time > :last-child { text-align: right; }
@@ -856,8 +861,9 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
 .player-track-duration {
   flex-shrink: 0;
   color: var(--ink-dim);
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-family: var(--font-lang), var(--font-body, system-ui, sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 

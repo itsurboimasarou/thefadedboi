@@ -3,6 +3,8 @@ import { createPortal } from "react-dom";
 import YearSelect from "./YearSelect";
 import ListBySelect, { type ListBy } from "./ListBySelect";
 import GalleryFilterMenu from "./GalleryFilterMenu";
+import { useDock } from "../controls/HuBarDock";
+import { useBarMode } from "../controls/BarMode";
 import { useCompact } from "@/lib/functions/useHuBarFit";
 import useHideOnScrollDown from "@/lib/functions/useHideOnScrollDown";
 import useHorizontalScroller from "@/lib/functions/useHorizontalScroller";
@@ -40,7 +42,12 @@ export default function AlbumPillBar({
     window.addEventListener("control-panel-state", onPanel);
     return () => window.removeEventListener("control-panel-state", onPanel);
   }, []);
-  const hidden = scrolledAway || (panelOpen && compact);
+  // Only a bottom-docked bar competes for this strip of the screen; with it
+  // anywhere else the pill bar has the bottom edge to itself and stays put.
+  const dock = useDock();
+  const split = useBarMode() === "split";
+  const barAtBottom = split ? compact || dock === "top" || dock === "bottom" : dock === "bottom";
+  const hidden = barAtBottom && (scrolledAway || (panelOpen && compact));
   const { ref: chipScrollRef, overflow } = useHorizontalScroller([chips]);
 
   const bar = (

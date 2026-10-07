@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import ThemeToggle, { AutoThemeToggle } from "../controls/ThemeToggle";
 import LiteModeToggle, { useLiteMode } from "../controls/LiteMode";
@@ -34,6 +34,7 @@ import AccentSetSwitch from "../controls/AccentSetSwitch";
 import LogoSwitch from "../controls/LogoSwitch";
 import StatusClock from "../widgets/StatusClock";
 import ChangelogDialog from "../content/ChangelogDialog";
+import ConfirmDialog from "../content/ConfirmDialog";
 import MusicPlayer from "../widgets/MusicPlayer";
 import { home as homeConfig, homeStatus } from "@/lib/configs/home.config";
 import { accentSets } from "@/lib/configs/accents.config";
@@ -105,6 +106,8 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
   };
 
   const [logOpen, setLogOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const closeReset = useCallback(() => setResetOpen(false), []);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const liteOn = useLiteMode();
   const gradient = useGradientChoice();
@@ -226,7 +229,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
       !(t as Element).closest?.(".panel-indicator") &&
       !(t as Element).closest?.(".notice-backdrop");
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !logOpen) navigateTo("none");
+      if (e.key === "Escape" && !logOpen && !resetOpen) navigateTo("none");
     };
     const onDown = (e: MouseEvent) => {
       if (isOutside(e.target as Node)) navigateTo("none");
@@ -242,7 +245,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("touchstart", onTouch);
     };
-  }, [visiblePanel, logOpen]);
+  }, [visiblePanel, logOpen, resetOpen]);
 
   // Swipe right to hand off to the music player.
   const swipe = usePanelSwipe({
@@ -272,7 +275,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         <div className="panel-head">
           <h2 className="h-with-icon panel-title">
             <Icon name="spark" size={18} />
-            {t.atAGlance}
+            <span className="panel-title-text">{t.atAGlance}</span>
           </h2>
           <div className="glance-row--mobile-only">
             <StatusClock
@@ -280,7 +283,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
               onClick={() => navigateTo("player")}
             />
           </div>
-          <div className={`panel-head-actions${themeMenuOpen ? " panel-head-actions--back" : ""}`}>
+          <div className="panel-head-actions">
             {themeMenuOpen ? (
               <button
                 type="button"
@@ -294,7 +297,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             ) : (
               <button
                 type="button"
-                className="panel-back-btn"
+                className="panel-back-btn panel-changelog-btn"
                 onClick={() => setLogOpen(true)}
                 aria-label={t.changelog}
               >
@@ -305,7 +308,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             <button
               type="button"
               className="panel-icon-btn"
-              onClick={resetAllToDefault}
+              onClick={() => setResetOpen(true)}
               aria-label={t.resetAll}
               data-tip={t.resetAll}
             >
@@ -313,7 +316,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
             </button>
             <button
               type="button"
-              className="panel-icon-btn"
+              className="panel-icon-btn panel-close-btn"
               onClick={() => navigateTo("none")}
               aria-label={t.close}
               data-tip={t.close}
@@ -389,7 +392,7 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
 
           <div className={liteOn ? "row--disabled" : undefined}>
             <dt>
-              <Icon name="star4" size={15} />
+              <Icon name="startrail" size={15} />
               {starT.stars}
             </dt>
             <dd className="dd-row">
@@ -566,6 +569,15 @@ export default function ControlPanel({ changelog }: { changelog: string }) {
         open={logOpen}
         onClose={() => setLogOpen(false)}
         changelog={changelog}
+      />
+      <ConfirmDialog
+        open={resetOpen}
+        title={t.resetTitle}
+        message={t.resetWarning}
+        confirmLabel={t.resetConfirm}
+        cancelLabel={t.cancel}
+        onConfirm={resetAllToDefault}
+        onClose={closeReset}
       />
       <MusicPlayer
         open={playerOpen}

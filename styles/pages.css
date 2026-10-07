@@ -1554,7 +1554,7 @@ body:has(.hubar--bottom) .gallery-page--motion {
 .hero-actions {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-auto-columns: minmax(0, 1fr);
   width: fit-content;
   margin-inline: auto;
   gap: 12px;
@@ -1626,6 +1626,12 @@ body:has(.hubar--bottom) .gallery-page--motion {
 .panel-title {
   font-size: 1.05rem;
   margin-bottom: 0;
+}
+
+.panel-title-text {
+  display: block;
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 
 /* Desktop: StatusClock already lives in HuBar itself, not the panel. */

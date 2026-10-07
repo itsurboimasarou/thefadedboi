@@ -343,7 +343,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       <div className="panel-head">
         <h2 className="h-with-icon panel-title">
           <Icon name="music" size={18} />
-          {t.music}
+          <span className="panel-title-text">{t.music}</span>
         </h2>
         <div className="panel-head-actions">
           <div className="player-header-volume">

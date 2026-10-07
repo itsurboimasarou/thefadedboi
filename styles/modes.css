@@ -137,7 +137,11 @@ html.compact { --topbar-h: 52px; }
 }
 /* Status specifically sits beside the "At a glance" title instead of
    its own grid row — an inline flex item there, not a block row. */
-:where(html.compact) .panel-head .glance-row--mobile-only { display: flex; align-items: center; }
+/* The auto margin takes the head's free space, parking the clock against the
+   actions rather than floating midway between them and the title. */
+:where(html.compact) .panel-head .glance-row--mobile-only { display: flex; align-items: center; margin-left: auto; margin-right: -4px; }
+/* The clock's own side padding is for the HuBar; here it only widens the gap. */
+:where(html.compact) .panel-head .status-clock { padding-inline: 0; }
 
 /* The panel carries a clock on a phone because the HuBar hides its end group
    there. The two-bar layout keeps one in the header, so this would be the
@@ -240,12 +244,11 @@ html.compact[data-bar-mode="split"] .panel-head .glance-row--mobile-only { displ
   transform: translateY(0) scale(1);
 }
 
-:where(html.narrow) .panel-head-actions { display: none; }
-:where(html.narrow) .player-panel .panel-head-actions { display: flex; }
+/* Changelog moves to the quick links and the panel closes by tapping outside,
+   so the head keeps only Back and Reset. */
+:where(html.narrow) .panel-changelog-btn,
+:where(html.narrow) .panel-close-btn,
 :where(html.narrow) .player-close-btn { display: none; }
-/* Theme menu open: only Back survives in the head, as in the player. */
-:where(html.narrow) .panel-head-actions--back { display: flex; }
-:where(html.narrow) .panel-head-actions--back .panel-icon-btn { display: none; }
 
 :where(html.narrow) .hero--bottom { padding-bottom: clamp(110px, 18vh, 170px); }
 
