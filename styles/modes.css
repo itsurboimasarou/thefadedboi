@@ -137,6 +137,19 @@ html.compact { --topbar-h: 52px; }
 }
 /* Status specifically sits beside the "At a glance" title instead of
    its own grid row — an inline flex item there, not a block row. */
+:where(html.compact) .panel-head .panel-title {
+  flex: 1 1 0;
+  min-width: 18px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  height: 26px;
+  padding-block: 4px;
+  overflow: hidden;
+}
+:where(html.compact) .panel-head .panel-title > .icn { flex-shrink: 0; }
+:where(html.compact) .panel-head .panel-title-text { white-space: nowrap; }
+:where(html.compact) .panel-head .glance-row--mobile-only { flex-shrink: 0; }
+
 /* The auto margin takes the head's free space, parking the clock against the
    actions rather than floating midway between them and the title. */
 :where(html.compact) .panel-head .glance-row--mobile-only { display: flex; align-items: center; margin-left: auto; margin-right: -4px; }

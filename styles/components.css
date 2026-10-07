@@ -586,6 +586,14 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   opacity: 0.45;
 }
 
+.player-panel > .player-single-btn {
+  position: absolute;
+  left: var(--panel-pad-x);
+  bottom: 14px;
+  width: 28px;
+  height: 28px;
+}
+
 .player-panel > .player-ambient-btn {
   position: absolute;
   right: var(--panel-pad-x);
@@ -1119,6 +1127,8 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   outline-offset: 2px;
 }
 
+.player-single-btn.panel-icon-btn--active,
+.player-ambient-btn.panel-icon-btn--active,
 .panel-icon-btn--active:hover,
 .panel-icon-btn--active:focus-visible {
   background: var(--accent);

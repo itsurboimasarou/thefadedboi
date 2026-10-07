@@ -575,6 +575,8 @@ export const musicPlayerUi: Localized<{
   swipeForControls: string;
   ambientOn: string;
   ambientOff: string;
+  singleOn: string;
+  singleOff: string;
 }> = {
   en: {
     music: "Music",
@@ -603,6 +605,8 @@ export const musicPlayerUi: Localized<{
     swipeForControls: "Swipe left for site controls",
     ambientOn: "Ambient mode: on",
     ambientOff: "Ambient mode: off",
+    singleOn: "Play single track only: on",
+    singleOff: "Play single track only: off",
   },
   vi: {
     music: "Nhạc",
@@ -631,6 +635,8 @@ export const musicPlayerUi: Localized<{
     swipeForControls: "Vuốt sang trái để mở điều khiển trang",
     ambientOn: "Chế độ ambient: bật",
     ambientOff: "Chế độ ambient: tắt",
+    singleOn: "Chỉ phát một bài: bật",
+    singleOff: "Chỉ phát một bài: tắt",
   },
 };
 

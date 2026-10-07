@@ -61,6 +61,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   const [duration, setDuration] = useState(0);
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState<RepeatMode>("off");
+  const [single, setSingle] = useState(false);
   const [scrubbing, setScrubbing] = useState(false);
   const [dragTime, setDragTime] = useState(0);
 
@@ -208,7 +209,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       if (el) { el.currentTime = 0; el.play().catch(() => {}); }
       return;
     }
-    if (repeat === "off" && !shuffle && activeTrack === len - 1) {
+    if (single || (repeat === "off" && !shuffle && activeTrack === len - 1)) {
       setPlaying(false);
       return;
     }
@@ -602,6 +603,20 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       </div>
 
       <p className="panel-swipe-hint">{t.swipeForControls}</p>
+
+      {current && !listOpen && (
+        <button
+          type="button"
+          className={`panel-icon-btn player-single-btn${single ? " panel-icon-btn--active" : ""}`}
+          onClick={() => setSingle((v) => !v)}
+          aria-pressed={single}
+          aria-label={single ? t.singleOn : t.singleOff}
+          data-tip={single ? t.singleOn : t.singleOff}
+          data-tip-pos="up"
+        >
+          <Icon name="playOnce" size={16} />
+        </button>
+      )}
 
       {current && !listOpen && (
         <button

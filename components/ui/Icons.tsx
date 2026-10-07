@@ -89,6 +89,7 @@ const icons: Record<string, JSX.Element> = {
   calendar: <svg {...p}><rect x="3.5" y="5" width="17" height="15.5" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /></svg>,
   shuffle: <svg {...p}><path d="M16 3h5v5" /><path d="M4 20 21 3" /><path d="M21 16v5h-5" /><path d="m15 15 6 6" /><path d="m4 4 5 5" /></svg>,
   repeat: <svg {...p}><path d="m17 1 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 23-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /></svg>,
+  playOnce: <svg {...p}><path d="M4 12h11M11 7l5 5-5 5M20 6v12" /></svg>,
   repeatOne: <svg {...p}><path d="m17 1 4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><path d="m7 23-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" /><text x="12" y="16.5" fontSize="12" fontWeight="700" fill="currentColor" stroke="none" textAnchor="middle" style={{ fontFamily: "var(--font-lang), sans-serif" }}>1</text></svg>,
   volumeHigh: <svg {...p}><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12" /></svg>,
   collection: <svg {...p}><rect x="3" y="4" width="18" height="5" rx="1.5" /><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4" /></svg>,
