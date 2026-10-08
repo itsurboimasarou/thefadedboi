@@ -836,7 +836,7 @@ body:has(.topbar) .mode-switch {
   writing-mode: vertical-lr;
   direction: rtl;
   width: 4px;
-  height: 92px;
+  height: calc(100px + var(--range-knob));
   cursor: pointer;
   --range-dir: to top;
   --range-rail: rgba(255, 255, 255, 0.26);
