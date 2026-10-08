@@ -109,7 +109,13 @@ function infoRows(
 
 const IDLE_MS = 2600;
 
-export default function VideoPlayer({ video }: { video: GalleryVideo | undefined }) {
+export default function VideoPlayer({
+  video,
+  onStep,
+}: {
+  video: GalleryVideo | undefined;
+  onStep?: (dir: 1 | -1) => void;
+}) {
   const t = useLocalized(ui);
   const ref = useRef<HTMLVideoElement>(null);
   const root = useRef<HTMLDivElement>(null);
@@ -374,6 +380,31 @@ export default function VideoPlayer({ video }: { video: GalleryVideo | undefined
             handoff = null;
           }}
         />
+
+        {onStep && (
+          <>
+            <button
+              type="button"
+              className="vplayer-nav vplayer-nav--prev"
+              onClick={() => onStep(-1)}
+              aria-label={t.previousVideo}
+              data-tip={t.previousVideo}
+              data-tip-pos="right"
+            >
+              <Icon name="chevronLeft" size={22} />
+            </button>
+            <button
+              type="button"
+              className="vplayer-nav vplayer-nav--next"
+              onClick={() => onStep(1)}
+              aria-label={t.nextVideo}
+              data-tip={t.nextVideo}
+              data-tip-pos="left"
+            >
+              <Icon name="chevronRight" size={22} />
+            </button>
+          </>
+        )}
 
         <div className="vplayer-bar">
           <button

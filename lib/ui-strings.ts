@@ -497,6 +497,8 @@ export const videoPlayerUi: Localized<{
   nothing: string;
   loopOn: string;
   loopOff: string;
+  previousVideo: string;
+  nextVideo: string;
   info: string;
   noInfo: string;
   resolution: string;
@@ -521,6 +523,8 @@ export const videoPlayerUi: Localized<{
     nothing: "No video selected.",
     loopOn: "Loop: on",
     loopOff: "Loop: off",
+    previousVideo: "Previous video",
+    nextVideo: "Next video",
     info: "Video info",
     noInfo: "No info available for this video.",
     resolution: "Resolution",
@@ -545,6 +549,8 @@ export const videoPlayerUi: Localized<{
     nothing: "Chưa chọn video nào.",
     loopOn: "Lặp lại: bật",
     loopOff: "Lặp lại: tắt",
+    previousVideo: "Video trước",
+    nextVideo: "Video sau",
     info: "Thông tin video",
     noInfo: "Chưa có thông tin cho video này.",
     resolution: "Độ phân giải",

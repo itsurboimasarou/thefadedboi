@@ -42,7 +42,14 @@ export default function MotionSection({
 
   return (
     <>
-      <VideoPlayer video={playing} />
+      <VideoPlayer
+        video={playing}
+        onStep={
+          videos.length > 1
+            ? (dir) => setCurrent((i) => (i + dir + videos.length) % videos.length)
+            : undefined
+        }
+      />
 
       <div className="motion-box">
         <div className="motion-strip-wrap">
