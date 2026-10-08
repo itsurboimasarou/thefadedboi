@@ -18,6 +18,8 @@ const COVER_MS = 300;
 const REVEAL_MS = 380;
 const SETTLE_MS = 240;
 
+const SCROLL_KEYS = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
+
 const NavigateCtx = createContext<(href: string) => void>(() => {});
 
 export function useStackNavigate(): (href: string) => void {
@@ -127,6 +129,32 @@ export default function PageStackTransition({ children }: { children: ReactNode 
   }, [router.events]);
 
   const visible = phase !== "idle" || drag !== null;
+  const swiping = drag !== null;
+
+  useEffect(() => {
+    if (!visible) return;
+    const stop = (e: Event) => {
+      if (e.cancelable) e.preventDefault();
+    };
+    const keys = (e: KeyboardEvent) => {
+      const typing = (e.target as Element | null)?.closest?.("input, textarea, select, [contenteditable]");
+      if (SCROLL_KEYS.has(e.key) && !typing) e.preventDefault();
+    };
+    window.addEventListener("wheel", stop, { passive: false });
+    window.addEventListener("touchmove", stop, { passive: false });
+    window.addEventListener("keydown", keys);
+    return () => {
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchmove", stop);
+      window.removeEventListener("keydown", keys);
+    };
+  }, [visible]);
+  useEffect(() => {
+    if (!swiping) return;
+    const root = document.documentElement;
+    root.classList.add("stack-swiping");
+    return () => root.classList.remove("stack-swiping");
+  }, [swiping]);
 
   return (
     <NavigateCtx.Provider value={navigate}>

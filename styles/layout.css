@@ -44,6 +44,14 @@ html:not(.no-scroll) .app-root:has(.hubar--top) .main { padding-top: calc(16px +
   }
 }
 
+html.stack-swiping,
+html.stack-swiping body {
+  overflow: hidden;
+}
+html.stack-swiping.no-scroll .main {
+  overflow: hidden;
+}
+
 /* ── Page transition veil (Canva-style stack) ───────── */
 .stack-veil {
   position: fixed;
