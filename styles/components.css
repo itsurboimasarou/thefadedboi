@@ -348,30 +348,29 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
-  animation: status-pulse 2.2s ease-out infinite;
+  position: relative;
+  animation: status-beat 2.2s ease-out infinite;
 }
 
-/* The box-shadow ring already expanded outward, but the dot itself stayed
-   a static size throughout — barely read as "pulsing" at 10px. Scaling
-   the dot in sync with the ring gives the pulse an actual source. */
-@keyframes status-pulse {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent);
-    transform: scale(1);
-  }
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  animation: status-ring 2.2s ease-out infinite;
+}
 
-  30% {
-    transform: scale(1.25);
-  }
+@keyframes status-beat {
+  0%, 70%, 100% { transform: scale(1); }
+  30% { transform: scale(1.25); }
+}
 
-  70% {
-    box-shadow: 0 0 0 8px transparent;
-    transform: scale(1);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-  }
+@keyframes status-ring {
+  0% { transform: scale(1); opacity: 0.45; }
+  70%, 100% { transform: scale(2.6); opacity: 0; }
 }
 
 .status-dot--online,
@@ -395,6 +394,7 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   opacity: 0.75;
   animation: none;
 }
+.status-dot--offline::after { animation: none; }
 
 .notice-backdrop {
   position: fixed;
@@ -955,7 +955,11 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   }
 }
 
+/* The digits change every second. On their own layer that redraws a strip the
+   size of the time; without it the whole bar they sit in, shadow included, is
+   redrawn each tick. */
 .status-clock-time {
+  will-change: transform;
   display: inline-flex;
   align-items: baseline;
   color: var(--ink);

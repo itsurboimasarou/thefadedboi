@@ -136,6 +136,7 @@ html.glass-fx--all:where([data-theme="light"]) {
 /* Lite mode (and reduced motion) force opaque chrome: a live blur repaints
    whenever anything moves behind it. */
 html.lite-mode {
+  --shadow: none;
   --chrome-blur: none;
   --chrome-bg: var(--hubar-solid);
   --surface-bg: var(--glass);

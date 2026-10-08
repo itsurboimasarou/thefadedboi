@@ -61,6 +61,17 @@ export default function VideoBackground() {
     v.play().catch(() => { });
   }, [kind]);
 
+  useEffect(() => {
+    const onLite = (e: Event) => {
+      const v = ref.current;
+      if (!v) return;
+      if ((e as CustomEvent<boolean>).detail) v.pause();
+      else v.play().catch(() => { });
+    };
+    window.addEventListener("lite-mode-change", onLite);
+    return () => window.removeEventListener("lite-mode-change", onLite);
+  }, []);
+
   const toggle = () => {
     const v = ref.current;
     if (!v) return;

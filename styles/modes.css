@@ -580,7 +580,9 @@ html.lite-mode .page-progress-bar--secondary { display: none; }
 html.lite-mode .thumb-loader::after { animation: none; }
 
 /* Lite mode: stop the only permanently-running animation on the page. */
-html.lite-mode .status-dot::after { animation: none; opacity: 0; }
+html.lite-mode .status-dot,
+html.lite-mode .status-dot::after { animation: none; }
+html.lite-mode .status-dot::after { opacity: 0; }
 
 html.lite-mode .control-panel { transition: none; }
 html.lite-mode .gallery-pillbar,

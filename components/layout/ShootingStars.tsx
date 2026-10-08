@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useStars, useStarRate, DEFAULT_STAR_RATE } from "../controls/StarMode";
 import { useLiteMode } from "../controls/LiteMode";
 
-interface Rate {
+interface BurstRate {
+  kind: "burst";
   showerMin: number;
   showerMax: number;
   staggerMin: number;
@@ -12,19 +13,26 @@ interface Rate {
   maxLive: number;
 }
 
+interface StreamRate {
+  kind: "stream";
+  gapMin: number;
+  gapMax: number;
+  maxLive: number;
+}
+
+type Rate = BurstRate | StreamRate;
+
 const RATES: Rate[] = [
-  { showerMin: 1, showerMax: 2, staggerMin: 200, staggerMax: 700, quietMin: 9000, quietMax: 15000, maxLive: 3 },
-  { showerMin: 2, showerMax: 5, staggerMin: 140, staggerMax: 620, quietMin: 4200, quietMax: 8400, maxLive: 5 },
-  { showerMin: 4, showerMax: 8, staggerMin: 100, staggerMax: 420, quietMin: 3000, quietMax: 6000, maxLive: 8 },
-  { showerMin: 5, showerMax: 9, staggerMin: 80, staggerMax: 300, quietMin: 600, quietMax: 1600, maxLive: 10 },
+  { kind: "burst", showerMin: 1, showerMax: 2, staggerMin: 200, staggerMax: 700, quietMin: 9000, quietMax: 15000, maxLive: 3 },
+  { kind: "burst", showerMin: 2, showerMax: 5, staggerMin: 140, staggerMax: 620, quietMin: 4200, quietMax: 8400, maxLive: 5 },
+  { kind: "stream", gapMin: 650, gapMax: 1700, maxLive: 8 },
+  { kind: "stream", gapMin: 90, gapMax: 360, maxLive: 16 },
 ];
 
 const FIRST_MIN = 600;
 const FIRST_MAX = 2200;
 const DUR_MIN = 0.9;
 const DUR_MAX = 1.6;
-
-type Corner = "left" | "right";
 
 interface Star {
   id: number;
@@ -33,17 +41,16 @@ interface Star {
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 
-function makeStar(id: number, corner: Corner): Star {
-  const right = corner === "right";
+function makeStar(id: number): Star {
   const overTop = Math.random() < 0.65;
   const top = overTop ? rand(-3, 3) : rand(0, 35);
-  const left = overTop ? (right ? rand(30, 100) : rand(0, 70)) : right ? rand(97, 101) : rand(-1, 3);
+  const left = overTop ? rand(30, 100) : rand(97, 101);
   return {
     id,
     style: {
       top: `${top.toFixed(1)}%`,
       left: `${left.toFixed(1)}%`,
-      ["--star-angle" as string]: `${(right ? rand(128, 146) : rand(34, 52)).toFixed(1)}deg`,
+      ["--star-angle" as string]: `${rand(128, 146).toFixed(1)}deg`,
       ["--star-dist" as string]: `${rand(85, 125).toFixed(0)}vmax`,
       ["--star-dur" as string]: `${rand(DUR_MIN, DUR_MAX).toFixed(2)}s`,
       ["--star-tail" as string]: `${rand(80, 140).toFixed(0)}px`,
@@ -90,26 +97,31 @@ export default function ShootingStars() {
       timers.add(t);
     };
 
-    const spawn = (corner: Corner) =>
+    const spawn = () =>
       setStars((live) =>
-        live.length >= rate.maxLive ? live : [...live, makeStar(seq.current++, corner)]
+        live.length >= rate.maxLive ? live : [...live, makeStar(seq.current++)]
       );
 
-    const shower = () => {
-      const corner: Corner = Math.random() < 0.5 ? "left" : "right";
-      const count = Math.round(rand(rate.showerMin, rate.showerMax));
+    const shower = (r: BurstRate) => {
+      const count = Math.round(rand(r.showerMin, r.showerMax));
       let at = 0;
       for (let i = 0; i < count; i++) {
-        later(() => spawn(corner), at);
-        at += rand(rate.staggerMin, rate.staggerMax);
+        later(spawn, at);
+        at += rand(r.staggerMin, r.staggerMax);
       }
-      later(shower, at + DUR_MAX * 1000 + rand(rate.quietMin, rate.quietMax));
+      later(() => shower(r), at + DUR_MAX * 1000 + rand(r.quietMin, r.quietMax));
+    };
+
+    const stream = (r: StreamRate) => {
+      spawn();
+      later(() => stream(r), rand(r.gapMin, r.gapMax));
     };
 
     const start = () => {
       if (running) return;
       running = true;
-      later(shower, rand(FIRST_MIN, FIRST_MAX));
+      if (rate.kind === "stream") later(() => stream(rate), rand(FIRST_MIN, FIRST_MAX) / 3);
+      else later(() => shower(rate), rand(FIRST_MIN, FIRST_MAX));
     };
     
     const halt = () => {

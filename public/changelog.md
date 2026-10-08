@@ -8,11 +8,12 @@ All notable changes to this site are documented here.
 - Introducing Ambient mode for Music Player!
 - Visual & bugs fixes
 - Gallery now has List filter with more mobile UI optimizations 
-- Knob style synchronized for range sliders
-- Reverted Gitea to GitHub for faster assets loadline
 - Loadline rebuild for Gallery or any kind of photos/videos so it should load much faster
 - New Collection section for Devices & Equipments
 - New important alert for Linux users about VA-API driver (for HEVC decoding)
+- [update-1] Knob style synchronized for range sliders & new single track mode
+- [update-1] Move site-assets database directly on D1 SQlite for quicker access (and easier for me to manage!)
+- [update-2] Animation optimization
 
 ### [6.0 - 10/06/2026]
 - Goodbye Snow, it's the Year of G(oat)anyu!

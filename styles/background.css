@@ -13,6 +13,7 @@
   background: var(--bg);
   transition: background 0.2s ease;
   isolation: isolate;
+  contain: layout paint style;
 }
 
 html.has-bg-video .orb-field {
@@ -31,15 +32,24 @@ html.accent-bg:is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-
   background: var(--wash-base);
 }
 
-html.accent-bg:is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .orb-field::before {
-  content: "";
+.wash {
   position: absolute;
   inset: -20%;
+  display: none;
   pointer-events: none;
 }
+.wash::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
 
-html.accent-bg[data-accent-bg-style="hulight"]:is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .orb-field::before,
-html.accent-bg:not([data-accent-bg-style]):is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .orb-field::before {
+html.accent-bg:is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .wash {
+  display: block;
+}
+
+html.accent-bg[data-accent-bg-style="hulight"]:is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .wash::before,
+html.accent-bg:not([data-accent-bg-style]):is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .wash::before {
   background:
     radial-gradient(45% 55% at 18% 22%, var(--wash-soft) 0%, transparent 70%),
     radial-gradient(55% 60% at 84% 82%, var(--wash-deep) 0%, transparent 72%),
@@ -48,7 +58,7 @@ html.accent-bg:not([data-accent-bg-style]):is([data-backdrop="gradient"], [data-
   filter: blur(64px);
 }
 
-html.accent-bg[data-accent-bg-style="linear"]:is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .orb-field::before {
+html.accent-bg[data-accent-bg-style="linear"]:is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .wash::before {
   background: var(--grad-ramp);
 }
 
@@ -121,8 +131,8 @@ html[data-accent-bg-mix="theme"][data-theme="dark"] {
 
 /* ── Drift ─────────────────────────────────────────── */
 
-html.accent-bg.accent-bg-motion[data-accent-bg-style="hulight"]:not(.lite-mode):is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .orb-field::before,
-html.accent-bg.accent-bg-motion:not([data-accent-bg-style]):not(.lite-mode):is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .orb-field::before {
+html.accent-bg.accent-bg-motion[data-accent-bg-style="hulight"]:not(.lite-mode):is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .wash,
+html.accent-bg.accent-bg-motion:not([data-accent-bg-style]):not(.lite-mode):is([data-backdrop="gradient"], [data-backdrop="media"]):not(.has-bg-video) .wash {
   animation: wash-drift var(--drift-dur, 48s) ease-in-out infinite alternate;
 }
 
@@ -134,25 +144,26 @@ html.accent-bg.accent-bg-motion:not([data-accent-bg-style]):not(.lite-mode):is([
 
 
 /* ── Video backdrop ───────────────────────────────── */
-.bg-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.4;
-  filter: brightness(0.8) saturate(0.9);
-  pointer-events: none;
-}
-
+/* The media plays untouched and a flat black sheet over it does the dimming.
+   A filter or opacity on a playing video has to be re-applied to every frame
+   and keeps it off the browser's cheap video path; a solid sheet costs
+   nothing. 0.68 black lands on the same brightness the old
+   opacity 0.4 + brightness 0.8 over black did. */
+.bg-video,
 .bg-image {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.4;
-  filter: brightness(0.8) saturate(0.9);
+  pointer-events: none;
+}
+
+html.has-bg-video .orb-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
   pointer-events: none;
 }
 

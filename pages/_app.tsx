@@ -73,6 +73,7 @@ function AppShell({ Component, pageProps }: AppProps) {
         <meta name="theme-color" content="#6fd6b4" />
       </Head>
       <div id="orb-field" className="orb-field" aria-hidden="true">
+        <div className="wash" />
         <ShootingStars />
       </div>
       <div className="shell">
