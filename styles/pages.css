@@ -1209,6 +1209,50 @@ body:has(.topbar) .mode-switch {
   color: var(--accent-contrast);
 }
 
+.vplayer--fs .vplayer-name[role="button"] {
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.vplayer--fs .vplayer-name[role="button"]:hover,
+.vplayer--fs .vplayer-name[role="button"]:focus-visible,
+.vplayer--fs .vplayer-name--on {
+  border-color: var(--accent);
+}
+.vplayer--fs .vplayer-name[role="button"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.vplayer-list {
+  position: absolute;
+  right: 18px;
+  bottom: 72px;
+  left: 18px;
+  z-index: 3;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(8, 10, 14, 0.84);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+  overscroll-behavior: contain;
+  --menu-from: 0 14px;
+  animation: menu-in 0.2s ease both;
+}
+.vplayer-list .motion-tile {
+  width: clamp(130px, 18vw, 200px);
+  background: rgba(255, 255, 255, 0.08);
+}
+.vplayer-list .motion-tile-name { color: rgba(255, 255, 255, 0.78); }
+.vplayer-list .motion-tile--on .motion-tile-name { color: #fff; }
+html.lite-mode .vplayer-list { animation: none; }
+.vplayer:has(.vplayer-list) .vplayer-nav {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .vplayer--fs.vplayer--idle:not(.vplayer--paused) { cursor: none; }
 .vplayer--fs.vplayer--idle:not(.vplayer--paused) .vplayer-video { cursor: none; }
 .vplayer--fs.vplayer--idle:not(.vplayer--paused) .vplayer-bar,
@@ -1265,6 +1309,34 @@ body:has(.topbar) .mode-switch {
 }
 .motion-box--browse .motion-tile { width: auto; }
 .motion-box--browse .motion-strip-empty { grid-column: 1 / -1; }
+
+/* The round tool buttons in the box's bottom row: expand, and move the box. */
+.motion-tool { flex-shrink: 0; }
+.motion-tool--on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+.motion-tool--on:hover { background: var(--accent); }
+
+/* Over the player rather than under it: the gap the player leaves above
+   itself becomes the gap between the two. */
+.motion-box--above + .vplayer { margin-top: 14px; }
+/* ...and the box turns over with it: chips and search along the top, clips
+   under them, so that expanded it grows down toward the player's place and
+   the row being typed in stays where it is. */
+.motion-box--above {
+  display: flex;
+  flex-direction: column;
+}
+/* Expanded it is the last thing on the page, as the player was, and keeps
+   the player's bottom margin so the page doesn't come up short. */
+.motion-box--above.motion-box--browse { margin-bottom: 14px; }
+.motion-box--above .motion-albums {
+  order: -1;
+  border-top: 0;
+  border-bottom: 1px solid var(--glass-border);
+}
 
 /* Holds the arrows against the strip's edges without joining the scroll. */
 .motion-strip-wrap {

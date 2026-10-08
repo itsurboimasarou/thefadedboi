@@ -131,9 +131,13 @@ const IDLE_MS = 2600;
 export default function VideoPlayer({
   video,
   onStep,
+  list,
+  onPick,
 }: {
   video: GalleryVideo | undefined;
   onStep?: (dir: 1 | -1) => void;
+  list?: GalleryVideo[];
+  onPick?: (index: number) => void;
 }) {
   const t = useLocalized(ui);
   const ref = useRef<HTMLVideoElement>(null);
@@ -150,6 +154,7 @@ export default function VideoPlayer({
   const [volOpen, setVolOpen] = useState(false);
   const [loop, setLoop] = useState(lastLoop);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [listOpen, setListOpen] = useState(false);
   const [natural, setNatural] = useState({ width: 0, height: 0 });
   const infoWrap = useRef<HTMLDivElement>(null);
   const scrubbing = useRef(false);
@@ -185,7 +190,9 @@ export default function VideoPlayer({
 
   useEffect(() => {
     const onChange = () => {
-      setFullscreen(!!root.current && document.fullscreenElement === root.current);
+      const on = !!root.current && document.fullscreenElement === root.current;
+      setFullscreen(on);
+      if (!on) setListOpen(false);
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
           const el = ref.current;
@@ -340,21 +347,38 @@ export default function VideoPlayer({
   }
 
   const rows = infoRows(video.info, t, { ...natural, length });
+  const canList = fullscreen && !!list?.length && !!onPick;
+  const listShown = canList && listOpen;
 
   return (
     <div
       ref={root}
       className={`vplayer${fullscreen ? " vplayer--fs" : ""}${
         playing ? "" : " vplayer--paused"
-      }${fullscreen && idle && !infoOpen && !volOpen ? " vplayer--idle" : ""}`}
+      }${fullscreen && idle && !infoOpen && !volOpen && !listShown ? " vplayer--idle" : ""}`}
       onPointerMove={fullscreen ? wake : undefined}
       onPointerDown={fullscreen ? wake : undefined}
       onKeyDown={fullscreen ? wake : undefined}
     >
       <div className="vplayer-head">
         <span
-          className={`vplayer-name${video.brief ? " vplayer-name--brief" : ""}`}
+          className={`vplayer-name${video.brief ? " vplayer-name--brief" : ""}${listShown ? " vplayer-name--on" : ""}`}
           title={video.brief ? `${video.name} | ${video.brief}` : video.name}
+          {...(canList
+            ? {
+                role: "button",
+                tabIndex: 0,
+                "aria-expanded": listShown,
+                "aria-label": `${video.name}. ${t.showVideoList}`,
+                onClick: () => setListOpen((v) => !v),
+                onKeyDown: (e: React.KeyboardEvent) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setListOpen((v) => !v);
+                  }
+                },
+              }
+            : {})}
         >
           <span className="vplayer-title">{video.name}</span>
           {video.brief && (
@@ -413,7 +437,8 @@ export default function VideoPlayer({
           loop={loop}
           preload="metadata"
           onClick={(e) => {
-            if (onPicture(e.currentTarget, e.clientX, e.clientY)) toggle();
+            if (listShown) setListOpen(false);
+            else if (onPicture(e.currentTarget, e.clientX, e.clientY)) toggle();
           }}
           onMouseMove={(e) => {
             const el = e.currentTarget;
@@ -459,6 +484,28 @@ export default function VideoPlayer({
               <Icon name="chevronRight" size={22} />
             </button>
           </>
+        )}
+
+        {listShown && list && (
+          <div className="vplayer-list" role="listbox" aria-label={t.videoList}>
+            {list.map((v, i) => (
+              <button
+                key={v.src}
+                type="button"
+                role="option"
+                aria-selected={v.src === video.src}
+                className={`motion-tile${v.src === video.src ? " motion-tile--on" : ""}`}
+                onClick={() => {
+                  setListOpen(false);
+                  if (v.src !== video.src) onPick?.(i);
+                }}
+                aria-label={t.playVideo(v.name)}
+              >
+                <video src={`${v.src}#t=0.1`} preload="metadata" muted playsInline tabIndex={-1} />
+                <span className="motion-tile-name">{v.name}</span>
+              </button>
+            ))}
+          </div>
         )}
 
         <div className="vplayer-bar">

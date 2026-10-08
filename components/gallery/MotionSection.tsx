@@ -12,6 +12,9 @@ import { motionUi as ui } from "@/lib/ui-strings";
 
 const MORPH_MS = 380;
 
+type ListPos = "below" | "above";
+const LIST_POS_KEY = "motion-list-pos";
+
 export default function MotionSection({
   videos,
   chips,
@@ -47,6 +50,20 @@ export default function MotionSection({
     setCurrent(kept < 0 ? 0 : kept);
   }, [videos]);
 
+  const [listPos, setListPos] = useState<ListPos>("below");
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(LIST_POS_KEY) === "above") setListPos("above");
+    } catch {}
+  }, []);
+  const moveList = () => {
+    const next: ListPos = listPos === "below" ? "above" : "below";
+    setListPos(next);
+    try {
+      localStorage.setItem(LIST_POS_KEY, next);
+    } catch {}
+  };
+
   const [browsing, setBrowsing] = useState(false);
   const [boxHeight, setBoxHeight] = useState<number>();
   const box = useRef<HTMLDivElement>(null);
@@ -54,14 +71,18 @@ export default function MotionSection({
   const scrolled = useRef(0);
   const span = useRef({ rest: 0, full: 0 });
 
+  const expand = () => {
+    const el = box.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const player = el.parentElement?.querySelector(":scope > .vplayer")?.getBoundingClientRect();
+    floor.current = Math.max(rect.bottom, player?.bottom ?? rect.bottom) + window.scrollY;
+    scrolled.current = window.scrollY;
+    span.current.rest = rect.height;
+    setBrowsing(true);
+  };
+
   const search = (v: string) => {
-    if (v !== "" && !browsing && box.current) {
-      const rect = box.current.getBoundingClientRect();
-      floor.current = rect.bottom + window.scrollY;
-      scrolled.current = window.scrollY;
-      span.current.rest = rect.height;
-      setBrowsing(true);
-    }
     if (v === "") setBrowsing(false);
     onQueryChange(v);
   };
@@ -73,10 +94,9 @@ export default function MotionSection({
     let { full } = span.current;
     if (browsing) {
       const now = el.getBoundingClientRect();
-      full = now.height + floor.current - (now.bottom + window.scrollY);
+      full = floor.current - (now.top + window.scrollY);
       span.current.full = full;
       setBoxHeight(full);
-
       el.style.height = `${full}px`;
       window.scrollTo({ top: scrolled.current, behavior: "instant" });
     } else {
@@ -89,17 +109,24 @@ export default function MotionSection({
     ) return;
 
     const extra = full - rest;
+    const small = `${rest}px`;
+    const large = `${full}px`;
     let frames: Keyframe[];
-    if (browsing) {
+    const below = parseFloat(getComputedStyle(el).marginBottom) || 0;
+    if (listPos === "above") {
+      frames = browsing
+        ? [{ height: small, marginBottom: `${extra + below}px` }, { height: large, marginBottom: `${below}px` }]
+        : [{ height: large, marginBottom: `${-extra}px` }, { height: small, marginBottom: "0px" }];
+    } else if (browsing) {
       const margin = parseFloat(getComputedStyle(el).marginTop) || 0;
       frames = [
-        { height: `${rest}px`, marginTop: `${margin + extra}px` },
-        { height: `${full}px`, marginTop: `${margin}px` },
+        { height: small, marginTop: `${margin + extra}px` },
+        { height: large, marginTop: `${margin}px` },
       ];
     } else {
       frames = [
-        { height: `${full}px`, top: `${-extra}px`, marginBottom: `${-extra}px` },
-        { height: `${rest}px`, top: "0px", marginBottom: "0px" },
+        { height: large, top: `${-extra}px`, marginBottom: `${-extra}px` },
+        { height: small, top: "0px", marginBottom: "0px" },
       ];
     }
     const morph = el.animate(frames, {
@@ -113,7 +140,7 @@ export default function MotionSection({
     setCurrent(i);
     setBrowsing(false);
   };
-  
+
   useEffect(() => {
     const t = setTimeout(() => setSettled(true), 380);
     return () => clearTimeout(t);
@@ -122,21 +149,25 @@ export default function MotionSection({
   const playing = videos[current];
   playingSrc.current = playing?.src;
 
+  const player = !browsing && (
+    <VideoPlayer
+      video={playing}
+      list={videos}
+      onPick={setCurrent}
+      onStep={
+        videos.length > 1
+          ? (dir) => setCurrent((i) => (i + dir + videos.length) % videos.length)
+          : undefined
+      }
+    />
+  );
+
   return (
     <>
-      {!browsing && (
-        <VideoPlayer
-          video={playing}
-          onStep={
-            videos.length > 1
-              ? (dir) => setCurrent((i) => (i + dir + videos.length) % videos.length)
-              : undefined
-          }
-        />
-      )}
+      {listPos === "below" && player}
 
       <div
-        className={`motion-box${browsing ? " motion-box--browse" : ""}`}
+        className={`motion-box motion-box--${listPos}${browsing ? " motion-box--browse" : ""}`}
         ref={box}
         style={boxHeight ? { height: boxHeight } : undefined}
       >
@@ -202,11 +233,36 @@ export default function MotionSection({
             ))}
           </div>
           <Search value={query} onChange={search} />
-          {years.length > 0 && (
-            <YearSelect years={years} value={year} onChange={onYearChange} allowAll direction="up" />
+          {query !== "" && (
+            <button
+              type="button"
+              className={`gallery-filter-btn motion-tool${browsing ? " motion-tool--on" : ""}`}
+              onClick={() => (browsing ? setBrowsing(false) : expand())}
+              aria-pressed={browsing}
+              aria-label={browsing ? t.collapseList : t.expandList}
+              data-tip={browsing ? t.collapseList : t.expandList}
+              data-tip-pos={listPos === "above" ? "down" : "up"}
+            >
+              <Icon name={browsing ? "shrink" : "expand"} size={15} />
+            </button>
           )}
+          {years.length > 0 && (
+            <YearSelect years={years} value={year} onChange={onYearChange} allowAll direction={listPos === "above" ? "down" : "up"} />
+          )}
+          <button
+            type="button"
+            className="gallery-filter-btn motion-tool"
+            onClick={moveList}
+            aria-label={listPos === "below" ? t.listAbove : t.listBelow}
+            data-tip={listPos === "below" ? t.listAbove : t.listBelow}
+            data-tip-pos={listPos === "above" ? "down" : "up"}
+          >
+            <Icon name={listPos === "below" ? "dockTop" : "dockBottom"} size={16} />
+          </button>
         </div>
       </div>
+
+      {listPos === "above" && player}
     </>
   );
 }

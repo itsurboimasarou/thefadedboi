@@ -464,6 +464,10 @@ export const motionUi: Localized<{
   empty: string;
   earlier: string;
   later: string;
+  expandList: string;
+  collapseList: string;
+  listAbove: string;
+  listBelow: string;
 }> = {
   en: {
     list: "Videos",
@@ -472,6 +476,10 @@ export const motionUi: Localized<{
     empty: "Videos to be added.",
     earlier: "Scroll left",
     later: "Scroll right",
+    expandList: "Expand the list",
+    collapseList: "Back to the player",
+    listAbove: "Move the list above the player",
+    listBelow: "Move the list below the player",
   },
   vi: {
     list: "Video",
@@ -480,6 +488,10 @@ export const motionUi: Localized<{
     empty: "Video sẽ được thêm sau.",
     earlier: "Cuộn sang trái",
     later: "Cuộn sang phải",
+    expandList: "Mở rộng danh sách",
+    collapseList: "Quay lại trình phát",
+    listAbove: "Đưa danh sách lên trên trình phát",
+    listBelow: "Đưa danh sách xuống dưới trình phát",
   },
 };
 
@@ -500,6 +512,9 @@ export const videoPlayerUi: Localized<{
   previousVideo: string;
   nextVideo: string;
   info: string;
+  videoList: string;
+  showVideoList: string;
+  playVideo: (name: string) => string;
   noInfo: string;
   resolution: string;
   codec: string;
@@ -526,6 +541,9 @@ export const videoPlayerUi: Localized<{
     previousVideo: "Previous video",
     nextVideo: "Next video",
     info: "Video info",
+    videoList: "Videos",
+    showVideoList: "Show the video list",
+    playVideo: (name) => `Play ${name}`,
     noInfo: "No info available for this video.",
     resolution: "Resolution",
     codec: "Codec",
@@ -552,6 +570,9 @@ export const videoPlayerUi: Localized<{
     previousVideo: "Video trước",
     nextVideo: "Video sau",
     info: "Thông tin video",
+    videoList: "Video",
+    showVideoList: "Hiện danh sách video",
+    playVideo: (name) => `Phát ${name}`,
     noInfo: "Chưa có thông tin cho video này.",
     resolution: "Độ phân giải",
     codec: "Codec",
