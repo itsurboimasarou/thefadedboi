@@ -54,6 +54,8 @@ export type GalleryImage =
       device?: string;
       album?: string;
       month?: string;
+      day?: number;
+      date?: string;
       ratio?: number;
       heavy?: boolean;
     };

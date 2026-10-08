@@ -11,7 +11,7 @@ import { getChangelog } from "@/lib/changelog";
 import type { GalleryImage, ScannedGalleryAlbum, ScannedVideoAlbum } from "@/lib/types";
 import { useLocalized, type Localized } from "@/lib/i18n";
 import { galleryPageUi as ui, listBySelectUi } from "@/lib/ui-strings";
-import { galleryQuotes } from "@/lib/configs/gallery.config";
+import { albumGenres, galleryQuotes } from "@/lib/configs/gallery.config";
 import { fold, folder, matcher } from "@/lib/search";
 
 const NO_TEXT: Localized<string> = { en: "", vi: "" };
@@ -44,6 +44,12 @@ function albumName(folder: string): string {
     .filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+const ALBUM_GENRES = new Set(albumGenres.map((g) => g.toLowerCase()));
+
+function hasAlbums(folder: string): boolean {
+  return ALBUM_GENRES.has((folder.split("/").pop() ?? "").toLowerCase());
 }
 
 function yearFromFolder(folder: string): number | undefined {
@@ -138,6 +144,7 @@ export default function GalleryIndex({
         return match(
           textOf(m, () => [
             m.name, m.device, m.album && albumName(m.album), a.name, a.year, m.month, monthWords(m.month),
+            m.day && t.day(m.day),
           ])
         );
       });
@@ -166,7 +173,7 @@ export default function GalleryIndex({
     if (!still) return [];
     for (const a of visible) {
       if (!("images" in a)) continue;
-      if (listBy === "genre") {
+      if (listBy === "genre" || (listBy === "album" && !hasAlbums(a.folder))) {
         map.set(a.folder, { key: a.folder, name: a.name, images: a.images });
         continue;
       }
@@ -246,6 +253,42 @@ export default function GalleryIndex({
     const images = activeGroup
       ? activeGroup.images
       : visible.flatMap((a) => ("images" in a ? a.images : []));
+
+    const isAlbum =
+      activeGroup && listBy === "album" && !visible.some((a) => a.folder === activeGroup.key);
+    if (isAlbum && images.some((img) => meta(img)?.day)) {
+      const days = new Map<number, { images: GalleryImage[]; date?: string }>();
+      for (const img of images) {
+        const m = meta(img);
+        const key = m?.day ?? 0;
+        const slot = days.get(key) ?? { images: [] };
+        slot.images.push(img);
+        if (m?.date && (!slot.date || m.date < slot.date)) slot.date = m.date;
+        days.set(key, slot);
+      }
+      const dated = [...days].every(([key, slot]) => key === 0 || slot.date);
+      const order = [...days.keys()].sort(
+        (a, b) =>
+          Number(a === 0) - Number(b === 0) ||
+          (dated ? (days.get(a)?.date ?? "").localeCompare(days.get(b)?.date ?? "") : 0) ||
+          a - b
+      );
+      return {
+        images: order.flatMap((k) => days.get(k)?.images ?? []),
+        sections: order.map((k) => {
+          const slot = days.get(k);
+          const count = slot?.images.length ?? 0;
+          if (k === 0) return { label: t.otherDays, count };
+          const [, month, day] = (slot?.date ?? "").split("-").map(Number);
+          return {
+            label: t.day(k, month && day ? { day, month } : undefined),
+            count,
+            mark: t.dayShort(k),
+          };
+        }),
+      };
+    }
+
     const months = new Map<string, GalleryImage[]>();
     for (const img of images) {
       const key = meta(img)?.month ?? UNKNOWN;

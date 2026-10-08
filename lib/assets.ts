@@ -11,6 +11,7 @@ import type {
 import type { Localized } from "./i18n";
 import { HEAVY_BYTES } from "./thumbs";
 import { deviceFrom, validateCameras, type CameraTable } from "./cameras";
+import { weekdayOf } from "./weekdays";
 
 const isLocalizedString = (v: any): v is Localized<string> =>
   !!v && typeof v.en === "string" && typeof v.vi === "string";
@@ -111,6 +112,8 @@ export interface ScannedImage {
   device?: string;
   album?: string;
   month?: string;
+  day?: number;
+  date?: string;
   ratio?: number;
   heavy?: true;
 }
@@ -148,8 +151,11 @@ export async function listImages(folder: string): Promise<ScannedImage[]> {
       const device = deviceFrom(text(p.cameraMake), text(p.cameraModel), cameras);
       const ratio = positive(p.ratio);
       const bytes = positive(p.bytes);
-      const album = name.includes("/") ? name.slice(0, name.indexOf("/")) : "";
+      const path = name.split("/");
+      const album = path.length > 1 ? path[0] : "";
       const month = text(p.takenAt)?.match(/^\d{4}-\d{2}/)?.[0];
+      const day = path.length > 2 ? weekdayOf(path[1]) : undefined;
+      const date = day ? text(p.takenAt)?.match(/^\d{4}-\d{2}-\d{2}/)?.[0] : undefined;
       return {
         full: cdnUrl(folder, name),
         thumb: thumbUrl(folder, name),
@@ -157,6 +163,8 @@ export async function listImages(folder: string): Promise<ScannedImage[]> {
         ...(device ? { device } : {}),
         ...(album ? { album } : {}),
         ...(month ? { month } : {}),
+        ...(day ? { day } : {}),
+        ...(date ? { date } : {}),
         ...(ratio ? { ratio } : {}),
         ...(bytes && bytes > HEAVY_BYTES ? { heavy: true as const } : {}),
       };

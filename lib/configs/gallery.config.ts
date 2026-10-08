@@ -1,6 +1,8 @@
 import type { Localized } from "../i18n";
 import { siteName } from "./site.config";
 
+export const albumGenres = ["Cosplays", "Trips"];
+
 export interface GalleryQuote {
   text: Localized<string>;
   by?: Localized<string>;

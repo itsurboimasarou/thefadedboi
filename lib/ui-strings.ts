@@ -822,6 +822,11 @@ export const devicesPageUi: Localized<{ eyebrow: string; heading: string; descri
   },
 };
 
+const EN_MONTHS = [
+  "January", "February", "March", "April", "May", "June", "July",
+  "August", "September", "October", "November", "December",
+];
+
 /* pages/gallery.tsx */
 export const galleryPageUi: Localized<{
   eyebrow: string;
@@ -833,6 +838,9 @@ export const galleryPageUi: Localized<{
   unknownDate: string;
   noPhotoMatches: string;
   noVideoMatches: string;
+  day: (weekday: number, date?: { day: number; month: number }) => string;
+  dayShort: (weekday: number) => string;
+  otherDays: string;
 }> = {
   en: {
     eyebrow: "Gallery",
@@ -841,15 +849,18 @@ export const galleryPageUi: Localized<{
     photosToBeAdded: "Photos to be added.",
     videosToBeAdded: "Videos to be added.",
     month: (month, year) => {
-      const name = [
-        "January", "February", "March", "April", "May", "June", "July",
-        "August", "September", "October", "November", "December",
-      ][month - 1];
+      const name = EN_MONTHS[month - 1];
       return year ? `${name} - ${year}` : name;
     },
     unknownDate: "Unknown date",
     noPhotoMatches: "No photos match that search.",
     noVideoMatches: "No videos match that search.",
+    day: (weekday, date) => {
+      const name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][weekday - 1];
+      return date ? `${name} - ${EN_MONTHS[date.month - 1]} ${date.day}` : name;
+    },
+    dayShort: (weekday) => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][weekday - 1],
+    otherDays: "Other days",
   },
   vi: {
     eyebrow: "Thư viện",
@@ -861,6 +872,12 @@ export const galleryPageUi: Localized<{
     unknownDate: "Không rõ ngày",
     noPhotoMatches: "Không có ảnh nào khớp với tìm kiếm.",
     noVideoMatches: "Không có video nào khớp với tìm kiếm.",
+    day: (weekday, date) => {
+      const name = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"][weekday - 1];
+      return date ? `${name} - ${date.day} tháng ${date.month}` : name;
+    },
+    dayShort: (weekday) => ["T2", "T3", "T4", "T5", "T6", "T7", "CN"][weekday - 1],
+    otherDays: "Ngày khác",
   },
 };
 
