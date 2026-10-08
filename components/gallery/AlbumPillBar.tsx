@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import YearSelect from "./YearSelect";
 import ListBySelect, { type ListBy } from "./ListBySelect";
+import SortBySelect, { type SortBy } from "./SortBySelect";
 import GalleryFilterMenu from "./GalleryFilterMenu";
 import { useDock } from "../controls/HuBarDock";
 import { useBarMode } from "../controls/BarMode";
@@ -20,6 +21,9 @@ interface AlbumPillBarProps {
   onYearChange: (y: number | undefined) => void;
   listBy: ListBy;
   onListByChange: (v: ListBy) => void;
+  sortBy: SortBy;
+  onSortByChange: (v: SortBy) => void;
+  sortDisabled: boolean;
 }
 
 export default function AlbumPillBar({
@@ -31,6 +35,9 @@ export default function AlbumPillBar({
   onYearChange,
   listBy,
   onListByChange,
+  sortBy,
+  onSortByChange,
+  sortDisabled,
 }: AlbumPillBarProps) {
   const scrolledAway = useHideOnScrollDown();
   const compact = useCompact();
@@ -42,8 +49,6 @@ export default function AlbumPillBar({
     window.addEventListener("control-panel-state", onPanel);
     return () => window.removeEventListener("control-panel-state", onPanel);
   }, []);
-  // Only a bottom-docked bar competes for this strip of the screen; with it
-  // anywhere else the pill bar has the bottom edge to itself and stays put.
   const dock = useDock();
   const split = useBarMode() === "split";
   const barAtBottom = split ? compact || dock === "top" || dock === "bottom" : dock === "bottom";
@@ -75,6 +80,9 @@ export default function AlbumPillBar({
         <GalleryFilterMenu
           listBy={listBy}
           onListByChange={onListByChange}
+          sortBy={sortBy}
+          onSortByChange={onSortByChange}
+          sortDisabled={sortDisabled}
           years={years}
           year={year}
           onYearChange={onYearChange}
@@ -82,6 +90,7 @@ export default function AlbumPillBar({
       ) : (
         <>
           <ListBySelect value={listBy} onChange={onListByChange} direction="up" />
+          <SortBySelect value={sortBy} onChange={onSortByChange} direction="up" disabled={sortDisabled} />
           {years.length > 0 && (
             <YearSelect
               years={years}

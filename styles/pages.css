@@ -214,6 +214,214 @@ body:has(.gallery-page) {
   min-width: 150px;
 }
 
+/* A grid per month / album, each under a label that runs out into a rule. */
+.album-sections {
+  position: relative;
+  max-width: var(--gallery-w, 1200px);
+  margin-inline: auto;
+}
+
+.album-section {
+  scroll-margin-top: 96px;
+}
+
+.album-section + .album-section {
+  margin-top: 28px;
+}
+
+/* ── Gallery: timeline ────────────────────────────────── */
+.gallery-timeline {
+  position: fixed;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 20;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0.45;
+  transition: opacity 0.24s ease;
+}
+
+.gallery-timeline--lit {
+  opacity: 1;
+}
+
+.gallery-timeline,
+.gallery-timeline * {
+  touch-action: none;
+}
+
+.gallery-timeline-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  max-height: 64vh;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.gallery-timeline-year {
+  display: flex;
+  flex-direction: column;
+  align-items: inherit;
+}
+
+.gallery-timeline-label {
+  padding: 3px 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+  transition: color 0.18s ease;
+}
+
+.gallery-timeline-label:hover,
+.gallery-timeline-label--on {
+  color: var(--accent);
+}
+
+/* The tick is drawn by ::before so the button itself stays an easy target. */
+.gallery-timeline-tick {
+  position: relative;
+  width: 36px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.gallery-timeline-tick::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 14px;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 34%, transparent);
+  transition: width 0.18s ease, background 0.18s ease;
+}
+
+.gallery-timeline-tick:hover::before {
+  width: 24px;
+  background: var(--ink);
+}
+
+.gallery-timeline-tick--on::before {
+  width: 32px;
+  background: var(--accent);
+}
+
+:is(.gallery-timeline-label, .gallery-timeline-tick):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.gallery-timeline[data-side="right"] .gallery-timeline-rail { align-items: flex-start; }
+.gallery-timeline[data-side="right"] .gallery-timeline-tick::before { right: auto; left: 0; }
+
+.gallery-timeline--edge {
+  left: 0;
+  padding: 18px 14px 18px 12px;
+  --ink: #ffffff;
+  --ink-dim: rgba(255, 255, 255, 0.82);
+  transition: translate 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+}
+
+.gallery-timeline--edge[data-side="right"] {
+  left: auto;
+  right: 0;
+  padding: 18px 12px 18px 14px;
+}
+
+.gallery-timeline--edge::before {
+  content: "";
+  position: absolute;
+  inset: -28px -24px -28px 0;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 100% 50% at left center,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.6) 45%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.gallery-timeline--edge[data-side="right"]::before {
+  inset: -28px 0 -28px -24px;
+  background: radial-gradient(
+    ellipse 100% 50% at right center,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.6) 45%,
+    transparent 100%
+  );
+}
+
+.gallery-timeline--edge .gallery-timeline-tick { height: 20px; }
+
+/* The stop under a dragging pointer, called out beside it the way a
+   launcher's alphabet strip shows the letter. */
+.gallery-timeline-bubble {
+  position: absolute;
+  left: calc(100% + 14px);
+  translate: 0 -50%;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.gallery-timeline[data-side="right"] .gallery-timeline-bubble {
+  left: auto;
+  right: calc(100% + 14px);
+}
+
+.gallery-timeline--asleep {
+  translate: -110% -50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gallery-timeline--asleep[data-side="right"] {
+  translate: 110% -50%;
+}
+
+.album-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 14px;
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.album-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+}
+
 .album-thumb img {
   width: 100%;
   height: 100%;
@@ -320,6 +528,7 @@ body:has(.gallery-page) {
   transition: background 0.2s, border-color 0.2s;
 }
 .year-select-btn:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+.year-select-btn:disabled { opacity: 0.5; cursor: default; background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .year-select-btn .icn:last-child svg { transition: rotate 0.2s; }
 .year-select-btn[aria-expanded="true"] .icn:last-child svg { rotate: 180deg; }
 
@@ -334,6 +543,10 @@ body:has(.gallery-page) {
   animation: page-in 0.18s ease both;
 }
 .year-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
   padding: 4px 14px 6px;
   color: var(--ink-dim);
   font-size: 0.7rem;
@@ -342,13 +555,26 @@ body:has(.gallery-page) {
   letter-spacing: 0.1em;
   white-space: nowrap;
 }
-.year-menu-head .icn { margin-right: 6px; vertical-align: -1px; }
 .year-menu-head:not(:first-child) {
   margin-top: 6px;
   padding-top: 10px;
   border-top: 1px solid var(--glass-border);
 }
 .gallery-filter-menu { min-width: 150px; }
+.gallery-filter-year {
+  display: flex; align-items: center; gap: 2px;
+  color: var(--ink);
+}
+.gallery-filter-year .icn { margin-left: -0.375em; translate: 0 0.15em; }
+.gallery-filter-year[aria-expanded="true"] { background: var(--glass-strong); }
+.gallery-filter-submenu {
+  right: calc(100% + 6px);
+  bottom: 0;
+  min-width: 96px;
+  max-height: min(60vh, 320px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 .gallery-filter-btn {
   position: relative;
   display: grid; place-items: center;

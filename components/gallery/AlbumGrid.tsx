@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import type { GalleryImage } from "@/lib/types";
 import Icon from "../ui/Icons";
+import GalleryTimeline, { type TimelineMark } from "./GalleryTimeline";
 import { useLocalized } from "@/lib/i18n";
 import { albumGridUi as ui } from "@/lib/ui-strings";
 import useImageZoom from "@/lib/functions/useImageZoom";
@@ -81,8 +82,10 @@ function zoomSrc(item: GridItem): string {
   return item.heavy && isThumbApi(item.thumb) ? thumbSrc(item.thumb, ZOOM_WIDTH) : item.full;
 }
 
-interface AlbumGridProps { images: GalleryImage[]; title: string }
-export default function AlbumGrid({ images, title }: AlbumGridProps) {
+export interface GridSection { label: string; count: number; mark?: string }
+
+interface AlbumGridProps { images: GalleryImage[]; title: string; sections?: GridSection[] }
+export default function AlbumGrid({ images, title, sections }: AlbumGridProps) {
   const t = useLocalized(ui);
   const router = useRouter();
   const [index, setIndex] = useState<number | null>(null);
@@ -113,6 +116,23 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
             }
       ),
     [images]
+  );
+
+  const sectionsRef = useRef<HTMLDivElement>(null);
+  const runs = useMemo(() => {
+    let start = 0;
+    return (sections ?? []).map((s) => {
+      const from = start;
+      start += s.count;
+      return { label: s.label, mark: s.mark, from, to: start };
+    });
+  }, [sections]);
+  const marks = useMemo(
+    () =>
+      runs.flatMap((r): TimelineMark[] =>
+        r.mark === undefined ? [] : [{ id: String(r.from), group: r.mark, label: r.label }]
+      ),
+    [runs]
   );
 
   const patch = (src: string, next: Partial<ThumbState>) =>
@@ -387,10 +407,10 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
       </div>
     ) : null;
 
-  return (
-    <>
+  const grid = (from: number, to: number) => (
       <div className="album-grid">
-        {items.map((img, i) => {
+        {items.slice(from, to).map((img, n) => {
+          const i = from + n;
           if (leaving) return <span key={img.full} className="album-thumb" aria-hidden="true" />;
           const { loaded, ready, dead, tries, ratio } = tileState(img);
           return (
@@ -442,6 +462,23 @@ export default function AlbumGrid({ images, title }: AlbumGridProps) {
             <span key={`filler-${i}`} className="album-thumb-filler" aria-hidden="true" />
           ))}
       </div>
+  );
+
+  return (
+    <>
+      {runs.length === 0 ? (
+        grid(0, items.length)
+      ) : (
+        <div className="album-sections" ref={sectionsRef}>
+          {marks.length > 1 && <GalleryTimeline marks={marks} container={sectionsRef} />}
+          {runs.map((run) => (
+            <section key={`${run.from}-${run.label}`} className="album-section" data-mark={run.from}>
+              <h2 className="album-divider">{run.label}</h2>
+              {grid(run.from, run.to)}
+            </section>
+          ))}
+        </div>
+      )}
       {mounted && lightbox && createPortal(lightbox, document.body)}
     </>
   );

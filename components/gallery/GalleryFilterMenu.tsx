@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
-import type { ListBy } from "./ListBySelect";
+import { LIST_BY, type ListBy } from "./ListBySelect";
+import { SORT_BY, type SortBy } from "./SortBySelect";
 import { useLocalized } from "@/lib/i18n";
-import { galleryFilterUi as ui, listBySelectUi, yearSelectUi } from "@/lib/ui-strings";
-
-const LIST_BY: ListBy[] = ["album", "device"];
+import { galleryFilterUi as ui, listBySelectUi, sortBySelectUi, yearSelectUi } from "@/lib/ui-strings";
 
 interface GalleryFilterMenuProps {
   listBy: ListBy;
   onListByChange: (v: ListBy) => void;
+  sortBy: SortBy;
+  onSortByChange: (v: SortBy) => void;
+  sortDisabled: boolean;
   years: number[];
   year: number | undefined;
   onYearChange: (y: number | undefined) => void;
@@ -17,15 +19,24 @@ interface GalleryFilterMenuProps {
 export default function GalleryFilterMenu({
   listBy,
   onListByChange,
+  sortBy,
+  onSortByChange,
+  sortDisabled,
   years,
   year,
   onYearChange,
 }: GalleryFilterMenuProps) {
   const t = useLocalized(ui);
   const tList = useLocalized(listBySelectUi);
+  const tSort = useLocalized(sortBySelectUi);
   const tYear = useLocalized(yearSelectUi);
   const [open, setOpen] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) setYearOpen(false);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -45,7 +56,7 @@ export default function GalleryFilterMenu({
     };
   }, [open]);
 
-  const filtered = listBy !== "album" || year !== undefined;
+  const filtered = listBy !== "genre" || year !== undefined;
 
   const option = (key: string, label: string | number, on: boolean, pick: () => void) => (
     <li key={key}>
@@ -83,14 +94,40 @@ export default function GalleryFilterMenu({
             {tList.listBy}
           </li>
           {LIST_BY.map((o) => option(o, tList[o], o === listBy, () => onListByChange(o)))}
+          {!sortDisabled && (
+            <>
+              <li className="year-menu-head" role="presentation">
+                <Icon name="sort" size={12} />
+                {tSort.sortBy}
+              </li>
+              {SORT_BY.map((o) => option(`sort-${o}`, tSort[o], o === sortBy, () => onSortByChange(o)))}
+            </>
+          )}
           {years.length > 0 && (
             <>
               <li className="year-menu-head" role="presentation">
                 <Icon name="calendar" size={12} />
                 {t.year}
               </li>
-              {option("all", tYear.all, year === undefined, () => onYearChange(undefined))}
-              {years.map((y) => option(String(y), y, y === year, () => onYearChange(y)))}
+              <li>
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="year-option gallery-filter-year"
+                  onClick={() => setYearOpen(!yearOpen)}
+                  aria-haspopup="menu"
+                  aria-expanded={yearOpen}
+                >
+                  <Icon name="chevronLeft" size="1em" />
+                  {year ?? tYear.all}
+                </button>
+                {yearOpen && (
+                  <ul className="year-menu gallery-filter-submenu" role="menu" aria-label={t.year}>
+                    {option("all", tYear.all, year === undefined, () => onYearChange(undefined))}
+                    {years.map((y) => option(String(y), y, y === year, () => onYearChange(y)))}
+                  </ul>
+                )}
+              </li>
             </>
           )}
         </ul>

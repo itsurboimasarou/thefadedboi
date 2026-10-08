@@ -52,6 +52,8 @@ export type GalleryImage =
       thumb?: string;
       name?: string;
       device?: string;
+      album?: string;
+      month?: string;
       ratio?: number;
       heavy?: boolean;
     };

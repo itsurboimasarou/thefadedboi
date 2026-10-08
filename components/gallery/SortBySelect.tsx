@@ -1,22 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 import Icon from "../ui/Icons";
 import { useLocalized } from "@/lib/i18n";
-import { listBySelectUi as ui } from "@/lib/ui-strings";
+import { sortBySelectUi as ui } from "@/lib/ui-strings";
 
-export type ListBy = "genre" | "album" | "device";
+export type SortBy = "time" | "alphabet";
 
-export const LIST_BY: ListBy[] = ["genre", "album", "device"];
+export const SORT_BY: SortBy[] = ["time", "alphabet"];
 
-interface ListBySelectProps {
-  value: ListBy;
-  onChange: (v: ListBy) => void;
+interface SortBySelectProps {
+  value: SortBy;
+  onChange: (v: SortBy) => void;
   direction?: "down" | "up";
+  disabled?: boolean;
 }
 
-export default function ListBySelect({ value, onChange, direction = "down" }: ListBySelectProps) {
+export default function SortBySelect({ value, onChange, direction = "down", disabled }: SortBySelectProps) {
   const t = useLocalized(ui);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (disabled) setOpen(false);
+  }, [disabled]);
 
   useEffect(() => {
     if (!open) return;
@@ -34,10 +39,12 @@ export default function ListBySelect({ value, onChange, direction = "down" }: Li
     };
   }, [open]);
 
-  const pick = (v: ListBy) => {
+  const pick = (v: SortBy) => {
     onChange(v);
     setOpen(false);
   };
+
+  const shown = disabled ? "time" : value;
 
   return (
     <div className="year-select-wrap" ref={ref}>
@@ -45,18 +52,19 @@ export default function ListBySelect({ value, onChange, direction = "down" }: Li
         type="button"
         className="year-select-btn"
         onClick={() => setOpen(!open)}
+        disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={`${t.listBy}: ${t[value]}`}
+        aria-label={`${t.sortBy}: ${t[shown]}`}
       >
-        <Icon name="list" size={14} />
-        {t[value]}
+        <Icon name="sort" size={14} />
+        {t[shown]}
         <Icon name="chevronDown" size={14} />
       </button>
       {open && (
-        <ul className={`year-menu year-menu--${direction}`} role="listbox" aria-label={t.listBy}>
-          <li className="year-menu-head" role="presentation">{t.listBy}</li>
-          {LIST_BY.map((o) => (
+        <ul className={`year-menu year-menu--${direction}`} role="listbox" aria-label={t.sortBy}>
+          <li className="year-menu-head" role="presentation">{t.sortBy}</li>
+          {SORT_BY.map((o) => (
             <li key={o}>
               <button
                 type="button"

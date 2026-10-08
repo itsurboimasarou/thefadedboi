@@ -109,6 +109,8 @@ export interface ScannedImage {
   thumb: string;
   name: string;
   device?: string;
+  album?: string;
+  month?: string;
   ratio?: number;
   heavy?: true;
 }
@@ -146,11 +148,15 @@ export async function listImages(folder: string): Promise<ScannedImage[]> {
       const device = deviceFrom(text(p.cameraMake), text(p.cameraModel), cameras);
       const ratio = positive(p.ratio);
       const bytes = positive(p.bytes);
+      const album = name.includes("/") ? name.slice(0, name.indexOf("/")) : "";
+      const month = text(p.takenAt)?.match(/^\d{4}-\d{2}/)?.[0];
       return {
         full: cdnUrl(folder, name),
         thumb: thumbUrl(folder, name),
-        name: name.replace(/.[^.]+$/, ""),
+        name: name.slice(name.lastIndexOf("/") + 1).replace(/.[^.]+$/, ""),
         ...(device ? { device } : {}),
+        ...(album ? { album } : {}),
+        ...(month ? { month } : {}),
         ...(ratio ? { ratio } : {}),
         ...(bytes && bytes > HEAVY_BYTES ? { heavy: true as const } : {}),
       };

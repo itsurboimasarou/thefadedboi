@@ -573,18 +573,46 @@ export const yearSelectUi: Localized<{ filterByYear: string; all: string }> = {
 /* components/gallery/ListBySelect.tsx */
 export const listBySelectUi: Localized<{
   listBy: string;
+  genre: string;
   album: string;
   device: string;
   unknownDevice: string;
+  noAlbum: string;
 }> = {
-  en: { listBy: "List by", album: "Album", device: "Shot device", unknownDevice: "Unknown device" },
-  vi: { listBy: "Xếp theo", album: "Album", device: "Thiết bị chụp", unknownDevice: "Không rõ thiết bị" },
+  en: {
+    listBy: "List by",
+    genre: "Genre",
+    album: "Album",
+    device: "Shot device",
+    unknownDevice: "Unknown device",
+    noAlbum: "No album",
+  },
+  vi: {
+    listBy: "Xếp theo",
+    genre: "Thể loại",
+    album: "Album",
+    device: "Thiết bị chụp",
+    unknownDevice: "Không rõ thiết bị",
+    noAlbum: "Không thuộc album",
+  },
+};
+
+/* components/gallery/SortBySelect.tsx */
+export const sortBySelectUi: Localized<{ sortBy: string; time: string; alphabet: string }> = {
+  en: { sortBy: "Sort by", time: "Time", alphabet: "Alphabet" },
+  vi: { sortBy: "Sắp xếp theo", time: "Thời gian", alphabet: "Bảng chữ cái" },
 };
 
 /* components/gallery/GalleryFilterMenu.tsx */
 export const galleryFilterUi: Localized<{ filters: string; year: string }> = {
   en: { filters: "Filters", year: "Year" },
   vi: { filters: "Bộ lọc", year: "Năm" },
+};
+
+/* components/gallery/GalleryTimeline.tsx */
+export const galleryTimelineUi: Localized<{ timeline: string }> = {
+  en: { timeline: "Timeline" },
+  vi: { timeline: "Dòng thời gian" },
 };
 
 /* ── Widgets ───────────────────────────────────── */
@@ -780,6 +808,8 @@ export const galleryPageUi: Localized<{
   all: string;
   photosToBeAdded: string;
   videosToBeAdded: string;
+  month: (month: number, year?: number) => string;
+  unknownDate: string;
 }> = {
   en: {
     eyebrow: "Gallery",
@@ -787,6 +817,14 @@ export const galleryPageUi: Localized<{
     all: "All",
     photosToBeAdded: "Photos to be added.",
     videosToBeAdded: "Videos to be added.",
+    month: (month, year) => {
+      const name = [
+        "January", "February", "March", "April", "May", "June", "July",
+        "August", "September", "October", "November", "December",
+      ][month - 1];
+      return year ? `${name} - ${year}` : name;
+    },
+    unknownDate: "Unknown date",
   },
   vi: {
     eyebrow: "Thư viện",
@@ -794,6 +832,8 @@ export const galleryPageUi: Localized<{
     all: "Tất cả",
     photosToBeAdded: "Ảnh sẽ được thêm sau.",
     videosToBeAdded: "Video sẽ được thêm sau.",
+    month: (month, year) => (year ? `Tháng ${month} - ${year}` : `Tháng ${month}`),
+    unknownDate: "Không rõ ngày",
   },
 };
 

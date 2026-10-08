@@ -7,7 +7,7 @@ const EDGE = 32;
 const ARM = 12;
 const COMMIT = 0.35;
 
-const BLOCK = ".control-panel, #music-player, .lightbox, .gallery-pillbar, .hubar, .panel-indicator";
+const BLOCK = ".control-panel, #music-player, .lightbox, .gallery-pillbar, .hubar, .panel-indicator, .gallery-timeline";
 
 interface Options {
   canGo: (dir: StackDir) => boolean;
