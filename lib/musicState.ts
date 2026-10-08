@@ -19,6 +19,17 @@ const EVT = "music-playback-change";
 const VOLUME_KEY = "music-volume";
 const MUTED_KEY = "music-muted";
 const AMBIENT_KEY = "music-ambient";
+const TRACK_KEY = "music-track";
+
+export const TRACK_TTL = 24 * 60 * 60 * 1000;
+
+export interface SavedTrack {
+  folder: string;
+  file: string;
+  all: boolean;
+  pos: number;
+  at: number;
+}
 
 const emptyNowPlaying: NowPlaying = {
   title: null,
@@ -94,6 +105,35 @@ export function setAmbient(ambient: boolean) {
     localStorage.setItem(AMBIENT_KEY, ambient ? "1" : "0");
   } catch {}
   emit();
+}
+
+export function readSavedTrack(): SavedTrack | null {
+  try {
+    const raw = localStorage.getItem(TRACK_KEY);
+    if (raw === null) return null;
+    const t = JSON.parse(raw) as Partial<SavedTrack> | null;
+    if (
+      !t ||
+      typeof t.folder !== "string" ||
+      typeof t.file !== "string" ||
+      typeof t.at !== "number" ||
+      Date.now() - t.at >= TRACK_TTL
+    ) {
+      localStorage.removeItem(TRACK_KEY);
+      return null;
+    }
+    const pos = typeof t.pos === "number" && t.pos > 0 ? t.pos : 0;
+    return { folder: t.folder, file: t.file, all: !!t.all, pos, at: t.at };
+  } catch {
+    return null;
+  }
+}
+
+export function saveTrack(track: SavedTrack | null) {
+  try {
+    if (!track) localStorage.removeItem(TRACK_KEY);
+    else localStorage.setItem(TRACK_KEY, JSON.stringify(track));
+  } catch {}
 }
 
 export function useMusicPlayback(): MusicPlayback {

@@ -5,7 +5,17 @@ import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
 import { useInert } from "@/lib/functions/useInert";
 import { useIsoLayoutEffect } from "@/lib/functions/useIsoLayoutEffect";
 import Marquee from "../ui/Marquee";
-import { useMusicPlayback, setNowPlaying, setVolume, setMuted, setAmbient, initMusicPrefs } from "@/lib/musicState";
+import {
+  useMusicPlayback,
+  setNowPlaying,
+  setVolume,
+  setMuted,
+  setAmbient,
+  initMusicPrefs,
+  readSavedTrack,
+  saveTrack,
+  TRACK_TTL,
+} from "@/lib/musicState";
 import { useCoverTone } from "@/lib/functions/useCoverTone";
 import { useLocalized } from "@/lib/i18n";
 import { musicPlayerUi as ui } from "@/lib/ui-strings";
@@ -22,6 +32,7 @@ interface MusicPlayerProps {
 type QueueMode = "all" | number | null;
 type RepeatMode = "off" | "all" | "one";
 type QueueItem = Track & { playlistIdx: number };
+type PlayRef = { folder: string; file: string; all: boolean };
 
 function formatTime(s: number): string {
   if (!Number.isFinite(s)) return "0:00";
@@ -55,7 +66,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   const [sliding, setSliding] = useState(false);
   const [albumMenuOpen, setAlbumMenuOpen] = useState(false);
   const [queueMode, setQueueMode] = useState<QueueMode>(null);
-  const [activeTrack, setActiveTrack] = useState<number | null>(null);
+  const [now, setNow] = useState<PlayRef | null>(null);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -75,9 +86,11 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   const listViewRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const durationRef = useRef(0);
+  const lastPlayedRef = useRef(0);
+  const posRef = useRef(0);
+  const resumeRef = useRef(false);
   useEffect(() => { durationRef.current = duration; }, [duration]);
 
-  // Closed panel / hidden slide are inert, not aria-hidden — see useInert.
   useInert(panelRef, !open);
   useInert(playerViewRef, listOpen);
   useInert(listViewRef, !listOpen);
@@ -87,7 +100,15 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   }, [open]);
 
   useEffect(() => {
-    if (!open || playlists !== null) return;
+    const saved = readSavedTrack();
+    if (!saved) return;
+    lastPlayedRef.current = saved.at;
+    posRef.current = saved.pos;
+    setNow({ folder: saved.folder, file: saved.file, all: saved.all });
+  }, []);
+
+  useEffect(() => {
+    if ((!open && !now) || playlists !== null) return;
     let cancelled = false;
     fetch("/api/music")
       .then((res) => res.json())
@@ -96,7 +117,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         if (!cancelled) { setPlaylists([]); setLoadError(true); }
       });
     return () => { cancelled = true; };
-  }, [open, playlists]);
+  }, [open, now, playlists]);
 
   const totalTracks = playlists?.reduce((n, p) => n + p.tracks.length, 0) ?? 0;
 
@@ -104,19 +125,31 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     if (playlists && queueMode === null && totalTracks > 0) setQueueMode("all");
   }, [playlists, queueMode, totalTracks]);
 
-  const queueItems: QueueItem[] = !playlists
-    ? []
-    : queueMode === "all"
-      ? playlists.flatMap((pl, pi) => pl.tracks.map((t) => ({ ...t, playlistIdx: pi })))
+  const allItems: QueueItem[] = (playlists ?? []).flatMap((pl, pi) =>
+    pl.tracks.map((t) => ({ ...t, playlistIdx: pi }))
+  );
+
+  const queueItems: QueueItem[] =
+    queueMode === "all"
+      ? allItems
       : typeof queueMode === "number"
-        ? (playlists[queueMode]?.tracks ?? []).map((t) => ({ ...t, playlistIdx: queueMode }))
+        ? allItems.filter((t) => t.playlistIdx === queueMode)
         : [];
 
-  const current = activeTrack !== null ? queueItems[activeTrack] : undefined;
+  const nowPlaylistIdx = now && playlists ? playlists.findIndex((p) => p.folder === now.folder) : -1;
+  const playItems: QueueItem[] = !now
+    ? []
+    : now.all
+      ? allItems
+      : allItems.filter((t) => t.playlistIdx === nowPlaylistIdx);
+  const activeTrack = now
+    ? playItems.findIndex((t) => t.playlistIdx === nowPlaylistIdx && t.file === now.file)
+    : -1;
+
+  const current = activeTrack >= 0 ? playItems[activeTrack] : undefined;
   const currentPlaylist = current ? playlists?.[current.playlistIdx] : undefined;
   const cover = current?.cover ?? currentPlaylist?.cover;
   const quality = current ? trackQuality(current) : null;
-  // Waits for the cover to load; until then the last loaded one stays up.
   const ambientCover = useCoverTone(cover, ambient);
   const ambientOn = ambient && !!cover && !!ambientCover.src;
 
@@ -136,7 +169,43 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     else el.pause();
   }, [playing, current]);
 
-  useEffect(() => { setProgress(0); }, [current?.url]);
+    useEffect(() => {
+    resumeRef.current = posRef.current > 0;
+    setProgress(posRef.current);
+    if (resumeRef.current && Number.isFinite(current?.duration)) setDuration(current?.duration as number);
+  }, [current?.url]);
+
+  const clearTrack = () => {
+    posRef.current = 0;
+    setNow(null);
+    setPlaying(false);
+    setDuration(0);
+    saveTrack(null);
+  };
+
+  const persist = () => {
+    if (now) saveTrack({ ...now, pos: posRef.current, at: lastPlayedRef.current });
+  };
+  const stamp = () => {
+    lastPlayedRef.current = Date.now();
+    persist();
+  };
+
+  const missing = !!now && playlists !== null && !loadError && !current;
+  useEffect(() => {
+    if (missing) clearTrack();
+  }, [missing]);
+
+   useEffect(() => {
+    if (!now) return;
+    if (playing) {
+      stamp();
+      const id = setInterval(stamp, 5_000);
+      return () => clearInterval(id);
+    }
+    const id = setTimeout(clearTrack, Math.max(0, lastPlayedRef.current + TRACK_TTL - Date.now()));
+    return () => clearTimeout(id);
+  }, [now, playing]);
 
   useEffect(() => { initMusicPrefs(); }, []);
 
@@ -190,35 +259,53 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
     return () => ro.disconnect();
   }, [listOpen, playlists, queueMode]);
 
-  const goTo = (dir: 1 | -1) => {
-    const len = queueItems.length;
-    if (!len) return;
-    setActiveTrack((i) => {
-      if (i === null) return dir === 1 ? 0 : len - 1;
-      if (dir === 1 && shuffle) return randomIndex(i, len);
-      return (i + dir + len) % len;
-    });
+  const playItem = (item: QueueItem, all: boolean) => {
+    const folder = playlists?.[item.playlistIdx]?.folder;
+    if (folder === undefined) return;
+    if (!now || now.folder !== folder || now.file !== item.file) posRef.current = 0;
+    setNow({ folder, file: item.file, all });
     setPlaying(true);
   };
 
+  const goTo = (dir: 1 | -1) => {
+    const items = current ? playItems : queueItems;
+    const len = items.length;
+    if (!len) return;
+    const next = !current
+      ? dir === 1 ? 0 : len - 1
+      : dir === 1 && shuffle
+        ? randomIndex(activeTrack, len)
+        : (activeTrack + dir + len) % len;
+    playItem(items[next], now && current ? now.all : queueMode === "all");
+  };
+
   const handleEnded = () => {
-    const len = queueItems.length;
-    if (!len || activeTrack === null) return;
+    const len = playItems.length;
+    if (!len || !current) return;
     if (repeat === "one") {
       const el = audioRef.current;
       if (el) { el.currentTime = 0; el.play().catch(() => {}); }
       return;
     }
     if (single || (repeat === "off" && !shuffle && activeTrack === len - 1)) {
-      setPlaying(false);
+      clearTrack();
       return;
     }
     goTo(1);
   };
 
+  const handleError = () => {
+    if (!current) return;
+    setPlaying(false);
+    fetch("/api/music", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => setPlaylists(data.playlists ?? []))
+      .catch(() => {});
+  };
+
   const togglePlay = () => {
-    if (activeTrack === null) {
-      if (queueItems.length) { setActiveTrack(0); setPlaying(true); }
+    if (!current) {
+      if (queueItems.length) playItem(queueItems[0], queueMode === "all");
       return;
     }
     setPlaying((v) => !v);
@@ -226,14 +313,11 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
 
   const selectQueue = (mode: QueueMode) => {
     setQueueMode(mode);
-    setActiveTrack(null);
-    setPlaying(false);
     setAlbumMenuOpen(false);
   };
 
   const playTrackAt = (idx: number) => {
-    setActiveTrack(idx);
-    setPlaying(true);
+    playItem(queueItems[idx], queueMode === "all");
     setListOpen(false);
   };
 
@@ -256,6 +340,8 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
       const el = audioRef.current;
       if (el) el.currentTime = t;
       setProgress(t);
+      posRef.current = t;
+      persist();
       return t;
     });
   };
@@ -580,21 +666,24 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
             </p>
           ) : (
             <ul className="player-track-list">
-              {queueItems.map((track, i) => (
+              {queueItems.map((track, i) => {
+                const isCurrent = !!current && track.playlistIdx === current.playlistIdx && track.file === current.file;
+                return (
                 <li key={`${track.playlistIdx}-${track.file}`}>
                   <button
                     type="button"
-                    className={`player-track${activeTrack === i ? " player-track--active" : ""}`}
+                    className={`player-track${isCurrent ? " player-track--active" : ""}`}
                     onClick={() => playTrackAt(i)}
                   >
-                    <Icon name={activeTrack === i && playing ? "pause" : "play"} size={13} />
+                    <Icon name={isCurrent && playing ? "pause" : "play"} size={13} />
                     <Marquee className="player-track-name">{track.title}</Marquee>
                     {Number.isFinite(track.duration) && (
                       <span className="player-track-duration">{formatTime(track.duration as number)}</span>
                     )}
                   </button>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
         </div>
@@ -636,9 +725,22 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
         ref={audioRef}
         src={current?.url}
         preload="none"
-        onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onTimeUpdate={(e) => {
+          if (resumeRef.current) return;
+          posRef.current = e.currentTarget.currentTime;
+          setProgress(posRef.current);
+        }}
+        onLoadedMetadata={(e) => {
+          const el = e.currentTarget;
+          setDuration(el.duration);
+          if (!resumeRef.current) return;
+          resumeRef.current = false;
+          if (posRef.current < el.duration - 1) el.currentTime = posRef.current;
+          else posRef.current = 0;
+        }}
+        onPause={stamp}
         onEnded={handleEnded}
+        onError={handleError}
       />
     </div>
   );
