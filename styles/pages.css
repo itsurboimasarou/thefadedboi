@@ -182,7 +182,7 @@
 
 body:has(.gallery-page) {
   --gallery-w: 1400px;
-  --motion-w: min(88%, 1180px);
+  --motion-w: var(--gallery-w);
 }
 
 .album-grid {
@@ -527,6 +527,7 @@ body:has(.gallery-page) {
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
 }
+.year-select-btn > .icn:last-child { margin-right: -1.5px; }
 .year-select-btn:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 .year-select-btn:disabled { opacity: 0.5; cursor: default; background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .year-select-btn .icn:last-child svg { transition: rotate 0.2s; }
@@ -693,6 +694,7 @@ body:has(.topbar) .mode-switch {
   cursor: pointer;
   transition: color 0.2s;
 }
+.mode-switch-side > .icn:first-child { margin-left: -1.5px; }
 .mode-switch-side:hover { color: var(--ink); }
 .mode-switch-side--on { color: var(--accent); }
 .mode-switch-side:focus-visible {
@@ -820,8 +822,9 @@ body:has(.topbar) .mode-switch {
   object-position: center;
   display: block;
   border-radius: 0 0 15px 15px;
-  cursor: pointer;
 }
+/* Clickable over the picture only, not the bars around it. */
+.vplayer-video[data-on-picture] { cursor: pointer; }
 
 .vplayer-bar {
   position: absolute;
@@ -1190,6 +1193,38 @@ body:has(.topbar) .mode-switch {
   background: var(--glass);
   overflow: hidden;
 }
+
+.motion-box--browse {
+  display: flex;
+  flex-direction: column;
+}
+.motion-box {
+  position: relative;
+  z-index: 1;
+}
+.motion-box--browse .motion-tile,
+.motion-box--browse .motion-strip-empty {
+  animation: motion-results-in 0.3s ease 0.08s both;
+}
+@keyframes motion-results-in {
+  from { opacity: 0; translate: 0 8px; }
+}
+.motion-box--browse .motion-strip-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.motion-box--browse .motion-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  align-content: start;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.motion-box--browse .motion-tile { width: auto; }
+.motion-box--browse .motion-strip-empty { grid-column: 1 / -1; }
 
 /* Holds the arrows against the strip's edges without joining the scroll. */
 .motion-strip-wrap {

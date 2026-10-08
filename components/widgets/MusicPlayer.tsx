@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Icon from "../ui/Icons";
 import type { ScannedPlaylist, Track } from "@/lib/types";
 import { usePanelSwipe } from "@/lib/functions/usePanelSwipe";
@@ -19,6 +19,7 @@ import {
 import { useCoverTone } from "@/lib/functions/useCoverTone";
 import { useLocalized } from "@/lib/i18n";
 import { musicPlayerUi as ui } from "@/lib/ui-strings";
+import { folder, matcher } from "@/lib/search";
 
 interface MusicPlayerProps {
   open: boolean;
@@ -65,6 +66,9 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   const [listOpen, setListOpen] = useState(false);
   const [sliding, setSliding] = useState(false);
   const [albumMenuOpen, setAlbumMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
   const [queueMode, setQueueMode] = useState<QueueMode>(null);
   const [now, setNow] = useState<PlayRef | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -386,6 +390,29 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
   const cycleRepeat = () =>
     setRepeat((r) => (r === "off" ? "all" : r === "all" ? "one" : "off"));
 
+  const textOf = useMemo(() => folder(), [playlists]);
+  const match = useMemo(() => matcher(query), [query]);
+  const listed = queueItems
+    .map((track, at) => ({ track, at }))
+    .filter(({ track }) => {
+      if (!match) return true;
+      const pl = playlists?.[track.playlistIdx];
+      return match(textOf(track, () => [track.title, track.artist ?? pl?.artist, track.album, pl?.folder, track.file]));
+    });
+
+  const openSearch = () => {
+    setSearchOpen(true);
+    setAlbumMenuOpen(false);
+    searchRef.current?.focus();
+  };
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setQuery("");
+  };
+  useEffect(() => {
+    if (!listOpen) closeSearch();
+  }, [listOpen]);
+
   const selectionLabel = !playlists || playlists.length === 0
     ? t.none
     : queueMode === "all"
@@ -615,6 +642,7 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
           className={`panel-view-slide panel-view-slide--theme${listOpen ? " panel-view-slide--front" : ""}`}
           ref={listViewRef}
         >
+          <div className={`player-list-head${searchOpen ? " player-list-head--search" : ""}`}>
           <div className="player-album-select" ref={albumSelectRef}>
             <button
               type="button"
@@ -622,7 +650,10 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               onClick={() => setAlbumMenuOpen((v) => !v)}
               aria-haspopup="listbox"
               aria-expanded={albumMenuOpen}
+              aria-label={searchOpen ? `${t.playlists}: ${selectionLabel}` : undefined}
+              data-tip={searchOpen ? selectionLabel : undefined}
             >
+              <Icon name="list" size={15} className="player-album-icon" />
               <Marquee className="player-album-trigger-text">{selectionLabel}</Marquee>
               <Icon name="chevronDown" size={12} className="player-album-caret" />
             </button>
@@ -659,14 +690,57 @@ export default function MusicPlayer({ open, onClose, onDismiss, dragProgress, se
               </ul>
             )}
           </div>
+          <div className="player-search">
+            <button
+              type="button"
+              className="player-search-btn"
+              onClick={openSearch}
+              aria-label={t.search}
+              data-tip={searchOpen ? undefined : t.search}
+              tabIndex={searchOpen ? -1 : 0}
+            >
+              <Icon name="search" size={15} />
+            </button>
+            <input
+              ref={searchRef}
+              type="text"
+              inputMode="search"
+              enterKeyHint="search"
+              autoComplete="off"
+              spellCheck={false}
+              className="player-search-input"
+              value={query}
+              placeholder={t.searchTracks}
+              aria-label={t.search}
+              tabIndex={searchOpen ? 0 : -1}
+              onChange={(e) => setQuery(e.target.value)}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.currentTarget.blur();
+                if (e.key === "Escape") { e.stopPropagation(); closeSearch(); }
+              }}
+            />
+            {searchOpen && (
+              <button
+                type="button"
+                className="player-search-close"
+                onClick={closeSearch}
+                aria-label={t.closeSearch}
+              >
+                <Icon name="close" size={12} />
+              </button>
+            )}
+          </div>
+          </div>
 
-          {queueItems.length === 0 ? (
+          {listed.length === 0 ? (
             <p className="album-empty">
-              {loadError ? t.loadError : t.noTracks}
+              {loadError ? t.loadError : match ? t.noMatches : t.noTracks}
             </p>
           ) : (
             <ul className="player-track-list">
-              {queueItems.map((track, i) => {
+              {listed.map(({ track, at: i }) => {
                 const isCurrent = !!current && track.playlistIdx === current.playlistIdx && track.file === current.file;
                 return (
                 <li key={`${track.playlistIdx}-${track.file}`}>

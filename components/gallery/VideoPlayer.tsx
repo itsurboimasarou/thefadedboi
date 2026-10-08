@@ -8,8 +8,21 @@ const VOLUME_KEY = "video-volume";
 
 const VOL_FULL = 100;
 const VOL_MIN = 40;
-const VOL_MAX = 200;
-const VOL_SHARE = 0.24;
+const VOL_MAX = 120;
+const VOL_SHARE = 0.15;
+
+function onPicture(el: HTMLVideoElement, x: number, y: number): boolean {
+  const { videoWidth: vw, videoHeight: vh } = el;
+  if (!vw || !vh) return true;
+  const box = el.getBoundingClientRect();
+  const scale = Math.min(box.width / vw, box.height / vh);
+  const w = vw * scale;
+  const h = vh * scale;
+  const left = box.left + (box.width - w) / 2;
+  const top = box.top + (box.height - h) / 2;
+  return x >= left && x <= left + w && y >= top && y <= top + h;
+}
+
 const VOL_CHROME = 8 + 24 + 2 + 14 + 8;
 const MUTED_KEY = "video-muted";
 
@@ -399,7 +412,13 @@ export default function VideoPlayer({
           playsInline
           loop={loop}
           preload="metadata"
-          onClick={toggle}
+          onClick={(e) => {
+            if (onPicture(e.currentTarget, e.clientX, e.clientY)) toggle();
+          }}
+          onMouseMove={(e) => {
+            const el = e.currentTarget;
+            el.toggleAttribute("data-on-picture", onPicture(el, e.clientX, e.clientY));
+          }}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onLoadedMetadata={(e) => {

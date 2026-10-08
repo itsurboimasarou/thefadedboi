@@ -617,6 +617,12 @@ export const galleryTimelineUi: Localized<{ timeline: string }> = {
 
 /* ── Widgets ───────────────────────────────────── */
 
+/* components/widgets/Search.tsx */
+export const searchUi: Localized<{ search: string; placeholder: string; clear: string }> = {
+  en: { search: "Search", placeholder: "Search…", clear: "Clear search" },
+  vi: { search: "Tìm kiếm", placeholder: "Tìm kiếm…", clear: "Xoá tìm kiếm" },
+};
+
 /* components/widgets/MusicPlayer.tsx */
 export const musicPlayerUi: Localized<{
   music: string;
@@ -647,6 +653,11 @@ export const musicPlayerUi: Localized<{
   ambientOff: string;
   singleOn: string;
   singleOff: string;
+  search: string;
+  searchTracks: string;
+  closeSearch: string;
+  noMatches: string;
+  playlists: string;
 }> = {
   en: {
     music: "Music",
@@ -677,6 +688,11 @@ export const musicPlayerUi: Localized<{
     ambientOff: "Ambient mode: off",
     singleOn: "Play single track only: on",
     singleOff: "Play single track only: off",
+    search: "Search",
+    searchTracks: "Search tracks…",
+    closeSearch: "Close search",
+    noMatches: "No tracks match that search.",
+    playlists: "Playlists",
   },
   vi: {
     music: "Nhạc",
@@ -707,6 +723,11 @@ export const musicPlayerUi: Localized<{
     ambientOff: "Chế độ ambient: tắt",
     singleOn: "Chỉ phát một bài: bật",
     singleOff: "Chỉ phát một bài: tắt",
+    search: "Tìm kiếm",
+    searchTracks: "Tìm bài hát…",
+    closeSearch: "Đóng tìm kiếm",
+    noMatches: "Không có bài hát nào khớp với tìm kiếm.",
+    playlists: "Danh sách phát",
   },
 };
 
@@ -810,6 +831,8 @@ export const galleryPageUi: Localized<{
   videosToBeAdded: string;
   month: (month: number, year?: number) => string;
   unknownDate: string;
+  noPhotoMatches: string;
+  noVideoMatches: string;
 }> = {
   en: {
     eyebrow: "Gallery",
@@ -825,6 +848,8 @@ export const galleryPageUi: Localized<{
       return year ? `${name} - ${year}` : name;
     },
     unknownDate: "Unknown date",
+    noPhotoMatches: "No photos match that search.",
+    noVideoMatches: "No videos match that search.",
   },
   vi: {
     eyebrow: "Thư viện",
@@ -834,6 +859,8 @@ export const galleryPageUi: Localized<{
     videosToBeAdded: "Video sẽ được thêm sau.",
     month: (month, year) => (year ? `Tháng ${month} - ${year}` : `Tháng ${month}`),
     unknownDate: "Không rõ ngày",
+    noPhotoMatches: "Không có ảnh nào khớp với tìm kiếm.",
+    noVideoMatches: "Không có video nào khớp với tìm kiếm.",
   },
 };
 

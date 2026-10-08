@@ -214,6 +214,10 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   margin: 0 8px 8px 0;
 }
 
+.btn > .icn:first-child,
+.text-btn > .icn:first-child { margin-left: -1.5px; }
+.btn > svg:first-child { margin-left: -3.1px; }
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -739,11 +743,84 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   width: 22px;
   height: 22px;
 }
-.player-album-select {
+
+.player-list-head {
   position: relative;
   z-index: 2;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 10px;
+}
+.player-album-select {
+  flex: 1 1 0;
+  min-width: 34px;
+  transition: flex-grow 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.player-list-head--search .player-album-select { flex-grow: 0; }
+.player-album-icon { display: none; flex-shrink: 0; }
+.player-list-head--search .player-album-trigger {
+  justify-content: center;
+  width: 34px;
+  padding: 0;
+}
+.player-list-head--search .player-album-icon { display: inline-flex; }
+.player-list-head--search .player-album-trigger-text,
+.player-list-head--search .player-album-caret { display: none; }
+
+.player-search {
+  display: flex;
+  align-items: center;
+  flex: 0 1 0;
+  min-width: 34px;
+  height: 34px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  color: var(--ink-dim);
+  transition: flex-grow 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s, color 0.2s;
+}
+.player-search:hover,
+.player-search:focus-within {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.player-list-head--search .player-search { flex-grow: 1; }
+.player-search-btn,
+.player-search-close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.player-search-btn { width: 32px; height: 32px; border-radius: 50%; }
+.player-list-head--search .player-search-btn { cursor: text; }
+.player-search-close { width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; }
+.player-search-close:hover { color: var(--accent); }
+.player-search-input {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.player-search-input::placeholder { color: var(--ink-dim); font-weight: 500; }
+.player-list-head--search .player-search-input { opacity: 1; padding-right: 6px; }
+@media (pointer: coarse) {
+  .player-search-input { font-size: 16px; }
+  .player-search-input::placeholder { font-size: 0.9rem; }
 }
 .player-album-trigger {
   display: flex;
@@ -1098,11 +1175,6 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
 .player-volume-track:active .player-volume-value {
   opacity: 1;
 }
-.player-header-volume .panel-icon-btn .icn {
-  position: relative;
-  top: -1px;
-}
-
 .player-header-volume .panel-icon-btn .icn svg {
   width: 18px;
   height: 18px;
@@ -1157,6 +1229,9 @@ html.glass-fx--all .mode-switch:not(.mode-switch--hidden) {
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
+.panel-back-btn:not(.panel-changelog-btn) > .icn:first-child { margin-left: -2.7px; }
+.player-album-caret { margin-right: -2.5px; }
+.set-select-btn > .icn:last-child { margin-right: -1.6px; }
 .panel-back-btn:hover,
 .panel-back-btn:focus-visible {
   color: var(--ink);
@@ -1491,6 +1566,55 @@ html.accent-bg:not([data-accent-bg-style="linear"]) .grad-preview {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* ── Search pill ──────────────────────────────────────── */
+.search-pill {
+  display: flex; align-items: center;
+  flex-shrink: 0; align-self: center;
+  height: 34px; box-sizing: border-box;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  transition: background 0.2s, border-color 0.2s;
+}
+.search-pill:focus-within { border-color: var(--accent); }
+.search-pill-btn,
+.search-pill-clear {
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  padding: 0; border: none; background: none;
+  color: inherit; cursor: pointer;
+}
+.search-pill-btn { width: 32px; height: 32px; border-radius: 50%; }
+.search-pill--open .search-pill-btn { cursor: text; }
+.search-pill-clear {
+  width: 20px; height: 20px; margin-right: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.search-pill-input {
+  width: 0; min-width: 0;
+  padding: 0; border: none; outline: none; background: none;
+  color: var(--ink);
+  font-family: var(--font-lang), monospace;
+  font-size: 0.88rem; font-weight: 500;
+  opacity: 0;
+  transition: width 0.26s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+}
+.search-pill-input::placeholder { color: var(--ink-dim); opacity: 0.8; }
+.search-pill--open .search-pill-input {
+  width: clamp(96px, 15vw, 190px);
+  padding-right: 10px;
+  opacity: 1;
+}
+/* iOS zooms the page into any field under 16px; that goes by the field's
+   own size, so the placeholder is free to stay small. */
+@media (pointer: coarse) {
+  .search-pill-input { font-size: 16px; }
+  .search-pill-input::placeholder { font-size: 0.9rem; }
+}
+html.lite-mode .search-pill-input { transition: none; }
 
 /* ── Hover tip ────────────────────────────────────────── */
 [data-tip] {

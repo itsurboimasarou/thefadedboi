@@ -12,6 +12,7 @@ import type { GalleryImage, ScannedGalleryAlbum, ScannedVideoAlbum } from "@/lib
 import { useLocalized, type Localized } from "@/lib/i18n";
 import { galleryPageUi as ui, listBySelectUi } from "@/lib/ui-strings";
 import { galleryQuotes } from "@/lib/configs/gallery.config";
+import { fold, folder, matcher } from "@/lib/search";
 
 const NO_TEXT: Localized<string> = { en: "", vi: "" };
 
@@ -109,14 +110,45 @@ export default function GalleryIndex({
     [source]
   );
 
-  const visible = useMemo(
+  const inYear = useMemo(
     () => (year ? source.filter((a) => a.year === year) : source),
     [source, year]
   );
 
+  const [query, setQuery] = useState("");
+  const asked = useDeferredValue(query);
+  const match = useMemo(() => matcher(asked), [asked]);
+  const textOf = useMemo(() => folder(), [t]);
+
+  const visible = useMemo(() => {
+    if (!match) return inYear;
+    const monthWords = (month?: string) => {
+      if (!month) return undefined;
+      const [y, m] = month.split("-").map(Number);
+      return t.month(m, y);
+    };
+    return inYear.flatMap((a): (ScannedGalleryAlbum | ScannedVideoAlbum)[] => {
+      if ("videos" in a) {
+        const videos = a.videos.filter((v) => match(textOf(v, () => [v.name, v.brief, a.name, a.year])));
+        return videos.length ? [{ ...a, videos }] : [];
+      }
+      const images = a.images.filter((img) => {
+        const m = meta(img);
+        if (!m) return match(fold(`${img} ${a.name}`));
+        return match(
+          textOf(m, () => [
+            m.name, m.device, m.album && albumName(m.album), a.name, a.year, m.month, monthWords(m.month),
+          ])
+        );
+      });
+      return images.length ? [{ ...a, images }] : [];
+    });
+  }, [inYear, match, textOf, t]);
+
   useEffect(() => {
     setActive("all");
     setYear(undefined);
+    setQuery("");
   }, [view]);
 
   const countOf = (a: ScannedGalleryAlbum | ScannedVideoAlbum) =>
@@ -287,6 +319,8 @@ export default function GalleryIndex({
           sortBy={sortBy}
           onSortByChange={(v) => setSorts((s) => ({ ...s, [listBy]: v }))}
           sortDisabled={!!activeGroup}
+          query={query}
+          onQueryChange={setQuery}
         />
       )}
 
@@ -299,9 +333,12 @@ export default function GalleryIndex({
           years={years}
           year={year}
           onYearChange={setYear}
+          query={query}
+          onQueryChange={setQuery}
+          empty={match ? t.noVideoMatches : undefined}
         />
       ) : shownImages.length === 0 ? (
-        <p className="album-empty">{t.photosToBeAdded}</p>
+        <p className="album-empty">{match ? t.noPhotoMatches : t.photosToBeAdded}</p>
       ) : (
         <AlbumGrid images={shownImages} title={gridTitle} sections={sections} />
       )}

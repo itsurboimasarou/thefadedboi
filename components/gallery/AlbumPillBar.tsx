@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import YearSelect from "./YearSelect";
-import ListBySelect, { type ListBy } from "./ListBySelect";
-import SortBySelect, { type SortBy } from "./SortBySelect";
+import type { ListBy } from "./ListBySelect";
+import type { SortBy } from "./SortBySelect";
 import GalleryFilterMenu from "./GalleryFilterMenu";
+import Search from "../widgets/Search";
 import { useDock } from "../controls/HuBarDock";
 import { useBarMode } from "../controls/BarMode";
 import { useCompact } from "@/lib/functions/useHuBarFit";
@@ -24,6 +24,8 @@ interface AlbumPillBarProps {
   sortBy: SortBy;
   onSortByChange: (v: SortBy) => void;
   sortDisabled: boolean;
+  query: string;
+  onQueryChange: (v: string) => void;
 }
 
 export default function AlbumPillBar({
@@ -38,6 +40,8 @@ export default function AlbumPillBar({
   sortBy,
   onSortByChange,
   sortDisabled,
+  query,
+  onQueryChange,
 }: AlbumPillBarProps) {
   const scrolledAway = useHideOnScrollDown();
   const compact = useCompact();
@@ -76,32 +80,17 @@ export default function AlbumPillBar({
           </button>
         ))}
       </div>
-      {compact ? (
-        <GalleryFilterMenu
-          listBy={listBy}
-          onListByChange={onListByChange}
-          sortBy={sortBy}
-          onSortByChange={onSortByChange}
-          sortDisabled={sortDisabled}
-          years={years}
-          year={year}
-          onYearChange={onYearChange}
-        />
-      ) : (
-        <>
-          <ListBySelect value={listBy} onChange={onListByChange} direction="up" />
-          <SortBySelect value={sortBy} onChange={onSortByChange} direction="up" disabled={sortDisabled} />
-          {years.length > 0 && (
-            <YearSelect
-              years={years}
-              value={year}
-              onChange={onYearChange}
-              allowAll
-              direction="up"
-            />
-          )}
-        </>
-      )}
+      <Search value={query} onChange={onQueryChange} />
+      <GalleryFilterMenu
+        listBy={listBy}
+        onListByChange={onListByChange}
+        sortBy={sortBy}
+        onSortByChange={onSortByChange}
+        sortDisabled={sortDisabled}
+        years={years}
+        year={year}
+        onYearChange={onYearChange}
+      />
     </div>
   );
 
