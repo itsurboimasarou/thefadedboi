@@ -5,6 +5,12 @@ import { useLocalized } from "@/lib/i18n";
 import { videoPlayerUi as ui } from "@/lib/ui-strings";
 
 const VOLUME_KEY = "video-volume";
+
+const VOL_FULL = 100;
+const VOL_MIN = 40;
+const VOL_MAX = 200;
+const VOL_SHARE = 0.24;
+const VOL_CHROME = 8 + 24 + 2 + 14 + 8;
 const MUTED_KEY = "video-muted";
 
 let lastVolume: number | null = null;
@@ -137,6 +143,7 @@ export default function VideoPlayer({
   const sliding = useRef(false);
   const coarse = useRef(false);
   const volWrap = useRef<HTMLDivElement>(null);
+  const [volTravel, setVolTravel] = useState(VOL_FULL);
 
   useEffect(() => {
     setAt(0);
@@ -223,6 +230,23 @@ export default function VideoPlayer({
   }, [volume, muted, video?.src]);
 
   useEffect(() => {
+    const el = root.current;
+    const wrap = volWrap.current;
+    if (!el || !wrap) return;
+    const fit = () => {
+      const box = el.getBoundingClientRect();
+      const head = parseFloat(getComputedStyle(el).getPropertyValue("--vp-head")) || 0;
+      const room = wrap.getBoundingClientRect().top - box.top - head - VOL_CHROME;
+      const wanted = Math.max(VOL_FULL, box.height * VOL_SHARE);
+      setVolTravel(Math.round(Math.min(VOL_MAX, Math.max(VOL_MIN, Math.min(room, wanted)))));
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [video?.src, fullscreen]);
+
+  useEffect(() => {
     if (!volOpen) return;
     const onDown = (e: PointerEvent) => {
       if (!volWrap.current?.contains(e.target as Node)) setVolOpen(false);
@@ -291,6 +315,7 @@ export default function VideoPlayer({
 
   const off = muted || volume === 0;
   const level = Math.round((muted ? 0 : volume) * 100);
+  const volStep = volTravel >= 100 ? 1 : volTravel >= 50 ? 2 : 5;
   const pct = (v: number) => (length > 0 ? Math.min(100, (v / length) * 100) : 0);
 
   if (!video) {
@@ -469,7 +494,10 @@ export default function VideoPlayer({
               <Icon name={off ? "volumeMute" : "volumeHigh"} size={18} />
             </button>
             <div className="vplayer-volume-panel">
-              <div className="vplayer-volume-track" style={{ "--vol": level } as CSSProperties}>
+              <div
+                className="vplayer-volume-track"
+                style={{ "--vol": level, "--vol-travel": `${volTravel}px` } as CSSProperties}
+              >
                 <span className="vplayer-volume-value" aria-hidden="true">{level}%</span>
                 <input
                   type="range"
@@ -477,6 +505,7 @@ export default function VideoPlayer({
                   style={{ "--fill": `${level}%` } as CSSProperties}
                   min={0}
                   max={100}
+                  step={volStep}
                   value={level}
                   aria-label={t.volume}
                   aria-valuetext={`${level}%`}

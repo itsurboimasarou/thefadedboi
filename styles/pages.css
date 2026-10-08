@@ -540,7 +540,10 @@ body:has(.gallery-page) {
   border: 1px solid var(--glass-border);
   background: var(--bg);
   box-shadow: var(--shadow);
-  animation: page-in 0.18s ease both;
+  animation: menu-in 0.18s ease both;
+}
+@keyframes menu-in {
+  from { opacity: 0; translate: var(--menu-from, 0 14px); }
 }
 .year-menu-head {
   display: flex;
@@ -568,6 +571,7 @@ body:has(.gallery-page) {
 .gallery-filter-year .icn { margin-left: -0.375em; translate: 0 0.15em; }
 .gallery-filter-year[aria-expanded="true"] { background: var(--glass-strong); }
 .gallery-filter-submenu {
+  --menu-from: 14px 0;
   right: calc(100% + 6px);
   bottom: 0;
   min-width: 96px;
@@ -604,8 +608,8 @@ body:has(.gallery-page) {
   border: 2px solid var(--bg);
 }
 .year-option { white-space: nowrap; }
-.year-menu--down { top: calc(100% + 8px); bottom: auto; }
-.year-menu--up { bottom: calc(100% + 8px); top: auto; }
+.year-menu--down { top: calc(100% + 8px); bottom: auto; --menu-from: 0 -14px; }
+.year-menu--up { bottom: calc(100% + 8px); top: auto; --menu-from: 0 14px; }
 .year-option {
   display: block; width: 100%;
   padding: 8px 14px; border: none; border-radius: 10px;
@@ -1062,7 +1066,7 @@ body:has(.topbar) .mode-switch {
   writing-mode: vertical-lr;
   direction: rtl;
   width: 4px;
-  height: calc(100px + var(--range-knob));
+  height: calc(var(--vol-travel, 100px) + var(--range-knob));
   cursor: pointer;
   --range-dir: to top;
   --range-rail: rgba(255, 255, 255, 0.26);
