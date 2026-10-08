@@ -314,7 +314,18 @@ export default function VideoPlayer({
       onKeyDown={fullscreen ? wake : undefined}
     >
       <div className="vplayer-head">
-        <span className="vplayer-name" title={video.name}>{video.name}</span>
+        <span
+          className={`vplayer-name${video.brief ? " vplayer-name--brief" : ""}`}
+          title={video.brief ? `${video.name} | ${video.brief}` : video.name}
+        >
+          <span className="vplayer-title">{video.name}</span>
+          {video.brief && (
+            <>
+              <span className="vplayer-name-sep" aria-hidden="true">|</span>
+              <span className="vplayer-brief">{video.brief}</span>
+            </>
+          )}
+        </span>
         <div className="vplayer-info" ref={infoWrap}>
           <button
             type="button"

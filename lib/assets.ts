@@ -198,7 +198,9 @@ export async function listVideos(folder: string): Promise<GalleryVideo[]> {
   const rel = folder.replace(new RegExp(`^${VIDEO_ROOT}/`), "");
   return (await albumVideos(folder)).map((v) => {
     const name: string = v.file;
+    const brief = typeof v.brief === "string" ? v.brief.trim() : "";
     return {
+      ...(brief ? { brief } : {}),
       src: videoUrl(`${rel}/${name}`),
       name: name.replace(/.[^.]+$/, ""),
       info: videoInfo(v),

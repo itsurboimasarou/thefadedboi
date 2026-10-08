@@ -74,6 +74,7 @@ export interface VideoInfo {
 export interface GalleryVideo {
   src: string;
   name: string;
+  brief?: string;
   info?: VideoInfo;
 }
 
