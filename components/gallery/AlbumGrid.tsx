@@ -84,8 +84,13 @@ function zoomSrc(item: GridItem): string {
 
 export interface GridSection { label: string; count: number; mark?: string }
 
-interface AlbumGridProps { images: GalleryImage[]; title: string; sections?: GridSection[] }
-export default function AlbumGrid({ images, title, sections }: AlbumGridProps) {
+interface AlbumGridProps {
+  images: GalleryImage[];
+  title: string;
+  sections?: GridSection[];
+  download?: boolean;
+}
+export default function AlbumGrid({ images, title, sections, download = true }: AlbumGridProps) {
   const t = useLocalized(ui);
   const router = useRouter();
   const [index, setIndex] = useState<number | null>(null);
@@ -351,19 +356,21 @@ export default function AlbumGrid({ images, title, sections }: AlbumGridProps) {
         <button type="button" className="lightbox-close" onClick={close} aria-label={t.close} data-tip={t.close}>
           <Icon name="close" size={18} />
         </button>
-        <button
-          type="button"
-          className="lightbox-download"
-          onClick={async (e) => {
-            e.stopPropagation();
-            const ok = await downloadImage(current.full);
-            setDownloadBlocked(!ok);
-          }}
-          aria-label={t.download}
-          data-tip={t.download}
-        >
-          <Icon name="download" size={18} />
-        </button>
+        {download && (
+          <button
+            type="button"
+            className="lightbox-download"
+            onClick={async (e) => {
+              e.stopPropagation();
+              const ok = await downloadImage(current.full);
+              setDownloadBlocked(!ok);
+            }}
+            aria-label={t.download}
+            data-tip={t.download}
+          >
+            <Icon name="download" size={18} />
+          </button>
+        )}
         {downloadBlocked && (
           <div className="lightbox-toast" onClick={(e) => e.stopPropagation()}>
             <span>{t.downloadBlocked}</span>

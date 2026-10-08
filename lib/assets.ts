@@ -234,8 +234,8 @@ export async function getManifest(): Promise<Manifest> {
   if (!raw) return { version: 5, photos: [], videos: [] };
   return {
     version: 5,
-    photos: validateAlbums(raw.photos),
-    videos: validateAlbums(raw.videos),
+    photos: validateAlbums(raw.photos).filter((a) => a.folder.startsWith("photos/")),
+    videos: validateAlbums(raw.videos).filter((a) => a.folder.startsWith(`${VIDEO_ROOT}/`)),
   };
 }
 

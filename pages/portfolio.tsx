@@ -2,7 +2,7 @@ import type { InferGetStaticPropsType } from "next";
 import { portfolio as portfolioConfig } from "@/lib/configs/portfolio.config";
 import { useLocalized } from "@/lib/i18n";
 import { portfolioPageUi as ui } from "@/lib/ui-strings";
-import AlbumGrid from "@/components/gallery/AlbumGrid";
+import AchievementGrid from "@/components/content/AchievementGrid";
 import Icon from "@/components/ui/Icons";
 import { listImages } from "@/lib/assets";
 import { getChangelog } from "@/lib/changelog";
@@ -32,7 +32,7 @@ export default function Portfolio({
       <section className="glass">
         <h2 className="h-with-icon"><Icon name="trophy" />{t.achievements}</h2>
         {achievements.length > 0 ? (
-          <AlbumGrid images={achievements} title={t.achievements} />
+          <AchievementGrid images={achievements} title={t.achievements} />
         ) : (
           <p className="album-empty">{t.photosToBeAdded}</p>
         )}

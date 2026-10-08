@@ -214,6 +214,46 @@ body:has(.gallery-page) {
   min-width: 150px;
 }
 
+/* ── Portfolio: achievements ──────────────────────────── */
+.cert-grid {
+  container-type: inline-size;
+  --cert-gap: 12px;
+  --cert-row: calc((100cqw - 2 * var(--cert-gap)) / 3 * 5 / 7);
+}
+
+.cert-grid-scroll {
+  max-height: calc(2 * var(--cert-row) + var(--cert-gap));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 14px;
+}
+
+/* More below: the bottom edge fades out instead of ending on a hard cut. */
+.cert-grid-scroll[data-more] {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 34px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 34px), transparent);
+}
+
+.cert-grid .album-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: var(--cert-row);
+  gap: var(--cert-gap);
+  max-width: none;
+}
+
+.cert-grid .album-thumb {
+  position: relative;
+  aspect-ratio: auto;
+}
+
+.cert-grid .album-thumb-filler { display: none; }
+
+/* The name is the point here, so it stays up rather than waiting for a hover. */
+.cert-grid .album-thumb-caption { opacity: 1; padding: 22px 10px 8px; }
+.cert-grid .album-thumb-device { display: none; }
+.cert-grid .album-thumb-name { font-size: clamp(0.68rem, 2.6cqw, 0.9rem); }
+
 /* A grid per month / album, each under a label that runs out into a rule. */
 .album-sections {
   position: relative;
