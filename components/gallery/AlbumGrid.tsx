@@ -82,7 +82,12 @@ function zoomSrc(item: GridItem): string {
   return item.heavy && isThumbApi(item.thumb) ? thumbSrc(item.thumb, ZOOM_WIDTH) : item.full;
 }
 
-export interface GridSection { label: string; count: number; mark?: string }
+export interface GridSection {
+  label: string;
+  count: number;
+  mark?: string;
+  sub?: { label: string; count: number }[];
+}
 
 interface AlbumGridProps {
   images: GalleryImage[];
@@ -129,7 +134,13 @@ export default function AlbumGrid({ images, title, sections, download = true }: 
     return (sections ?? []).map((s) => {
       const from = start;
       start += s.count;
-      return { label: s.label, mark: s.mark, from, to: start };
+      let at = from;
+      const sub = s.sub?.map((part) => {
+        const piece = { label: part.label, from: at, to: at + part.count };
+        at += part.count;
+        return piece;
+      });
+      return { label: s.label, mark: s.mark, from, to: start, sub };
     });
   }, [sections]);
   const marks = useMemo(
@@ -481,7 +492,14 @@ export default function AlbumGrid({ images, title, sections, download = true }: 
           {runs.map((run) => (
             <section key={`${run.from}-${run.label}`} className="album-section" data-mark={run.from}>
               <h2 className="album-divider">{run.label}</h2>
-              {grid(run.from, run.to)}
+              {run.sub
+                ? run.sub.map((part) => (
+                    <div key={`${part.from}-${part.label}`} className="album-subsection">
+                      <h3 className="album-subdivider">{part.label}</h3>
+                      {grid(part.from, part.to)}
+                    </div>
+                  ))
+                : grid(run.from, run.to)}
             </section>
           ))}
         </div>

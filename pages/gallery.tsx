@@ -231,21 +231,44 @@ export default function GalleryIndex({
     images: GalleryImage[];
     sections?: GridSection[];
   } => {
+    const monthLabel = (key: string) => {
+      if (key === UNKNOWN) return t.unknownDate;
+      const [y, m] = key.split("-").map(Number);
+      return t.month(m, y === year ? undefined : y);
+    };
+
+    const byMonth = (list: GalleryImage[]) => {
+      const months = new Map<string, GalleryImage[]>();
+      for (const img of list) {
+        const key = meta(img)?.month ?? UNKNOWN;
+        const slot = months.get(key);
+        if (slot) slot.push(img);
+        else months.set(key, [img]);
+      }
+      return [...months]
+        .sort(([a], [b]) => Number(a === UNKNOWN) - Number(b === UNKNOWN) || b.localeCompare(a))
+        .map(([key, images]) => ({ key, images }));
+    };
+
+    const parts = (list: { label: string; images: GalleryImage[] }[]) =>
+      list.length > 1 ? { sub: list.map((x) => ({ label: x.label, count: x.images.length })) } : {};
+
     if (!activeGroup && sortBy === "alphabet") {
       const named = groups
         .filter((g) => g.images.length > 0)
-        .map((g) => ({ ...g, label: groupLabel(g) }))
+        .map((g) => ({ ...g, label: groupLabel(g), months: byMonth(g.images) }))
         .sort(
           (a, b) =>
             Number(a.key === UNKNOWN) - Number(b.key === UNKNOWN) ||
             a.label.localeCompare(b.label, undefined, { sensitivity: "base", numeric: true })
         );
       return {
-        images: named.flatMap((g) => g.images),
+        images: named.flatMap((g) => g.months.flatMap((m) => m.images)),
         sections: named.map((g) => ({
           label: g.label,
           count: g.images.length,
           ...(g.key === UNKNOWN ? {} : { mark: initial(g.label) }),
+          ...parts(g.months.map((m) => ({ label: monthLabel(m.key), images: m.images }))),
         })),
       };
     }
@@ -289,27 +312,28 @@ export default function GalleryIndex({
       };
     }
 
-    const months = new Map<string, GalleryImage[]>();
-    for (const img of images) {
-      const key = meta(img)?.month ?? UNKNOWN;
-      const list = months.get(key);
-      if (list) list.push(img);
-      else months.set(key, [img]);
-    }
-    const keys = [...months.keys()].sort(
-      (a, b) => Number(a === UNKNOWN) - Number(b === UNKNOWN) || b.localeCompare(a)
-    );
-    const monthLabel = (key: string) => {
-      if (key === UNKNOWN) return t.unknownDate;
-      const [y, m] = key.split("-").map(Number);
-      return t.month(m, y === year ? undefined : y);
-    };
+    const owner = new Map<GalleryImage, number>();
+    if (!activeGroup) groups.forEach((g, at) => g.images.forEach((img) => owner.set(img, at)));
+    const months = byMonth(images).map((month) => {
+      const within = new Map<number, GalleryImage[]>();
+      for (const img of month.images) {
+        const at = owner.get(img) ?? -1;
+        const slot = within.get(at);
+        if (slot) slot.push(img);
+        else within.set(at, [img]);
+      }
+      const split = [...within]
+        .sort(([a], [b]) => a - b)
+        .map(([at, list]) => ({ label: at < 0 ? "" : groupLabel(groups[at]), images: list }));
+      return { ...month, split };
+    });
     return {
-      images: keys.flatMap((k) => months.get(k) ?? []),
-      sections: keys.map((k) => ({
-        label: monthLabel(k),
-        count: months.get(k)?.length ?? 0,
-        ...(year === undefined && k !== UNKNOWN ? { mark: k.slice(0, 4) } : {}),
+      images: months.flatMap((m) => m.split.flatMap((x) => x.images)),
+      sections: months.map((m) => ({
+        label: monthLabel(m.key),
+        count: m.images.length,
+        ...(year === undefined && m.key !== UNKNOWN ? { mark: m.key.slice(0, 4) } : {}),
+        ...parts(m.split),
       })),
     };
   }, [activeGroup, groups, listBy, sortBy, visible, year, t, tList]);

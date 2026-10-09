@@ -179,9 +179,12 @@
 }
 
 /* ── Gallery ────────────────────────────────────────── */
-
 body:has(.gallery-page) {
   --gallery-w: 1400px;
+  --motion-w: min(88%, 1180px, max(640px, calc((100vh - 250px) * 16 / 9)));
+}
+
+html.compact body:has(.gallery-page) {
   --motion-w: var(--gallery-w);
 }
 
@@ -460,6 +463,33 @@ body:has(.gallery-page) {
   flex: 1;
   height: 1px;
   background: color-mix(in srgb, var(--ink) 22%, transparent);
+}
+
+/* The second level, inside a section: quieter, and without the full rule,
+   so it reads as a label within the section rather than a section of its own. */
+.album-subsection + .album-subsection {
+  margin-top: 18px;
+}
+
+.album-subdivider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  font-family: var(--font-lang), var(--font-display, system-ui, sans-serif);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.album-subdivider::before {
+  content: "";
+  width: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
 }
 
 .album-thumb img {
@@ -1437,6 +1467,51 @@ html.lite-mode .vplayer-list { animation: none; }
   scrollbar-width: none;
 }
 .motion-albums-scroll::-webkit-scrollbar { display: none; }
+
+/* ── Motion: phones and small tablets ─────────────────── */
+@media (max-width: 900px), (max-height: 520px) {
+  .gallery-page--motion .vplayer { --vp-head: 40px; }
+  .gallery-page--motion .vplayer-head { gap: 5px; padding: 0 6px 0 12px; }
+  .gallery-page--motion .vplayer-name { font-size: 0.8rem; }
+  .gallery-page--motion .vplayer-head .panel-icon-btn { width: 26px; height: 26px; }
+  .gallery-page--motion .vplayer-head .panel-icon-btn .icn { scale: 0.88; }
+
+  .gallery-page--motion .vplayer-bar { gap: 8px; padding: 30px 10px 8px; }
+  .gallery-page--motion .vplayer-btn { width: 30px; height: 30px; }
+  .gallery-page--motion .vplayer-btn .icn { scale: 0.88; }
+  .gallery-page--motion .vplayer-clock { min-width: 34px; font-size: 0.68rem; }
+  .gallery-page--motion .vplayer-nav { width: 36px; height: 36px; }
+  .gallery-page--motion .vplayer-nav .icn { scale: 0.85; }
+
+  .gallery-page--motion .motion-strip { gap: 10px; padding: 10px; }
+  .gallery-page--motion .motion-tile { width: 150px; border-radius: 10px; }
+  .gallery-page--motion .motion-tile-name { padding: 5px 8px; font-size: 0.66rem; }
+  .gallery-page--motion .motion-strip-empty { padding: 18px 4px; font-size: 0.8rem; }
+  .gallery-page--motion .motion-arrow { width: 30px; height: 30px; }
+  .gallery-page--motion .motion-box--browse .motion-strip {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .gallery-page--motion .motion-albums { gap: 8px; padding: 8px 10px; }
+  .gallery-page--motion .gallery-pill { height: 30px; padding: 0 12px; font-size: 0.8rem; }
+  .gallery-page--motion .gallery-pill-count { font-size: 0.68rem; }
+  .gallery-page--motion .search-pill { height: 30px; }
+  .gallery-page--motion .search-pill-btn { width: 28px; height: 28px; }
+  .gallery-page--motion .search-pill-btn .icn { scale: 0.9; }
+  .gallery-page--motion .search-pill--open .search-pill-input { width: clamp(84px, 22vw, 150px); }
+  .gallery-page--motion .gallery-filter-btn { width: 30px; height: 30px; }
+  .gallery-page--motion .gallery-filter-btn .icn { scale: 0.9; }
+  .gallery-page--motion .year-select-btn { height: 30px; gap: 6px; padding: 0 11px; font-size: 0.78rem; }
+
+  .gallery-page--motion .vplayer--fs .vplayer-head { padding: 12px 14px; }
+  .gallery-page--motion .vplayer--fs .vplayer-name { padding: 7px 13px; }
+  .gallery-page--motion .vplayer--fs .vplayer-name--brief { padding: 7px 13px 8px; }
+  .gallery-page--motion .vplayer--fs .vplayer-name--brief .vplayer-brief { font-size: 0.72rem; }
+  .gallery-page--motion .vplayer--fs .vplayer-head .panel-icon-btn { width: 32px; height: 32px; }
+  .gallery-page--motion .vplayer--fs .vplayer-bar { padding: 40px 14px 12px; }
+  .gallery-page--motion .vplayer-list { right: 14px; bottom: 60px; left: 14px; gap: 10px; padding: 10px; }
+  .gallery-page--motion .vplayer-list .motion-tile { width: clamp(118px, 18vw, 160px); }
+}
 
 /* ── Motion grid ──────────────────────────────────────── */
 .album-grid--motion {
