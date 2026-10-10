@@ -4,6 +4,13 @@ All notable changes to this site are documented here.
 
 ## 甘雨 (latin: Ganyu, codename: chuntian)
 
+### [6.2 - 10/10/2026]
+- Introducing Search in Gallery & Music - help you find photos quicker
+- Implement play single track mode & playing track auto-save in MusicPlayer
+- Fixed a visual bug which caused vertical volume slider unable to set at exact 50% & dynamically rescale it
+- Gallery: specific Album sets in each genre, Sort by filter & timeline scrollbar
+- Rescale VideoPlayer for large DPI display
+
 ### [6.1 - 10/08/2026]
 - Introducing Ambient mode for Music Player!
 - Visual & bugs fixes

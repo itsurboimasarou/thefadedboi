@@ -7,7 +7,7 @@ export interface SiteContent {
 export const siteName = "masarou.";
 export const siteHandle = "thefadedboi";
 export const siteDescription = "All about masarou!";
-export const siteFooter = "Copyright © 2026 by masarou/thefadedboi - v6.1-甘雨";
+export const siteFooter = "Copyright © 2026 by masarou/thefadedboi - v6.2-甘雨";
 export const siteGithub = "https://github.com/itsurboimasarou/thefadedboi/";
 export const siteUrl = "https://thefadedboi.me";
 export const siteBanner = {
